@@ -1,0 +1,88 @@
+<a routerLink="/marketplace" class="back-link">← الفرص</a>
+@if (failed()) {
+  <div class="card card--muted">تعذر التحميل.</div>
+} @else if (opp()) {
+  <section class="page-head">
+    <h1>{{ opp()!.title }}</h1>
+    <p class="page-head__sub">
+      {{ oppStatus(opp()!.status) }} · {{ oppType(opp()!.opportunityType) }} · فتح {{ opp()!.openDate | date: 'mediumDate' }}
+    </p>
+  </section>
+  <div class="card prose">
+    <p>{{ opp()!.description || '—' }}</p>
+    <p class="subtle">
+      وحدة: <app-id-chip [id]="opp()!.organizationUnitId" />
+      @if (opp()!.positionId) {
+        · منصب: <app-id-chip [id]="opp()!.positionId!" />
+      }
+    </p>
+  </div>
+
+  <div class="card apps">
+    <h2 class="h2">طلبات التقديم</h2>
+    @if (!applications().length) {
+      <p class="muted">لا توجد طلبات لهذه الفرصة.</p>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>الموظف</th>
+            <th>الحالة</th>
+            <th>تاريخ التقديم</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (a of applications(); track a.id) {
+            <tr>
+              <td><app-id-chip [id]="a.employeeId" /></td>
+              <td>{{ appStatus(a.applicationStatus) }}</td>
+              <td>{{ a.appliedOnUtc | date: 'short' }}</td>
+              <td class="cell-actions">
+                @if (auth.hasPermission(PermissionCodes.MarketplaceManage)) {
+                  @if (a.applicationStatus === AppStatus.Submitted) {
+                    <button type="button" class="linkish" [disabled]="busyRowId() === a.id" (click)="underReview(a)">
+                      {{ busyRowId() === a.id ? '…' : 'قيد المراجعة' }}
+                    </button>
+                    <button type="button" class="linkish" [disabled]="busyRowId() === a.id" (click)="shortlist(a)">
+                      قائمة مختصرة
+                    </button>
+                    <button type="button" class="linkish danger" [disabled]="busyRowId() === a.id" (click)="reject(a)">
+                      رفض
+                    </button>
+                  }
+                  @if (a.applicationStatus === AppStatus.UnderReview) {
+                    <button type="button" class="linkish" [disabled]="busyRowId() === a.id" (click)="shortlist(a)">
+                      قائمة مختصرة
+                    </button>
+                    <button type="button" class="linkish danger" [disabled]="busyRowId() === a.id" (click)="reject(a)">
+                      رفض
+                    </button>
+                  }
+                  @if (a.applicationStatus === AppStatus.Shortlisted) {
+                    <button type="button" class="linkish" [disabled]="busyRowId() === a.id" (click)="accept(a)">
+                      قبول
+                    </button>
+                    <button type="button" class="linkish danger" [disabled]="busyRowId() === a.id" (click)="reject(a)">
+                      رفض
+                    </button>
+                  }
+                }
+                @if (
+                  auth.hasPermission(PermissionCodes.MarketplaceApply) &&
+                  (a.applicationStatus === AppStatus.Submitted || a.applicationStatus === AppStatus.UnderReview)
+                ) {
+                  <button type="button" class="linkish danger" [disabled]="busyRowId() === a.id" (click)="withdraw(a)">
+                    سحب
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+} @else {
+  <div class="skeleton detail-skel"></div>
+}

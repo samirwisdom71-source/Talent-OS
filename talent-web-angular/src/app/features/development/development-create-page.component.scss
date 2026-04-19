@@ -1,0 +1,57 @@
+@import '../employees/employee-detail-page.component.scss';
+
+.form-card {
+  padding: 1.35rem 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.form-grid .full {
+  grid-column: 1 / -1;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+}
+
+input,
+select,
+textarea {
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 0.65rem;
+  font: inherit;
+}
+
+.inline-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-direction: row;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 500;
+}

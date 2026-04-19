@@ -1,0 +1,28 @@
+<a routerLink="/approvals" class="back-link">← الموافقات</a>
+<section class="page-head">
+  <h1>طلب موافقة جديد</h1>
+</section>
+<div class="card form-card">
+  <div class="form-grid">
+    <label
+      >نوع الطلب
+      <select [(ngModel)]="model.requestType" name="rt">
+        <option [ngValue]="1">تقييم أداء</option>
+        <option [ngValue]="2">تصنيف مواهب</option>
+        <option [ngValue]="3">خطة تعاقب</option>
+        <option [ngValue]="4">خطة تطوير</option>
+        <option [ngValue]="5">فرصة سوق</option>
+        <option [ngValue]="6">طلب سوق</option>
+        <option [ngValue]="99">أخرى</option>
+      </select>
+    </label>
+    <label>معرّف الكيان المرتبط<input [(ngModel)]="model.relatedEntityId" name="re" /></label>
+    <label class="full">العنوان<input [(ngModel)]="model.title" name="tl" /></label>
+    <label class="full">ملخص<textarea rows="2" [(ngModel)]="model.summary" name="sm"></textarea></label>
+    <label class="full">ملاحظات<textarea rows="2" [(ngModel)]="model.notes" name="nt"></textarea></label>
+  </div>
+  <div class="form-actions">
+    <button type="button" class="btn-primary" [disabled]="busy()" (click)="save()">{{ busy() ? '…' : 'حفظ' }}</button>
+    <a routerLink="/approvals" class="btn-ghost">إلغاء</a>
+  </div>
+</div>

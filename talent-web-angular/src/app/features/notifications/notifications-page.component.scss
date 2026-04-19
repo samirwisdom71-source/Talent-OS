@@ -1,0 +1,117 @@
+@import '../analytics/insights-list-page.component.scss';
+
+.nt {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.nt__hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.35rem 1.5rem;
+  border-radius: var(--radius-lg, 22px);
+  background: linear-gradient(118deg, rgba(14, 165, 233, 0.12) 0%, rgba(99, 102, 241, 0.1) 60%, rgba(244, 114, 182, 0.08) 100%);
+  border: 1px solid rgba(14, 165, 233, 0.22);
+  box-shadow: var(--shadow-md);
+}
+
+.nt__title {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.nt__lead {
+  margin: 0;
+  max-width: 38rem;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.nt__tag {
+  align-self: center;
+  font-size: 0.68rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(14, 165, 233, 0.12);
+  color: #0369a1;
+  font-weight: 600;
+  font-family: ui-monospace, monospace;
+}
+
+.nt-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem !important;
+}
+
+.nt-toolbar__link {
+  font-weight: 600;
+}
+
+.nt-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.nt-fail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nt-fail p {
+  margin: 0;
+}
+
+.note {
+  padding: 1rem 1.2rem;
+}
+
+.note--unread {
+  border-inline-start: 3px solid var(--color-accent);
+}
+
+.note__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.note h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.note__body {
+  margin: 0.5rem 0 0;
+  line-height: 1.55;
+  font-size: 0.92rem;
+  color: var(--color-fg, inherit);
+}
+
+.note__meta {
+  margin-top: 0.65rem;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.btn-ghost {
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+}

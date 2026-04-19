@@ -1,0 +1,41 @@
+<a routerLink="/marketplace" class="back-link">← الفرص</a>
+<section class="page-head">
+  <h1>فرصة جديدة</h1>
+</section>
+<div class="card form-card">
+  <div class="form-grid">
+    <label>العنوان<input [(ngModel)]="model.title" name="ti" /></label>
+    <label
+      >النوع
+      <select [(ngModel)]="model.opportunityType" name="ot">
+        <option [ngValue]="1">مشروع</option>
+        <option [ngValue]="2">فريق مهام</option>
+        <option [ngValue]="3">مهمة موسّعة</option>
+        <option [ngValue]="4">تدوير وظيفي</option>
+        <option [ngValue]="5">دور داخلي</option>
+        <option [ngValue]="6">تكليف مؤقت</option>
+        <option [ngValue]="7">لجنة</option>
+        <option [ngValue]="8">أخرى</option>
+      </select>
+    </label>
+    <label>معرّف الوحدة التنظيمية<input [(ngModel)]="model.organizationUnitId" name="ou" /></label>
+    <label
+      >معرّف المنصب (اختياري)
+      <input [ngModel]="model.positionId ?? ''" (ngModelChange)="model.positionId = $event || null" name="po" />
+    </label>
+    <label>تاريخ الفتح<input type="date" [(ngModel)]="model.openDate" name="od" /></label>
+    <label
+      >تاريخ الإغلاق
+      <input [ngModel]="model.closeDate ?? ''" (ngModelChange)="model.closeDate = $event || null" type="date" name="cd" />
+    </label>
+    <label class="inline-check">
+      <input type="checkbox" [(ngModel)]="model.isConfidential" name="cf" />
+      سرّي
+    </label>
+    <label class="full">الوصف<textarea rows="3" [(ngModel)]="model.description" name="ds"></textarea></label>
+  </div>
+  <div class="form-actions">
+    <button type="button" class="btn-primary" [disabled]="busy()" (click)="save()">{{ busy() ? '…' : 'حفظ' }}</button>
+    <a routerLink="/marketplace" class="btn-ghost">إلغاء</a>
+  </div>
+</div>

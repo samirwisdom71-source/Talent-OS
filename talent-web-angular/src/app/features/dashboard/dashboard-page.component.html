@@ -1,0 +1,165 @@
+<div class="dash">
+  <header class="dash__hero">
+    <div>
+      <h1 class="dash__title">لوحة التحكم التنفيذية</h1>
+      <p class="dash__lead">نظرة موحّدة على المواهب والأداء والتعاقب — متصلة مباشرة بواجهات التحليلات.</p>
+    </div>
+    <div class="dash__hero-actions">
+      @if (auth.hasPermission(PermissionCodes.IntelligenceView)) {
+        <a class="btn-dash btn-dash--ghost" routerLink="/analytics/intelligence">الذكاء المؤسسي</a>
+      }
+      <a class="btn-dash" routerLink="/analytics/executive">تحليلات أعمق</a>
+    </div>
+  </header>
+
+  @if (loadError()) {
+    <app-empty-state
+      icon="⚠️"
+      title="تعذر تحميل الملخص"
+      message="تحقق من الصلاحيات أو توفر واجهة التحليلات التنفيذية. يمكنك إعادة المحاولة."
+      retryLabel="إعادة المحاولة"
+      (retryClick)="reload()"
+    />
+  } @else if (summary()) {
+    <section class="dash-section dash-section--enter">
+      <h2 class="dash-section__title">مؤشرات رئيسية</h2>
+      <div class="kpi-deck">
+        <article class="kpi-card kpi-card--indigo">
+          <div class="kpi-card__icon" aria-hidden="true">👥</div>
+          <div class="kpi-card__meta">الموظفون</div>
+          <div class="kpi-card__value">{{ display('totalEmployees', summary()!) | number }}</div>
+          <div class="kpi-card__hint">إجمالي السجل البشري</div>
+        </article>
+        <article class="kpi-card kpi-card--teal">
+          <div class="kpi-card__icon" aria-hidden="true">✨</div>
+          <div class="kpi-card__meta">إمكانات مرتفعة</div>
+          <div class="kpi-card__value">{{ display('highPotentialCount', summary()!) | number }}</div>
+          <div class="kpi-card__hint">من تصنيفات الصندوق التسعة</div>
+        </article>
+        <article class="kpi-card kpi-card--violet">
+          <div class="kpi-card__icon" aria-hidden="true">📈</div>
+          <div class="kpi-card__meta">دورات أداء نشطة</div>
+          <div class="kpi-card__value">{{ display('activePerformanceCycleCount', summary()!) | number }}</div>
+          <div class="kpi-card__hint">جاهزة للمتابعة</div>
+        </article>
+        <article class="kpi-card kpi-card--amber">
+          <div class="kpi-card__icon" aria-hidden="true">🏪</div>
+          <div class="kpi-card__meta">فرص مفتوحة</div>
+          <div class="kpi-card__value">{{ display('openMarketplaceOpportunityCount', summary()!) | number }}</div>
+          <div class="kpi-card__hint">السوق الداخلي</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="dash-grid dash-section--enter dash-section--delay-1">
+      <div class="panel panel--chart">
+        <div class="panel__head">
+          <h3>توزيع الصندوق التسعة</h3>
+          <span class="panel__tag">Talent analytics</span>
+        </div>
+        @if (chartTalentLabels().length) {
+          <app-chart-widget
+            kind="doughnut"
+            [labels]="chartTalentLabels()"
+            [values]="chartTalentValues()"
+            datasetLabel="الموظفون حسب الخانة"
+          />
+        } @else {
+          <p class="panel__empty">لا تتوفر بيانات توزيع حالياً أو تعذر التحميل.</p>
+        }
+      </div>
+      <div class="panel panel--chart">
+        <div class="panel__head">
+          <h3>نشاط الوحدات</h3>
+          <span class="panel__tag">Executive pulse</span>
+        </div>
+        <app-chart-widget kind="bar" [labels]="chartOpsLabels()" [values]="chartOpsValues()" datasetLabel="عدد" />
+      </div>
+    </section>
+
+    <section class="dash-section dash-section--enter dash-section--delay-2">
+      <h2 class="dash-section__title">ملخصات الوحدات</h2>
+      <div class="tile-grid">
+        <div class="tile">
+          <div class="tile__head">الأداء</div>
+          @if (performance()) {
+            <ul class="tile__list">
+              <li>
+                <span>أهداف مكتملة</span>
+                <strong>{{ performance()!.completedGoals }}/{{ performance()!.totalGoals }}</strong>
+              </li>
+              <li>
+                <span>تقييمات مُعتمدة</span>
+                <strong>{{ performance()!.finalizedEvaluations }}/{{ performance()!.totalEvaluations }}</strong>
+              </li>
+            </ul>
+          } @else {
+            <p class="tile__muted">—</p>
+          }
+          <a routerLink="/talent/performance" class="tile__link">انتقال</a>
+        </div>
+        <div class="tile">
+          <div class="tile__head">التعاقب</div>
+          @if (succession()) {
+            <ul class="tile__list">
+              <li><span>خطط نشطة</span><strong>{{ succession()!.activeSuccessionPlans }}</strong></li>
+              <li><span>بخليفة أساسي</span><strong>{{ succession()!.plansWithPrimarySuccessor }}</strong></li>
+            </ul>
+          } @else {
+            <p class="tile__muted">—</p>
+          }
+          <a routerLink="/succession" class="tile__link">انتقال</a>
+        </div>
+        <div class="tile">
+          <div class="tile__head">التطوير</div>
+          @if (development()) {
+            <ul class="tile__list">
+              <li><span>خطط نشطة</span><strong>{{ development()!.activeDevelopmentPlans }}</strong></li>
+              <li><span>بنود مكتملة</span><strong>{{ development()!.completedDevelopmentPlanItems }}</strong></li>
+            </ul>
+          } @else {
+            <p class="tile__muted">—</p>
+          }
+          <a routerLink="/development" class="tile__link">انتقال</a>
+        </div>
+        <div class="tile">
+          <div class="tile__head">السوق</div>
+          @if (marketplace()) {
+            <ul class="tile__list">
+              <li><span>طلبات</span><strong>{{ marketplace()!.totalApplications }}</strong></li>
+              <li><span>فرص مفتوحة</span><strong>{{ marketplace()!.openOpportunities }}</strong></li>
+            </ul>
+          } @else {
+            <p class="tile__muted">—</p>
+          }
+          <a routerLink="/marketplace" class="tile__link">انتقال</a>
+        </div>
+        @if (auth.hasPermission(PermissionCodes.IntelligenceView)) {
+          <div class="tile tile--accent">
+            <div class="tile__head">الذكاء المؤسسي</div>
+            <p class="tile__muted">رؤى وتوصيات وتوليد ذكاء من البيانات الفعلية.</p>
+            <a routerLink="/analytics/intelligence" class="tile__link">فتح الذكاء</a>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="dash-section dash-section--enter dash-section--delay-3">
+      <h2 class="dash-section__title">ملخص تنفيذي إضافي</h2>
+      <div class="mini-kpis">
+        <div class="mini-kpi"><span>تصنيفات</span><b>{{ summary()!.totalTalentClassifications | number }}</b></div>
+        <div class="mini-kpi"><span>درجات مواهب</span><b>{{ summary()!.totalTalentScores | number }}</b></div>
+        <div class="mini-kpi"><span>أداء مرتفع</span><b>{{ summary()!.highPerformerCount | number }}</b></div>
+        <div class="mini-kpi"><span>قادة استراتيجيون</span><b>{{ summary()!.strategicLeaderCount | number }}</b></div>
+        <div class="mini-kpi"><span>خطط تعاقب</span><b>{{ summary()!.activeSuccessionPlanCount | number }}</b></div>
+        <div class="mini-kpi"><span>خطط تطوير</span><b>{{ summary()!.activeDevelopmentPlanCount | number }}</b></div>
+      </div>
+    </section>
+  } @else {
+    <div class="skeleton-grid">
+      @for (x of [1, 2, 3, 4, 5, 6]; track x) {
+        <div class="skeleton kpi-skel"></div>
+      }
+    </div>
+  }
+</div>

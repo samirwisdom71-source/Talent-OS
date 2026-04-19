@@ -1,0 +1,140 @@
+<a routerLink="/approvals" class="back-link">← الموافقات</a>
+@if (failed()) {
+  <div class="card card--muted">تعذر التحميل.</div>
+} @else if (req()) {
+  <section class="page-head">
+    <h1>{{ req()!.title }}</h1>
+    <p class="page-head__sub">{{ statusLabel(req()!.status) }} · نوع {{ req()!.requestType }}</p>
+  </section>
+
+  <div class="card meta">
+    <div class="meta__row">
+      <span class="meta__lbl">المُقدِّم</span>
+      <app-id-chip [id]="req()!.requestedByUserId" />
+    </div>
+    @if (req()!.currentApproverUserId) {
+      <div class="meta__row">
+        <span class="meta__lbl">المعتمد الحالي</span>
+        <app-id-chip [id]="req()!.currentApproverUserId!" />
+      </div>
+    }
+    <div class="meta__row">
+      <span class="meta__lbl">الكيان المرتبط</span>
+      <app-id-chip [id]="req()!.relatedEntityId" />
+    </div>
+  </div>
+
+  <div class="card actions">
+    @if (req()!.status === Status.Draft && auth.hasPermission(PermissionCodes.ApprovalRequestCreate) && isRequester(req()!)) {
+      <button type="button" class="btn-primary" [disabled]="busy()" (click)="submit()">
+        {{ busy() ? '…' : 'إرسال للموافقة' }}
+      </button>
+    }
+
+    @if (
+      (req()!.status === Status.Submitted || req()!.status === Status.InReview) &&
+      auth.hasPermission(PermissionCodes.ApprovalRequestCreate) &&
+      isRequester(req()!)
+    ) {
+      <button type="button" class="btn-secondary" [disabled]="busy()" (click)="open('cancel')">إلغاء الطلب</button>
+    }
+
+    @if (
+      req()!.status === Status.Submitted &&
+      auth.hasPermission(PermissionCodes.ApprovalRequestReview)
+    ) {
+      <button type="button" class="btn-primary" [disabled]="busy()" (click)="open('review')">بدء المراجعة</button>
+    }
+
+    @if (
+      (req()!.status === Status.Submitted || req()!.status === Status.InReview) &&
+      auth.hasPermission(PermissionCodes.ApprovalRequestAssign)
+    ) {
+      <button type="button" class="btn-secondary" [disabled]="busy()" (click)="open('assign')">تعيين معتمد</button>
+      <button type="button" class="btn-secondary" [disabled]="busy()" (click)="open('reassign')">إعادة تعيين</button>
+    }
+
+    @if (req()!.status === Status.InReview && auth.hasPermission(PermissionCodes.ApprovalRequestApprove)) {
+      <button type="button" class="btn-primary" [disabled]="busy()" (click)="approve()">
+        {{ busy() ? '…' : 'موافقة' }}
+      </button>
+    }
+    @if (req()!.status === Status.InReview && auth.hasPermission(PermissionCodes.ApprovalRequestReject)) {
+      <button type="button" class="btn-danger" [disabled]="busy()" (click)="reject()">رفض</button>
+    }
+  </div>
+
+  @if (req()!.status === Status.InReview && (auth.hasPermission(PermissionCodes.ApprovalRequestApprove) || auth.hasPermission(PermissionCodes.ApprovalRequestReject))) {
+    <div class="card notebox">
+      <label>ملاحظات (اختياري) للموافقة / الرفض</label>
+      <textarea rows="2" [(ngModel)]="workflowComments" name="wfcomments"></textarea>
+    </div>
+  }
+
+  <div class="card">
+    <h2 class="h2">التعيينات</h2>
+    <ul class="muted">
+      @for (a of req()!.assignments; track a.id) {
+        <li>
+          <app-id-chip label="إلى" [id]="a.assignedToUserId" />
+          <span class="pill">{{ a.isCurrent ? 'حالي' : '' }}</span>
+        </li>
+      }
+    </ul>
+    <h2 class="h2">سجل الإجراءات</h2>
+    <ul class="muted">
+      @for (a of req()!.actions; track a.id) {
+        <li>{{ actionTypeLabel(a.actionType) }} · <app-id-chip [id]="a.actionByUserId" /> · {{ a.actionedOnUtc }}</li>
+      }
+    </ul>
+  </div>
+} @else {
+  <div class="skeleton detail-skel"></div>
+}
+
+@if (modal(); as m) {
+  <div class="modal-backdrop" (click)="closeModal()"></div>
+  <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    @if (m === 'assign') {
+      <h3>تعيين معتمد</h3>
+      <label>معرّف المستخدم (GUID)<input type="text" [(ngModel)]="assignApproverId" name="aid" /></label>
+      <div class="modal__actions">
+        <button type="button" class="btn-primary" [disabled]="busy() || !assignApproverId.trim()" (click)="confirmAssign()">
+          تأكيد
+        </button>
+        <button type="button" class="btn-secondary" (click)="closeModal()">إلغاء</button>
+      </div>
+    }
+    @if (m === 'reassign') {
+      <h3>إعادة تعيين المعتمد</h3>
+      <label>معرّف المستخدم الجديد<input type="text" [(ngModel)]="reassignApproverId" name="rid" /></label>
+      <div class="modal__actions">
+        <button
+          type="button"
+          class="btn-primary"
+          [disabled]="busy() || !reassignApproverId.trim()"
+          (click)="confirmReassign()"
+        >
+          تأكيد
+        </button>
+        <button type="button" class="btn-secondary" (click)="closeModal()">إلغاء</button>
+      </div>
+    }
+    @if (m === 'review') {
+      <h3>بدء المراجعة</h3>
+      <label>ملاحظات (اختياري)<textarea rows="2" [(ngModel)]="workflowComments" name="rv"></textarea></label>
+      <div class="modal__actions">
+        <button type="button" class="btn-primary" [disabled]="busy()" (click)="confirmStartReview()">تأكيد</button>
+        <button type="button" class="btn-secondary" (click)="closeModal()">إلغاء</button>
+      </div>
+    }
+    @if (m === 'cancel') {
+      <h3>إلغاء الطلب</h3>
+      <label>سبب أو ملاحظات (اختياري)<textarea rows="2" [(ngModel)]="workflowComments" name="cx"></textarea></label>
+      <div class="modal__actions">
+        <button type="button" class="btn-danger" [disabled]="busy()" (click)="confirmCancel()">تأكيد الإلغاء</button>
+        <button type="button" class="btn-secondary" (click)="closeModal()">رجوع</button>
+      </div>
+    }
+  </div>
+}

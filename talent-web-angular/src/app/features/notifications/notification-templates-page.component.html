@@ -1,0 +1,115 @@
+<div class="tpl">
+  <header class="tpl__hero">
+    <a routerLink="/notifications" class="tpl__back">← الإشعارات</a>
+    <div class="tpl__hero-main">
+      <h1 class="tpl__title">قوالب الإشعارات</h1>
+      <p class="tpl__lead">تعريف الرسائل حسب الرمز والقناة — العرض يتطلب صلاحية عرض الإشعارات؛ الإنشاء والتعديل يتطلبان الإدارة.</p>
+    </div>
+  </header>
+
+  @if (auth.hasPermission(PermissionCodes.NotificationManage)) {
+    <div class="toolbar card tpl-toolbar card--interactive">
+      <button type="button" class="btn-primary" (click)="openCreate()">قالب جديد</button>
+    </div>
+  }
+
+  @if (failed()) {
+    <div class="card card--muted tpl-fail">
+      <p>تعذر التحميل أو ليست لديك صلاحية العرض.</p>
+      <button type="button" class="btn-primary" (click)="load()">إعادة المحاولة</button>
+    </div>
+  } @else if (data()) {
+    <div class="card table-card card--interactive tpl-table-wrap">
+      <div class="tpl__panel-head">
+        <h2 class="tpl__panel-title">القوالب</h2>
+        <span class="tpl__pill">{{ data()!.items.length }} قالب</span>
+      </div>
+      <div class="tpl-table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>الرمز</th>
+              <th>الاسم</th>
+              <th>النوع</th>
+              <th>القناة</th>
+              <th>نشط</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of data()!.items; track row.id) {
+              <tr>
+                <td class="mono">{{ row.code }}</td>
+                <td>{{ row.name }}</td>
+                <td>{{ typeLabel(row.notificationType) }}</td>
+                <td>{{ channelLabel(row.channel) }}</td>
+                <td>{{ row.isActive ? 'نعم' : 'لا' }}</td>
+                <td class="cell-actions">
+                  <app-id-chip [id]="row.id" />
+                  @if (auth.hasPermission(PermissionCodes.NotificationManage)) {
+                    <button type="button" class="linkish" (click)="openEdit(row)">تعديل</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else {
+    <div class="skeleton table-skel"></div>
+  }
+</div>
+
+@if (editorOpen()) {
+  <div class="modal-backdrop" (click)="closeEditor()"></div>
+  <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    @if (editingId()) {
+      <h3>تعديل قالب</h3>
+      <p class="muted"><app-id-chip [id]="editingId()!" /></p>
+      <label>الاسم<input type="text" [(ngModel)]="draftUpdate.name" name="un" /></label>
+      <label>الموضوع (قالب)<input type="text" [(ngModel)]="draftUpdate.subjectTemplate" name="us" /></label>
+      <label>المحتوى<textarea rows="5" [(ngModel)]="draftUpdate.bodyTemplate" name="ub"></textarea></label>
+      <label
+        >نوع الإشعار
+        <input type="number" [(ngModel)]="draftUpdate.notificationType" name="ut" min="1" />
+      </label>
+      <label
+        >القناة
+        <select [(ngModel)]="draftUpdate.channel" name="uc">
+          <option [ngValue]="1">داخل التطبيق</option>
+          <option [ngValue]="2">بريد</option>
+          <option [ngValue]="3">الاثنان</option>
+        </select>
+      </label>
+      <label class="inline-check">
+        <input type="checkbox" [(ngModel)]="draftUpdate.isActive" name="ua" />
+        نشط
+      </label>
+    } @else {
+      <h3>قالب جديد</h3>
+      <label>الرمز الفريد<input type="text" [(ngModel)]="draftCreate.code" name="cc" /></label>
+      <label>الاسم<input type="text" [(ngModel)]="draftCreate.name" name="cn" /></label>
+      <label>الموضوع (قالب)<input type="text" [(ngModel)]="draftCreate.subjectTemplate" name="cs" /></label>
+      <label>المحتوى<textarea rows="5" [(ngModel)]="draftCreate.bodyTemplate" name="cb"></textarea></label>
+      <label
+        >نوع الإشعار
+        <input type="number" [(ngModel)]="draftCreate.notificationType" name="ct" min="1" />
+      </label>
+      <label
+        >القناة
+        <select [(ngModel)]="draftCreate.channel" name="cch">
+          <option [ngValue]="1">داخل التطبيق</option>
+          <option [ngValue]="2">بريد</option>
+          <option [ngValue]="3">الاثنان</option>
+        </select>
+      </label>
+    }
+    <div class="modal__actions">
+      <button type="button" class="btn-primary" [disabled]="busy()" (click)="save()">
+        {{ busy() ? '…' : 'حفظ' }}
+      </button>
+      <button type="button" class="btn-secondary" (click)="closeEditor()">إلغاء</button>
+    </div>
+  </div>
+}

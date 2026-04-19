@@ -1,0 +1,22 @@
+<aside class="sidebar">
+  <div class="sidebar__brand">
+    <div class="sidebar__logo">T</div>
+    <div>
+      <div class="sidebar__title">{{ brandTitle() }}</div>
+      <div class="sidebar__subtitle">{{ brandSubtitle() }}</div>
+    </div>
+  </div>
+  <nav class="sidebar__nav" aria-label="Primary">
+    @for (item of visibleItems(); track item.path) {
+      <a
+        class="sidebar__link"
+        [routerLink]="item.path"
+        routerLinkActive="sidebar__link--active"
+        [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
+      >
+        <span class="sidebar__icon" aria-hidden="true">{{ iconFor(item.path) }}</span>
+        <span class="sidebar__link-text">{{ item.labelKey | t }}</span>
+      </a>
+    }
+  </nav>
+</aside>

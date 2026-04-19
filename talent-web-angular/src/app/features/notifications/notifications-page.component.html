@@ -1,0 +1,39 @@
+<div class="nt">
+  <header class="nt__hero">
+    <div class="nt__hero-text">
+      <h1 class="nt__title">الإشعارات</h1>
+      <p class="nt__lead">رسائلك داخل التطبيق — تعليم كمقروء أو الانتقال إلى إدارة القوالب عند توفر الصلاحية.</p>
+    </div>
+  </header>
+
+  <div class="toolbar card nt-toolbar card--interactive">
+    <button type="button" class="btn-primary" (click)="markAll()">تعليم الكل كمقروء</button>
+    @if (auth.hasPermission(PermissionCodes.NotificationView)) {
+      <a class="link nt-toolbar__link" routerLink="/notification-templates">قوالب الإشعارات</a>
+    }
+  </div>
+
+  @if (failed()) {
+    <div class="card card--muted nt-fail">
+      <p>تعذر التحميل.</p>
+      <button type="button" class="btn-primary" (click)="load()">إعادة المحاولة</button>
+    </div>
+  } @else if (data()) {
+    <div class="nt-stack">
+      @for (row of data()!.items; track row.id) {
+        <article class="card note card--interactive" [class.note--unread]="!row.isRead">
+          <div class="note__head">
+            <h3>{{ row.title }}</h3>
+            @if (!row.isRead) {
+              <button type="button" class="btn-ghost" (click)="mark(row.id)">مقروء</button>
+            }
+          </div>
+          <p class="note__body">{{ row.message }}</p>
+          <footer class="note__meta">{{ row.createdOnUtc | date: 'medium' }}</footer>
+        </article>
+      }
+    </div>
+  } @else {
+    <div class="skeleton table-skel"></div>
+  }
+</div>

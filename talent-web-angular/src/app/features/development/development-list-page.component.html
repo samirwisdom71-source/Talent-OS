@@ -1,0 +1,67 @@
+<div class="page-head-row">
+  <section class="page-head">
+    <h1>خطط التطوير</h1>
+  </section>
+  @if (auth.hasPermission(PermissionCodes.DevelopmentManage)) {
+    <div class="page-actions">
+      <a class="btn-primary btn-primary--icon" routerLink="/development/create">
+        <span class="btn-ico" aria-hidden="true">＋</span>
+        خطة جديدة
+      </a>
+    </div>
+  }
+</div>
+
+@if (summary() && !summaryFailed()) {
+  <div class="card stat-grid">
+    <div class="stat">
+      <div class="stat__label">خطط نشطة</div>
+      <div class="stat__value">{{ summary()!.activeDevelopmentPlans }}/{{ summary()!.totalDevelopmentPlans }}</div>
+    </div>
+    <div class="stat">
+      <div class="stat__label">بنود مكتملة</div>
+      <div class="stat__value">{{ summary()!.completedDevelopmentPlanItems }}/{{ summary()!.totalDevelopmentPlanItems }}</div>
+    </div>
+    <div class="stat">
+      <div class="stat__label">قيد التنفيذ</div>
+      <div class="stat__value">{{ summary()!.inProgressDevelopmentPlanItems }}</div>
+    </div>
+    @if (summary()!.averageProgressPercentageActiveItems != null) {
+      <div class="stat">
+        <div class="stat__label">متوسط التقدّم (نشط)</div>
+        <div class="stat__value">{{ summary()!.averageProgressPercentageActiveItems | number: '1.0-0' }}%</div>
+      </div>
+    }
+  </div>
+} @else if (summaryFailed()) {
+  <div class="card card--muted">تعذر تحميل ملخص التطوير.</div>
+}
+
+@if (failed()) {
+  <div class="card card--muted">تعذر التحميل.</div>
+} @else if (data()) {
+  <div class="card table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>العنوان</th>
+          <th>الموظف</th>
+          <th>الحالة</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of data()!.items; track row.id) {
+          <tr>
+            <td>{{ row.planTitle }}</td>
+            <td><app-id-chip [id]="row.employeeId" /></td>
+            <td>{{ planStatus(row.status) }}</td>
+            <td class="cell-actions"><a class="link" [routerLink]="['/development', row.id]">عرض</a></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <div class="skeleton table-skel"></div>
+}

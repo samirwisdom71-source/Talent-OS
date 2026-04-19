@@ -1,0 +1,60 @@
+<div class="page-head-row">
+  <section class="page-head">
+    <h1>الموظفون</h1>
+  </section>
+  @if (auth.hasPermission(PermissionCodes.EmployeeEdit)) {
+    <div class="page-actions">
+      <a class="btn-primary btn-primary--icon" routerLink="/employees/create">
+        <span class="btn-ico" aria-hidden="true">＋</span>
+        إضافة موظف
+      </a>
+    </div>
+  }
+</div>
+
+<div class="toolbar card card--interactive">
+  <input
+    class="toolbar__search"
+    type="search"
+    [(ngModel)]="search"
+    (keyup.enter)="page = 1; load()"
+    [placeholder]="'common.search' | t"
+  />
+  <button type="button" class="btn-primary" (click)="page = 1; load()">بحث</button>
+</div>
+
+@if (failed()) {
+  <div class="card card--muted">تعذر تحميل القائمة.</div>
+} @else if (result()) {
+  <div class="card table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>الرقم</th>
+          <th>الاسم</th>
+          <th>البريد</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of result()!.items; track row.id) {
+          <tr>
+            <td>{{ row.employeeNumber }}</td>
+            <td>{{ displayName(row) }}</td>
+            <td>{{ row.email }}</td>
+            <td class="cell-actions">
+              <a class="link" [routerLink]="['/employees', row.id]">{{ 'common.view' | t }}</a>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <div class="pager">
+      <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">السابق</button>
+      <span>{{ result()!.page }} / {{ result()!.totalPages || 1 }}</span>
+      <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">التالي</button>
+    </div>
+  </div>
+} @else {
+  <div class="skeleton table-skel"></div>
+}

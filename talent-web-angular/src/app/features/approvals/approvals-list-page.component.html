@@ -1,0 +1,28 @@
+@if (failed()) {
+  <div class="card card--muted">تعذر التحميل.</div>
+} @else if (data()) {
+  <div class="card table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>العنوان</th>
+          <th>النوع</th>
+          <th>الحالة</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of data()!.items; track row.id) {
+          <tr>
+            <td>{{ row.title }}</td>
+            <td>{{ row.requestType }}</td>
+            <td>{{ row.status }}</td>
+            <td class="cell-actions"><a class="link" [routerLink]="['/approvals', row.id]">عرض</a></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <div class="skeleton table-skel"></div>
+}

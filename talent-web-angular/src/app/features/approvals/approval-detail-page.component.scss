@@ -1,0 +1,148 @@
+@import '../employees/employee-detail-page.component.scss';
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  padding: 1rem 1.25rem;
+}
+
+.btn-secondary {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  background: var(--color-card);
+  color: var(--color-text);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  background: #b91c1c;
+  color: #fff;
+}
+
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.meta {
+  padding: 1rem 1.25rem;
+}
+
+.meta__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.meta__row:last-child {
+  border-bottom: none;
+}
+
+.meta__lbl {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  min-width: 7rem;
+}
+
+.notebox {
+  padding: 1rem 1.25rem;
+}
+
+.notebox label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.notebox textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 0.65rem;
+  font: inherit;
+}
+
+.h2 {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.95rem;
+}
+
+.muted {
+  color: var(--color-muted);
+  font-size: 0.88rem;
+}
+
+.pill {
+  display: inline-block;
+  margin-inline-start: 0.35rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: var(--color-accent-strong);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 40;
+}
+
+.modal {
+  position: fixed;
+  z-index: 50;
+  left: 50%;
+  top: 18%;
+  transform: translateX(-50%);
+  width: min(420px, calc(100vw - 2rem));
+  max-height: 70vh;
+  overflow: auto;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 1.25rem 1.35rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.modal h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+}
+
+.modal label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.modal input[type='text'],
+.modal textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  padding: 0.45rem 0.6rem;
+  margin-bottom: 0.75rem;
+  font: inherit;
+}
+
+.modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}

@@ -1,0 +1,102 @@
+<a routerLink="/development" class="back-link">← الخطط</a>
+@if (failed()) {
+  <div class="card card--muted">تعذر التحميل.</div>
+} @else if (plan()) {
+  <section class="page-head">
+    <h1>{{ plan()!.planTitle }}</h1>
+    <p class="page-head__sub">{{ planStatus(plan()!.status) }} · موظف <app-id-chip [id]="plan()!.employeeId" /></p>
+  </section>
+  @if (plan()!.links?.length) {
+    <div class="card">
+      <h2 class="h2">روابط</h2>
+      <ul class="links">
+        @for (l of plan()!.links!; track l.id) {
+          <li><span class="mono">{{ l.linkType }}</span> → <app-id-chip [id]="l.linkedEntityId" /></li>
+        }
+      </ul>
+    </div>
+  }
+
+  <div class="card items-block">
+    <h2 class="h2">بنود الخطة</h2>
+    @if (!items().length) {
+      <p class="muted">لا توجد بنود.</p>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>البند</th>
+            <th>النوع</th>
+            <th>الحالة</th>
+            <th>التقدّم</th>
+            @if (auth.hasPermission(PermissionCodes.DevelopmentManage)) {
+              <th></th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (it of items(); track it.id) {
+            <tr>
+              <td>
+                <div class="item-title">{{ it.title }}</div>
+                @if (it.description) {
+                  <div class="muted small">{{ it.description }}</div>
+                }
+              </td>
+              <td>{{ itemType(it.itemType) }}</td>
+              <td>{{ itemStatus(it.status) }}</td>
+              <td>
+                @if (auth.hasPermission(PermissionCodes.DevelopmentManage) && it.status !== 3 && it.status !== 4) {
+                  <input
+                    class="prog-input"
+                    type="number"
+                    min="0"
+                    max="100"
+                    [ngModel]="progressFor(it)"
+                    (ngModelChange)="setProgress(it, +$event)"
+                    [name]="'p' + it.id"
+                  />
+                  <span class="pct">%</span>
+                } @else {
+                  {{ it.progressPercentage }}%
+                }
+              </td>
+              @if (auth.hasPermission(PermissionCodes.DevelopmentManage)) {
+                <td class="cell-actions">
+                  @if (it.status !== 3 && it.status !== 4) {
+                    <button
+                      type="button"
+                      class="linkish"
+                      [disabled]="busyRowId() === it.id"
+                      (click)="saveProgress(it)"
+                    >
+                      {{ busyRowId() === it.id ? '…' : 'حفظ التقدّم' }}
+                    </button>
+                    <button
+                      type="button"
+                      class="linkish"
+                      [disabled]="busyRowId() === it.id"
+                      (click)="markDone(it)"
+                    >
+                      إكمال
+                    </button>
+                    <button
+                      type="button"
+                      class="linkish danger"
+                      [disabled]="busyRowId() === it.id"
+                      (click)="remove(it)"
+                    >
+                      حذف
+                    </button>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+} @else {
+  <div class="skeleton detail-skel"></div>
+}

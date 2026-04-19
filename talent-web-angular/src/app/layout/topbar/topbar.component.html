@@ -1,0 +1,14 @@
+<header class="topbar">
+  <div class="topbar__spacer"></div>
+  <div class="topbar__actions">
+    <a routerLink="/notifications" class="topbar__icon-link" aria-label="Notifications">
+      <span class="topbar__bell">🔔</span>
+      @if (unread() !== null && (unread() ?? 0) > 0) {
+        <span class="topbar__badge">{{ unread() }}</span>
+      }
+    </a>
+    <button type="button" class="topbar__ghost" (click)="toggleLang()">{{ 'login.lang' | t }}</button>
+    <span class="topbar__user">{{ auth.sessionSnapshot()?.email }}</span>
+    <button type="button" class="topbar__logout" (click)="logout()">{{ 'topbar.logout' | t }}</button>
+  </div>
+</header>

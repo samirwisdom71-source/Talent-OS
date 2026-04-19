@@ -1,0 +1,22 @@
+<a routerLink="/employees" class="back-link">← العودة للقائمة</a>
+
+@if (failed()) {
+  <div class="card card--muted">تعذر تحميل بيانات الموظف.</div>
+} @else if (employee()) {
+  <section class="page-head">
+    <h1>{{ displayName(employee()!) }}</h1>
+    <p class="page-head__sub">{{ employee()!.email }} · {{ employee()!.employeeNumber }}</p>
+  </section>
+  <div class="card grid">
+    <div>
+      <div class="label">Organization unit</div>
+      <div class="value mono">{{ employee()!.organizationUnitId }}</div>
+    </div>
+    <div>
+      <div class="label">Position</div>
+      <div class="value mono">{{ employee()!.positionId }}</div>
+    </div>
+  </div>
+} @else {
+  <div class="skeleton detail-skel"></div>
+}

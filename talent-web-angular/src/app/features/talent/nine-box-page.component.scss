@@ -1,0 +1,83 @@
+@import './talent-pages.component.scss';
+
+.nb {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.nb__hero {
+  padding: 1.35rem 1.5rem;
+  border-radius: var(--radius-lg, 22px);
+  background: linear-gradient(120deg, rgba(14, 165, 233, 0.12) 0%, rgba(99, 102, 241, 0.1) 55%, rgba(20, 184, 166, 0.08) 100%);
+  border: 1px solid rgba(14, 165, 233, 0.22);
+  box-shadow: var(--shadow-md);
+}
+
+.nb__title {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.nb__lead {
+  margin: 0;
+  max-width: 40rem;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.nb__panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem 0;
+}
+
+.nb__panel-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.nb__tag {
+  font-size: 0.68rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(79, 70, 229, 0.1);
+  color: #4338ca;
+  font-weight: 600;
+}
+
+.nb-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1.25rem;
+  padding: 1rem 1.25rem !important;
+}
+
+.nb-toolbar label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.nb-table-wrap {
+  overflow: hidden;
+  border-radius: 0 0 var(--radius-lg, 18px) var(--radius-lg, 18px);
+}
+
+.nb-distribution .stat-grid {
+  padding: 0.5rem 1rem 1.1rem;
+}
+
+.nb-distribution .nb__panel-head {
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 0.25rem;
+}

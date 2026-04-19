@@ -1,0 +1,61 @@
+<section class="page-head">
+  <h1>دورات الأداء</h1>
+</section>
+
+@if (summary() && !summaryFailed()) {
+  <div class="card stat-grid">
+    <div class="stat">
+      <div class="stat__label">إجمالي الدورات</div>
+      <div class="stat__value">{{ summary()!.totalPerformanceCycles }}</div>
+    </div>
+    <div class="stat">
+      <div class="stat__label">دورات نشطة</div>
+      <div class="stat__value">{{ summary()!.activePerformanceCycles }}</div>
+    </div>
+    <div class="stat">
+      <div class="stat__label">الأهداف</div>
+      <div class="stat__value">{{ summary()!.completedGoals }}/{{ summary()!.totalGoals }}</div>
+    </div>
+    <div class="stat">
+      <div class="stat__label">التقييمات المُعتمدة</div>
+      <div class="stat__value">{{ summary()!.finalizedEvaluations }}/{{ summary()!.totalEvaluations }}</div>
+    </div>
+    @if (summary()!.averageOverallEvaluationScoreFinalized != null) {
+      <div class="stat">
+        <div class="stat__label">متوسط الدرجة (مُعتمد)</div>
+        <div class="stat__value">{{ summary()!.averageOverallEvaluationScoreFinalized | number: '1.0-1' }}</div>
+      </div>
+    }
+  </div>
+} @else if (summaryFailed()) {
+  <div class="card card--muted">تعذر تحميل ملخص الأداء.</div>
+}
+
+@if (failed()) {
+  <div class="card card--muted">تعذر التحميل.</div>
+} @else if (data()) {
+  <div class="card table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>الاسم</th>
+          <th>البداية</th>
+          <th>النهاية</th>
+          <th>الحالة</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of data()!.items; track c.id) {
+          <tr>
+            <td>{{ cycleName(c) }}</td>
+            <td>{{ c.startDate | date: 'mediumDate' }}</td>
+            <td>{{ c.endDate | date: 'mediumDate' }}</td>
+            <td>{{ cycleStatusLabel(c.status) }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <div class="skeleton table-skel"></div>
+}

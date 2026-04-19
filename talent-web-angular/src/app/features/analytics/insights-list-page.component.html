@@ -1,0 +1,36 @@
+<section class="page-head">
+  <h1>الرؤى</h1>
+</section>
+@if (failed()) {
+  <div class="card card--muted">تعذر التحميل.</div>
+} @else if (data()) {
+  <div class="stack">
+    @for (row of data()!.items; track row.id) {
+      <article class="card insight">
+        <div class="insight__head">
+          <h3>{{ row.title }}</h3>
+          <span class="pill">{{ statusLabel(row.status) }}</span>
+        </div>
+        <p>{{ row.summary }}</p>
+        <div class="insight__ids">
+          @if (row.employeeId) {
+            <app-id-chip label="موظف" [id]="row.employeeId" />
+          }
+          @if (row.performanceCycleId) {
+            <app-id-chip label="دورة" [id]="row.performanceCycleId" />
+          }
+        </div>
+        <footer class="insight__meta">{{ row.generatedOnUtc | date: 'medium' }}</footer>
+        <div class="insight__actions">
+          @if (row.status === 1 && auth.hasPermission(PermissionCodes.IntelligenceManage)) {
+            <button type="button" class="btn-ghost" [disabled]="isRowBusy(row.id)" (click)="dismiss(row)">
+              {{ isRowBusy(row.id) ? '…' : 'تجاهل' }}
+            </button>
+          }
+        </div>
+      </article>
+    }
+  </div>
+} @else {
+  <div class="skeleton table-skel"></div>
+}

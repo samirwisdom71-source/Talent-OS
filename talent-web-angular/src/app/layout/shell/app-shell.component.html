@@ -1,0 +1,31 @@
+<div class="shell">
+  <app-sidebar />
+  <div class="shell__main">
+    <app-topbar />
+    @if (toast.toast(); as t) {
+      <div
+        class="shell__toast"
+        [class.shell__toast--success]="t.tone === 'success'"
+        [class.shell__toast--error]="t.tone === 'error'"
+        role="status"
+      >
+        <span>{{ t.message }}</span>
+        <button type="button" class="shell__toast-dismiss" (click)="dismissToast()">×</button>
+      </div>
+    }
+    @if (errors.message(); as msg) {
+      <div class="shell__banner" role="alert">
+        <span>{{ msg }}</span>
+        <button type="button" class="shell__banner-dismiss" (click)="dismissError()">×</button>
+      </div>
+    }
+    <main class="shell__content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+@if (loading.isLoading()) {
+  <div class="shell__overlay" aria-busy="true">
+    <div class="shell__spinner"></div>
+  </div>
+}

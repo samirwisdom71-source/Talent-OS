@@ -1,0 +1,84 @@
+<div class="succ">
+  <header class="succ__hero">
+    <div class="succ__hero-text">
+      <h1 class="succ__title">التعاقب الوظيفي</h1>
+      <p class="succ__lead">مناصب حرجة وخطط التعاقب مع ملخص من تحليلات النطاق — ابدأ بخطة جديدة عند توفر الصلاحية.</p>
+    </div>
+    @if (auth.hasPermission(PermissionCodes.SuccessionManage)) {
+      <a class="succ__cta btn-primary btn-primary--icon" routerLink="/succession/plans/create">
+        <span class="btn-ico" aria-hidden="true">＋</span>
+        خطة تعاقب
+      </a>
+    }
+  </header>
+
+  @if (summary() && !summaryFailed()) {
+    <div class="card card--interactive succ-distribution">
+      <div class="succ__panel-head">
+        <h2 class="succ__panel-title">ملخص التغطية</h2>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat__label">خطط نشطة</div>
+          <div class="stat__value">{{ summary()!.activeSuccessionPlans }}/{{ summary()!.totalSuccessionPlans }}</div>
+        </div>
+        <div class="stat">
+          <div class="stat__label">مناصب حرجة نشطة</div>
+          <div class="stat__value">{{ summary()!.activeCriticalPositions }}/{{ summary()!.totalCriticalPositions }}</div>
+        </div>
+        <div class="stat">
+          <div class="stat__label">بخليفة أساسي</div>
+          <div class="stat__value">{{ summary()!.plansWithPrimarySuccessor }}</div>
+        </div>
+        <div class="stat">
+          <div class="stat__label">جاهز الآن</div>
+          <div class="stat__value">{{ readinessCount(summary()!.successorReadinessBreakdown, 1) }}</div>
+        </div>
+        @if (summary()!.averageCoverageScore != null) {
+          <div class="stat">
+            <div class="stat__label">متوسط التغطية</div>
+            <div class="stat__value">{{ summary()!.averageCoverageScore | number: '1.0-2' }}</div>
+          </div>
+        }
+      </div>
+    </div>
+  } @else if (summaryFailed()) {
+    <div class="card card--muted">تعذر تحميل ملخص التعاقب.</div>
+  }
+
+  @if (failed()) {
+    <div class="card card--muted">تعذر تحميل القوائم.</div>
+  } @else {
+    <div class="succ__split">
+      <div class="card card--interactive succ-panel">
+        <div class="succ__panel-head">
+          <h2 class="succ__panel-title">مناصب حرجة</h2>
+          <span class="succ__tag">Critical positions</span>
+        </div>
+        <ul class="succ-list">
+          @for (p of positions(); track p.id) {
+            <li>
+              <app-id-chip label="منصب" [id]="p.positionId" />
+              <span class="pill">{{ criticality(p.criticalityLevel) }}</span>
+              <span class="pill muted-pill">{{ risk(p.riskLevel) }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+      <div class="card card--interactive succ-panel">
+        <div class="succ__panel-head">
+          <h2 class="succ__panel-title">خطط التعاقب</h2>
+          <span class="succ__tag">Plans</span>
+        </div>
+        <ul class="succ-list">
+          @for (plan of plans(); track plan.id) {
+            <li>
+              <a class="link" [routerLink]="['/succession/plans', plan.id]">{{ plan.planName }}</a>
+              <span class="pill">{{ planStatus(plan.status) }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+</div>

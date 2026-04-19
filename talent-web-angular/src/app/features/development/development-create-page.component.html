@@ -1,0 +1,35 @@
+<a routerLink="/development" class="back-link">← خطط التطوير</a>
+<section class="page-head">
+  <h1>خطة تطوير جديدة</h1>
+</section>
+<div class="card form-card">
+  <div class="form-grid">
+    <label>معرّف الموظف<input [(ngModel)]="model.employeeId" name="eid" /></label>
+    <label
+      >دورة الأداء
+      <select class="select" [(ngModel)]="model.performanceCycleId" name="cy">
+        <option value="">— اختر —</option>
+        @for (c of cycles(); track c.id) {
+          <option [value]="c.id">{{ cycleLabel(c) }}</option>
+        }
+      </select>
+    </label>
+    <label>عنوان الخطة<input [(ngModel)]="model.planTitle" name="pt" /></label>
+    <label
+      >مصدر الخطة
+      <select [(ngModel)]="model.sourceType" name="st">
+        <option [ngValue]="1">يدوي</option>
+        <option [ngValue]="2">فجوة كفاءات</option>
+        <option [ngValue]="3">تعاقب</option>
+        <option [ngValue]="4">أداء</option>
+        <option [ngValue]="5">إمكانات</option>
+      </select>
+    </label>
+    <label>تاريخ الهدف<input type="date" [(ngModel)]="model.targetCompletionDate" name="td" /></label>
+    <label class="full">ملاحظات<textarea rows="2" [(ngModel)]="model.notes" name="nt"></textarea></label>
+  </div>
+  <div class="form-actions">
+    <button type="button" class="btn-primary" [disabled]="busy()" (click)="save()">{{ busy() ? '…' : 'حفظ' }}</button>
+    <a routerLink="/development" class="btn-ghost">إلغاء</a>
+  </div>
+</div>

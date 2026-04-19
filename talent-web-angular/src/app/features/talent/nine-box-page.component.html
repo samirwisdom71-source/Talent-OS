@@ -1,0 +1,89 @@
+<div class="nb">
+  <header class="nb__hero">
+    <h1 class="nb__title">مصفوفة الصناديق التسعة</h1>
+    <p class="nb__lead">عرض التصنيفات مع توزيع الخانات من تحليلات المواهب — اختر الدورة والصندوق لتضييق النتائج.</p>
+  </header>
+
+  @if (talentSummary() && !summaryFailed()) {
+    <div class="card card--interactive nb-distribution">
+      <div class="nb__panel-head">
+        <h2 class="nb__panel-title">توزيع الخانات</h2>
+        <span class="nb__tag">Talent distribution</span>
+      </div>
+      <div class="stat-grid">
+        @for (cell of talentSummary()!.byNineBox; track cell.nineBoxCode) {
+          <div class="stat">
+            <div class="stat__label">{{ nineBoxLabel(cell.nineBoxCode) }}</div>
+            <div class="stat__value">{{ cell.count }}</div>
+          </div>
+        }
+      </div>
+    </div>
+  } @else if (summaryFailed()) {
+    <div class="card card--muted">تعذر تحميل ملخص التوزيع.</div>
+  }
+
+  <div class="toolbar card nb-toolbar card--interactive">
+    <label>
+      الدورة
+      <select class="select" [(ngModel)]="cycleFilterId" (change)="onFiltersChange()">
+        <option value="">كل الدورات</option>
+        @for (c of cycles(); track c.id) {
+          <option [value]="c.id">{{ cycleLabel(c) }}</option>
+        }
+      </select>
+    </label>
+    <label>
+      الصندوق
+      <select class="select" [(ngModel)]="filterBox" (change)="onFiltersChange()">
+        <option value="">الكل</option>
+        @for (b of [1, 2, 3, 4, 5, 6, 7, 8, 9]; track b) {
+          <option [value]="'' + b">{{ nineBoxLabel(b) }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (failed()) {
+    <div class="card card--muted">تعذر التحميل.</div>
+  } @else if (data()) {
+    <div class="card table-card card--interactive">
+      <div class="nb__panel-head">
+        <h2 class="nb__panel-title">سجل التصنيفات</h2>
+      </div>
+      <div class="nb-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>الموظف</th>
+              <th>الدورة</th>
+              <th>الصندوق</th>
+              <th>التصنيف</th>
+              <th>HP</th>
+              <th>HiPerf</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of data()!.items; track row.id) {
+              <tr>
+                <td><app-id-chip [id]="row.employeeId" /></td>
+                <td><app-id-chip label="دورة" [id]="row.performanceCycleId" /></td>
+                <td>{{ nineBoxLabel(row.nineBoxCode) }}</td>
+                <td>{{ row.categoryName }}</td>
+                <td>{{ row.isHighPotential ? 'نعم' : 'لا' }}</td>
+                <td>{{ row.isHighPerformer ? 'نعم' : 'لا' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <button type="button" (click)="prev()" [disabled]="!data()!.hasPreviousPage">السابق</button>
+        <span>{{ data()!.page }} / {{ data()!.totalPages || 1 }}</span>
+        <button type="button" (click)="next()" [disabled]="!data()!.hasNextPage">التالي</button>
+      </div>
+    </div>
+  } @else {
+    <div class="skeleton table-skel"></div>
+  }
+</div>

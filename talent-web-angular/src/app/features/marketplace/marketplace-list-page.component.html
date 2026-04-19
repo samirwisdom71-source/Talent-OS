@@ -1,0 +1,71 @@
+<div class="page-head-row">
+  <section class="page-head">
+    <h1>الفرص</h1>
+  </section>
+  @if (auth.hasPermission(PermissionCodes.MarketplaceManage)) {
+    <div class="page-actions">
+      <a class="btn-primary btn-primary--icon" routerLink="/marketplace/create">
+        <span class="btn-ico" aria-hidden="true">＋</span>
+        فرصة جديدة
+      </a>
+    </div>
+  }
+</div>
+
+@if (summary() && !summaryFailed()) {
+  <div class="card stat-grid">
+    <div class="stat">
+      <div class="stat__label">فرص مفتوحة</div>
+      <div class="stat__value">{{ summary()!.openOpportunities }}/{{ summary()!.totalMarketplaceOpportunities }}</div>
+    </div>
+    <div class="stat">
+      <div class="stat__label">طلبات</div>
+      <div class="stat__value">{{ summary()!.totalApplications }}</div>
+    </div>
+    <div class="stat">
+      <div class="stat__label">قيد المراجعة</div>
+      <div class="stat__value">{{ summary()!.underReviewApplications }}</div>
+    </div>
+    <div class="stat">
+      <div class="stat__label">مقبولة</div>
+      <div class="stat__value">{{ summary()!.acceptedApplications }}</div>
+    </div>
+    @if (summary()!.averageMatchScore != null) {
+      <div class="stat">
+        <div class="stat__label">متوسط التطابق</div>
+        <div class="stat__value">{{ summary()!.averageMatchScore | number: '1.0-1' }}</div>
+      </div>
+    }
+  </div>
+} @else if (summaryFailed()) {
+  <div class="card card--muted">تعذر تحميل ملخص السوق.</div>
+}
+
+@if (failed()) {
+  <div class="card card--muted">تعذر التحميل.</div>
+} @else if (data()) {
+  <div class="card table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>العنوان</th>
+          <th>النوع</th>
+          <th>الحالة</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of data()!.items; track row.id) {
+          <tr>
+            <td>{{ row.title }}</td>
+            <td>{{ oppType(row.opportunityType) }}</td>
+            <td>{{ oppStatus(row.status) }}</td>
+            <td class="cell-actions"><a class="link" [routerLink]="['/marketplace', row.id]">عرض</a></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <div class="skeleton table-skel"></div>
+}

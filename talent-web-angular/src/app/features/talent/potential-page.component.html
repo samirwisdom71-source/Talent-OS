@@ -1,0 +1,33 @@
+<section class="page-head">
+  <h1>تقييمات الإمكانات</h1>
+</section>
+@if (failed()) {
+  <div class="card card--muted">تعذر التحميل.</div>
+} @else if (data()) {
+  <div class="card table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>الموظف</th>
+          <th>الدورة</th>
+          <th>المستوى</th>
+          <th>الإجمالي</th>
+          <th>الحالة</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of data()!.items; track row.id) {
+          <tr>
+            <td><app-id-chip [id]="row.employeeId" /></td>
+            <td><app-id-chip label="دورة" [id]="row.performanceCycleId" /></td>
+            <td>{{ potentialLevel(row.potentialLevel) }}</td>
+            <td>{{ row.overallPotentialScore | number: '1.0-2' }}</td>
+            <td>{{ assessmentStatus(row.status) }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <div class="skeleton table-skel"></div>
+}

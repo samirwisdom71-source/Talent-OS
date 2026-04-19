@@ -1,0 +1,87 @@
+<div class="exec">
+  <header class="exec__hero">
+    <div class="exec__hero-text">
+      <h1 class="exec__title">التحليلات التنفيذية</h1>
+      <p class="exec__lead">مؤشرات موحّدة من ملخص التنفيذ — نفس مصدر لوحة التحكم للاتساق.</p>
+    </div>
+    <a class="exec__back" routerLink="/dashboard">← لوحة التحكم</a>
+  </header>
+
+  @if (failed()) {
+    <app-empty-state
+      icon="📊"
+      title="تعذر تحميل التحليلات"
+      message="تحقق من الاتصال بالخادم وصلاحياتك ثم أعد المحاولة."
+      retryLabel="إعادة المحاولة"
+      (retryClick)="load()"
+    />
+  } @else if (summary()) {
+    <section class="exec__section exec__section--enter">
+      <h2 class="exec__section-title">مؤشرات المواهب والأداء</h2>
+      <div class="exec__kpi-grid">
+        <article class="exec__kpi exec__kpi--indigo">
+          <span class="exec__kpi-ico" aria-hidden="true">👥</span>
+          <div class="exec__kpi-meta">الموظفون</div>
+          <div class="exec__kpi-value">{{ summary()!.totalEmployees | number }}</div>
+        </article>
+        <article class="exec__kpi exec__kpi--sky">
+          <span class="exec__kpi-ico" aria-hidden="true">📑</span>
+          <div class="exec__kpi-meta">التصنيفات</div>
+          <div class="exec__kpi-value">{{ summary()!.totalTalentClassifications | number }}</div>
+        </article>
+        <article class="exec__kpi exec__kpi--teal">
+          <span class="exec__kpi-ico" aria-hidden="true">✨</span>
+          <div class="exec__kpi-meta">إمكانات مرتفعة</div>
+          <div class="exec__kpi-value">{{ summary()!.highPotentialCount | number }}</div>
+        </article>
+        <article class="exec__kpi exec__kpi--violet">
+          <span class="exec__kpi-ico" aria-hidden="true">🚀</span>
+          <div class="exec__kpi-meta">أداء مرتفع</div>
+          <div class="exec__kpi-value">{{ summary()!.highPerformerCount | number }}</div>
+        </article>
+        <article class="exec__kpi exec__kpi--amber">
+          <span class="exec__kpi-ico" aria-hidden="true">🎯</span>
+          <div class="exec__kpi-meta">قادة استراتيجيون</div>
+          <div class="exec__kpi-value">{{ summary()!.strategicLeaderCount | number }}</div>
+        </article>
+        <article class="exec__kpi exec__kpi--rose">
+          <span class="exec__kpi-ico" aria-hidden="true">📈</span>
+          <div class="exec__kpi-meta">درجات مواهب</div>
+          <div class="exec__kpi-value">{{ summary()!.totalTalentScores | number }}</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="exec__section exec__section--enter exec__section--delay">
+      <h2 class="exec__section-title">العمليات والسوق</h2>
+      <div class="exec__kpi-grid exec__kpi-grid--dense">
+        <article class="exec__kpi exec__kpi--slate">
+          <span class="exec__kpi-ico" aria-hidden="true">📆</span>
+          <div class="exec__kpi-meta">دورات أداء نشطة</div>
+          <div class="exec__kpi-value">{{ summary()!.activePerformanceCycleCount | number }}</div>
+        </article>
+        <article class="exec__kpi exec__kpi--slate">
+          <span class="exec__kpi-ico" aria-hidden="true">🔀</span>
+          <div class="exec__kpi-meta">خطط تعاقب نشطة</div>
+          <div class="exec__kpi-value">{{ summary()!.activeSuccessionPlanCount | number }}</div>
+        </article>
+        <article class="exec__kpi exec__kpi--slate">
+          <span class="exec__kpi-ico" aria-hidden="true">🏪</span>
+          <div class="exec__kpi-meta">فرص مفتوحة</div>
+          <div class="exec__kpi-value">{{ summary()!.openMarketplaceOpportunityCount | number }}</div>
+        </article>
+        <article class="exec__kpi exec__kpi--slate">
+          <span class="exec__kpi-ico" aria-hidden="true">🎓</span>
+          <div class="exec__kpi-meta">خطط تطوير نشطة</div>
+          <div class="exec__kpi-value">{{ summary()!.activeDevelopmentPlanCount | number }}</div>
+        </article>
+      </div>
+    </section>
+  } @else {
+    <div class="exec__skeleton-grid">
+      @for (x of [1, 2, 3, 4, 5, 6]; track x) {
+        <div class="exec__skel"></div>
+      }
+    </div>
+  }
+</div>

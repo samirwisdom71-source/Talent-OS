@@ -1,0 +1,121 @@
+<a routerLink="/succession" class="back-link">← نظرة التعاقب</a>
+@if (failed()) {
+  <div class="card card--muted">تعذر التحميل.</div>
+} @else if (plan()) {
+  <section class="page-head">
+    <h1>{{ plan()!.planName }}</h1>
+    <p class="page-head__sub">{{ planStatus(plan()!.status) }}</p>
+  </section>
+  <div class="card grid">
+    <div>
+      <div class="label">منصب حرج</div>
+      <div class="value"><app-id-chip [id]="plan()!.criticalPositionId" /></div>
+    </div>
+    <div>
+      <div class="label">دورة الأداء</div>
+      <div class="value"><app-id-chip [id]="plan()!.performanceCycleId" /></div>
+    </div>
+    @if (plan()!.coverageSnapshot; as c) {
+      <div>
+        <div class="label">درجة التغطية</div>
+        <div class="value">{{ c.coverageScore | number: '1.0-2' }}</div>
+      </div>
+      <div>
+        <div class="label">عدد المرشحين</div>
+        <div class="value">{{ c.totalCandidates }}</div>
+      </div>
+    }
+  </div>
+
+  <div class="card candidates">
+    <div class="candidates__head">
+      <h2 class="h2">مرشحو الخلافة</h2>
+      @if (auth.hasPermission(PermissionCodes.SuccessionManage)) {
+        <button type="button" class="btn-primary" [disabled]="busy()" (click)="openAdd()">إضافة مرشح</button>
+      }
+    </div>
+    @if (!sortedCandidates().length) {
+      <p class="muted">لا يوجد مرشحون مسجّلون.</p>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>الترتيب</th>
+            <th>الموظف</th>
+            <th>الجاهزية</th>
+            <th>أساسي</th>
+            @if (auth.hasPermission(PermissionCodes.SuccessionManage)) {
+              <th></th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of sortedCandidates(); track c.id) {
+            <tr>
+              <td>{{ c.rankOrder }}</td>
+              <td><app-id-chip [id]="c.employeeId" /></td>
+              <td>{{ readiness(c.readinessLevel) }}</td>
+              <td>
+                @if (c.isPrimarySuccessor) {
+                  <span class="pill pill--primary">أساسي</span>
+                } @else {
+                  <span class="muted">—</span>
+                }
+              </td>
+              @if (auth.hasPermission(PermissionCodes.SuccessionManage)) {
+                <td class="cell-actions">
+                  @if (!c.isPrimarySuccessor) {
+                    <button
+                      type="button"
+                      class="linkish"
+                      [disabled]="busyRowId() === c.id"
+                      (click)="markPrimary(c)"
+                    >
+                      {{ busyRowId() === c.id ? '…' : 'تعيين كأساسي' }}
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    class="linkish danger"
+                    [disabled]="busyRowId() === c.id"
+                    (click)="removeCandidate(c)"
+                  >
+                    حذف
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+} @else {
+  <div class="skeleton detail-skel"></div>
+}
+
+@if (showAddModal()) {
+  <div class="modal-backdrop" (click)="closeAdd()"></div>
+  <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <h3>مرشح جديد</h3>
+    <label>معرّف الموظف (GUID)<input type="text" [(ngModel)]="addForm.employeeId" name="eid" /></label>
+    <label
+      >الجاهزية
+      <select class="select" [(ngModel)]="addForm.readinessLevel" name="rl">
+        <option [ngValue]="1">جاهز الآن</option>
+        <option [ngValue]="2">جاهز قريباً</option>
+        <option [ngValue]="3">جاهز لاحقاً</option>
+      </select>
+    </label>
+    <label>الترتيب <input type="number" [(ngModel)]="addForm.rankOrder" name="ro" min="1" /></label>
+    <label class="inline-check">
+      <input type="checkbox" [(ngModel)]="addForm.isPrimarySuccessor" name="ip" />
+      خليفة أساسي
+    </label>
+    <label>ملاحظات<input type="text" [(ngModel)]="addForm.notes" name="nt" /></label>
+    <div class="modal__actions">
+      <button type="button" class="btn-primary" [disabled]="busy()" (click)="saveCandidate()">حفظ</button>
+      <button type="button" class="btn-secondary" (click)="closeAdd()">إلغاء</button>
+    </div>
+  </div>
+}

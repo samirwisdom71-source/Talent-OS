@@ -1,0 +1,65 @@
+@import '../employees/employee-detail-page.component.scss';
+
+.h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.links {
+  margin: 0;
+  padding-inline-start: 1.1rem;
+  font-size: 0.88rem;
+}
+
+.items-block {
+  margin-top: 1rem;
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.small {
+  font-size: 0.8rem;
+}
+
+.item-title {
+  font-weight: 600;
+}
+
+.prog-input {
+  width: 4rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  padding: 0.25rem 0.35rem;
+}
+
+.pct {
+  font-size: 0.85rem;
+  margin-inline-start: 0.15rem;
+}
+
+.cell-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.linkish {
+  border: none;
+  background: none;
+  color: var(--color-accent-strong);
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.linkish.danger {
+  color: #b91c1c;
+}
+
+.linkish:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

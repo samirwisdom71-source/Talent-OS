@@ -1,0 +1,66 @@
+<section class="page-head">
+  <h1>الذكاء المؤسسي</h1>
+</section>
+@if (failed()) {
+  <div class="card card--muted">تعذر التحميل أو لا تملك صلاحية العرض.</div>
+} @else {
+  <div class="tiles">
+    <a class="tile card" routerLink="/analytics/insights">
+      <div class="tile__label">الرؤى</div>
+      <div class="tile__value">{{ insightTotal() ?? '—' }}</div>
+    </a>
+    <a class="tile card" routerLink="/analytics/recommendations">
+      <div class="tile__label">التوصيات</div>
+      <div class="tile__value">{{ recommendationTotal() ?? '—' }}</div>
+    </a>
+  </div>
+
+  @if (auth.hasPermission(PermissionCodes.IntelligenceGenerate)) {
+    <div class="card gen">
+      <h2 class="gen__title">توليد للموظف والدورة</h2>
+      <div class="gen__grid">
+        <form class="gen__form" [formGroup]="employeeForm" (ngSubmit)="runEmployeeGeneration()">
+          <h3>توليد لموظف</h3>
+          <label>معرّف الموظف (GUID)<input type="text" formControlName="employeeId" autocomplete="off" /></label>
+          <label
+            >دورة الأداء
+            <select formControlName="performanceCycleId">
+              <option value="">— اختر —</option>
+              @for (c of cycles(); track c.id) {
+                <option [value]="c.id">{{ cycleLabel(c) }}</option>
+              }
+            </select>
+          </label>
+          <label
+            >الهدف
+            <select formControlName="target">
+              <option [ngValue]="1">رؤى فقط</option>
+              <option [ngValue]="2">توصيات فقط</option>
+              <option [ngValue]="3">الكل</option>
+            </select>
+          </label>
+          <button class="btn-primary" type="submit" [disabled]="employeeForm.invalid || genEmployeeBusy()">
+            {{ genEmployeeBusy() ? '…' : 'تشغيل التوليد' }}
+          </button>
+        </form>
+        <form class="gen__form" [formGroup]="cycleForm" (ngSubmit)="runCycleGeneration()">
+          <h3>توليد لدورة أداء</h3>
+          <label
+            >الدورة
+            <select formControlName="performanceCycleId">
+              <option value="">— اختر —</option>
+              @for (c of cycles(); track c.id) {
+                <option [value]="c.id">{{ cycleLabel(c) }}</option>
+              }
+            </select>
+          </label>
+          <button class="btn-primary" type="submit" [disabled]="cycleForm.invalid || genCycleBusy()">
+            {{ genCycleBusy() ? '…' : 'توليد للدورة' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  } @else {
+    <p class="hint card card--muted">لا تملك صلاحية التوليد (<code>INTELLIGENCE_GENERATE</code>).</p>
+  }
+}

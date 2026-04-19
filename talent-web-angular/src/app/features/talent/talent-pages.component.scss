@@ -1,0 +1,31 @@
+.select {
+  margin-inline-start: 0.5rem;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  padding: 0.35rem 0.65rem;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+.stat {
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  padding: 0.65rem 0.85rem;
+  background: color-mix(in srgb, var(--color-card) 92%, var(--color-accent) 8%);
+}
+
+.stat__label {
+  font-size: 0.72rem;
+  color: var(--color-muted);
+  margin-bottom: 0.2rem;
+}
+
+.stat__value {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
