@@ -50,6 +50,31 @@ export const routes: Routes = [
         loadComponent: () => import('./features/roles/roles-page.component').then((m) => m.RolesPageComponent),
       },
       {
+        path: 'competency-categories',
+        canActivate: [permissionGuard],
+        data: { permissions: ['COMPETENCY_EDIT'] },
+        loadComponent: () =>
+          import('./features/competency-categories/competency-categories-page.component').then(
+            (m) => m.CompetencyCategoriesPageComponent,
+          ),
+      },
+      {
+        path: 'competencies',
+        canActivate: [permissionGuard],
+        data: { permissions: ['COMPETENCY_EDIT'] },
+        loadComponent: () =>
+          import('./features/competencies/competencies-page.component').then((m) => m.CompetenciesPageComponent),
+      },
+      {
+        path: 'competency-levels',
+        canActivate: [permissionGuard],
+        data: { permissions: ['COMPETENCY_EDIT'] },
+        loadComponent: () =>
+          import('./features/competency-levels/competency-levels-page.component').then(
+            (m) => m.CompetencyLevelsPageComponent,
+          ),
+      },
+      {
         path: 'profile',
         loadComponent: () => import('./features/profile/profile-page.component').then((m) => m.ProfilePageComponent),
       },

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TalentSystem.Application.Common;
 using TalentSystem.Application.Features.Competencies.DTOs;
 using TalentSystem.Application.Features.Competencies.Interfaces;
+using TalentSystem.Application.Features.Identity.DTOs;
 using TalentSystem.Domain.Competencies;
 using TalentSystem.Persistence;
 using TalentSystem.Shared.Api;
@@ -13,6 +14,8 @@ namespace TalentSystem.Application.Features.Competencies.Services;
 
 public sealed class CompetencyCategoryService : ICompetencyCategoryService
 {
+    private const int LookupMaxTake = 200;
+
     private readonly TalentDbContext _db;
     private readonly IValidator<CreateCompetencyCategoryRequest> _createValidator;
     private readonly IValidator<UpdateCompetencyCategoryRequest> _updateValidator;
@@ -147,6 +150,45 @@ public sealed class CompetencyCategoryService : ICompetencyCategoryService
             PageSize = pageSize,
             TotalCount = totalCount
         });
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetLookupAsync(
+        string? search = null,
+        int? take = null,
+        CancellationToken cancellationToken = default)
+    {
+        var baseQuery = _db.CompetencyCategories.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            baseQuery = baseQuery.Where(x =>
+                x.NameAr.Contains(term) ||
+                x.NameEn.Contains(term) ||
+                (x.Description != null && x.Description.Contains(term)));
+        }
+
+        var query = baseQuery
+            .OrderBy(x => x.NameAr)
+            .ThenBy(x => x.NameEn)
+            .Select(x => new LookupItemDto
+            {
+                Id = x.Id,
+                Name = string.IsNullOrWhiteSpace(x.NameAr) ? x.NameEn : x.NameAr,
+                Email = null
+            });
+
+        if (take.HasValue && take.Value > 0)
+        {
+            query = query.Take(Math.Min(take.Value, LookupMaxTake));
+        }
+        else
+        {
+            query = query.Take(LookupMaxTake);
+        }
+
+        var list = await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(list);
     }
 
     private static CompetencyCategoryDto MapToDto(CompetencyCategory entity) =>

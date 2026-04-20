@@ -30,13 +30,13 @@ public sealed class IdentityDatabaseSeeder : IIdentityDatabaseSeeder
     {
         await _permissionService.SeedDefaultPermissionsAsync(cancellationToken).ConfigureAwait(false);
 
-        await EnsureSystemRoleAsync(SystemRoles.Admin, "Full system access", cancellationToken).ConfigureAwait(false);
-        await EnsureSystemRoleAsync(SystemRoles.Hr, "Human resources", cancellationToken).ConfigureAwait(false);
-        await EnsureSystemRoleAsync(SystemRoles.Manager, "Line manager", cancellationToken).ConfigureAwait(false);
-        await EnsureSystemRoleAsync(SystemRoles.Employee, "Standard employee", cancellationToken).ConfigureAwait(false);
+        await EnsureSystemRoleAsync(SystemRoles.Admin, "مدير النظام", "Full system access", cancellationToken).ConfigureAwait(false);
+        await EnsureSystemRoleAsync(SystemRoles.Hr, "الموارد البشرية", "Human resources", cancellationToken).ConfigureAwait(false);
+        await EnsureSystemRoleAsync(SystemRoles.Manager, "المدير", "Line manager", cancellationToken).ConfigureAwait(false);
+        await EnsureSystemRoleAsync(SystemRoles.Employee, "الموظف", "Standard employee", cancellationToken).ConfigureAwait(false);
 
         var adminRole = await _db.Roles.AsNoTracking()
-            .FirstAsync(r => r.Name == SystemRoles.Admin, cancellationToken)
+            .FirstAsync(r => r.NameEn == SystemRoles.Admin, cancellationToken)
             .ConfigureAwait(false);
 
         var allPermissionIds = await _db.Permissions.AsNoTracking().Select(p => p.Id).ToListAsync(cancellationToken)
@@ -94,17 +94,19 @@ public sealed class IdentityDatabaseSeeder : IIdentityDatabaseSeeder
         await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task EnsureSystemRoleAsync(string name, string description, CancellationToken cancellationToken)
+    private async Task EnsureSystemRoleAsync(string nameEn, string nameAr, string descriptionEn, CancellationToken cancellationToken)
     {
-        if (await _db.Roles.AsNoTracking().AnyAsync(r => r.Name == name, cancellationToken).ConfigureAwait(false))
+        if (await _db.Roles.AsNoTracking().AnyAsync(r => r.NameEn == nameEn, cancellationToken).ConfigureAwait(false))
         {
             return;
         }
 
         _db.Roles.Add(new Role
         {
-            Name = name,
-            Description = description,
+            NameAr = nameAr,
+            NameEn = nameEn,
+            DescriptionAr = descriptionEn,
+            DescriptionEn = descriptionEn,
             IsSystemRole = true
         });
 

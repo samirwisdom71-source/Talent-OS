@@ -38,9 +38,10 @@ public sealed class RoleService : IRoleService
             return Result<RoleDto>.Fail(validation.Errors.Select(e => e.ErrorMessage).ToList());
         }
 
-        var name = request.Name.Trim();
+        var nameAr = request.NameAr.Trim();
+        var nameEn = request.NameEn.Trim();
         if (await _db.Roles.AsNoTracking()
-                .AnyAsync(r => r.Name.ToLower() == name.ToLower(), cancellationToken)
+                .AnyAsync(r => r.NameAr.ToLower() == nameAr.ToLower() || r.NameEn.ToLower() == nameEn.ToLower(), cancellationToken)
                 .ConfigureAwait(false))
         {
             return Result<RoleDto>.Fail("A role with this name already exists.", IdentityErrors.DuplicateRoleName);
@@ -48,8 +49,10 @@ public sealed class RoleService : IRoleService
 
         var role = new Role
         {
-            Name = name,
-            Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
+            NameAr = nameAr,
+            NameEn = nameEn,
+            DescriptionAr = string.IsNullOrWhiteSpace(request.DescriptionAr) ? null : request.DescriptionAr.Trim(),
+            DescriptionEn = string.IsNullOrWhiteSpace(request.DescriptionEn) ? null : request.DescriptionEn.Trim(),
             IsSystemRole = request.IsSystemRole
         };
 
@@ -73,21 +76,27 @@ public sealed class RoleService : IRoleService
             return Result<RoleDto>.Fail("The role was not found.", IdentityErrors.RoleNotFound);
         }
 
-        var name = request.Name.Trim();
-        if (role.IsSystemRole && !string.Equals(role.Name, name, StringComparison.Ordinal))
+        var nameAr = request.NameAr.Trim();
+        var nameEn = request.NameEn.Trim();
+        if (role.IsSystemRole &&
+            (!string.Equals(role.NameAr, nameAr, StringComparison.Ordinal) || !string.Equals(role.NameEn, nameEn, StringComparison.Ordinal)))
         {
             return Result<RoleDto>.Fail("System role names cannot be changed.", IdentityErrors.SystemRoleNameImmutable);
         }
 
         if (await _db.Roles.AsNoTracking()
-                .AnyAsync(r => r.Name.ToLower() == name.ToLower() && r.Id != id, cancellationToken)
+                .AnyAsync(r =>
+                    (r.NameAr.ToLower() == nameAr.ToLower() || r.NameEn.ToLower() == nameEn.ToLower()) && r.Id != id,
+                    cancellationToken)
                 .ConfigureAwait(false))
         {
             return Result<RoleDto>.Fail("A role with this name already exists.", IdentityErrors.DuplicateRoleName);
         }
 
-        role.Name = name;
-        role.Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim();
+        role.NameAr = nameAr;
+        role.NameEn = nameEn;
+        role.DescriptionAr = string.IsNullOrWhiteSpace(request.DescriptionAr) ? null : request.DescriptionAr.Trim();
+        role.DescriptionEn = string.IsNullOrWhiteSpace(request.DescriptionEn) ? null : request.DescriptionEn.Trim();
 
         await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
@@ -163,19 +172,25 @@ public sealed class RoleService : IRoleService
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
             var term = request.Search.Trim();
-            query = query.Where(r => r.Name.Contains(term) || (r.Description != null && r.Description.Contains(term)));
+            query = query.Where(r =>
+                r.NameAr.Contains(term) ||
+                r.NameEn.Contains(term) ||
+                (r.DescriptionAr != null && r.DescriptionAr.Contains(term)) ||
+                (r.DescriptionEn != null && r.DescriptionEn.Contains(term)));
         }
 
         var total = await query.CountAsync(cancellationToken).ConfigureAwait(false);
         var items = await query
-            .OrderBy(r => r.Name)
+            .OrderBy(r => r.NameEn)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(r => new RoleListItemDto
             {
                 Id = r.Id,
-                Name = r.Name,
-                Description = r.Description,
+                NameAr = r.NameAr,
+                NameEn = r.NameEn,
+                DescriptionAr = r.DescriptionAr,
+                DescriptionEn = r.DescriptionEn,
                 IsSystemRole = r.IsSystemRole
             })
             .ToListAsync(cancellationToken)
@@ -197,8 +212,10 @@ public sealed class RoleService : IRoleService
             .Select(r => new
             {
                 r.Id,
-                r.Name,
-                r.Description,
+                r.NameAr,
+                r.NameEn,
+                r.DescriptionAr,
+                r.DescriptionEn,
                 r.IsSystemRole,
                 PermissionCodes = r.RolePermissions
                     .Select(rp => rp.Permission.Code)
@@ -211,8 +228,10 @@ public sealed class RoleService : IRoleService
         return new RoleDto
         {
             Id = role.Id,
-            Name = role.Name,
-            Description = role.Description,
+            NameAr = role.NameAr,
+            NameEn = role.NameEn,
+            DescriptionAr = role.DescriptionAr,
+            DescriptionEn = role.DescriptionEn,
             IsSystemRole = role.IsSystemRole,
             PermissionCodes = role.PermissionCodes
         };

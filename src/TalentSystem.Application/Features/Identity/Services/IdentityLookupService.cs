@@ -46,17 +46,30 @@ public sealed class IdentityLookupService : IIdentityLookupService
         int? take = null,
         CancellationToken cancellationToken = default)
     {
-        var query = _db.Users
-            .AsNoTracking()
+        var baseQuery = _db.Users.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            baseQuery = baseQuery.Where(u =>
+                u.UserName.Contains(term) ||
+                (u.Email != null && u.Email.Contains(term)) ||
+                (u.NameAr != null && u.NameAr.Contains(term)) ||
+                (u.NameEn != null && u.NameEn.Contains(term)));
+        }
+
+        var query = baseQuery
             .OrderBy(u => u.UserName)
             .Select(u => new LookupItemDto
             {
                 Id = u.Id,
-                Name = u.UserName,
+                Name = string.IsNullOrWhiteSpace(u.NameAr)
+                    ? (string.IsNullOrWhiteSpace(u.NameEn) ? u.UserName : u.NameEn)
+                    : u.NameAr,
                 Email = u.Email
             });
 
-        var users = await ApplySearchAndTake(query, search, take)
+        var users = await ApplySearchAndTake(query, search: null, take, includeEmailSearch: true)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
@@ -70,11 +83,12 @@ public sealed class IdentityLookupService : IIdentityLookupService
     {
         var query = _db.Roles
             .AsNoTracking()
-            .OrderBy(r => r.Name)
+            .OrderBy(r => r.NameAr)
+            .ThenBy(r => r.NameEn)
             .Select(r => new LookupItemDto
             {
                 Id = r.Id,
-                Name = r.Name
+                Name = string.IsNullOrWhiteSpace(r.NameAr) ? r.NameEn : r.NameAr
             });
 
         var roles = await ApplySearchAndTake(query, search, take, includeEmailSearch: false)
@@ -92,11 +106,12 @@ public sealed class IdentityLookupService : IIdentityLookupService
         var query = _db.Permissions
             .AsNoTracking()
             .OrderBy(p => p.Module)
-            .ThenBy(p => p.Name)
+            .ThenBy(p => p.NameAr)
+            .ThenBy(p => p.NameEn)
             .Select(p => new LookupItemDto
             {
                 Id = p.Id,
-                Name = p.Name
+                Name = string.IsNullOrWhiteSpace(p.NameAr) ? p.NameEn : p.NameAr
             });
 
         var permissions = await ApplySearchAndTake(query, search, take, includeEmailSearch: false)

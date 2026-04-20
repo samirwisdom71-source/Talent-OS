@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TalentSystem.Api.Extensions;
 using TalentSystem.Application.Features.Competencies.DTOs;
 using TalentSystem.Application.Features.Competencies.Interfaces;
+using TalentSystem.Application.Features.Identity.DTOs;
 using TalentSystem.Shared.Api;
 
 namespace TalentSystem.Api.Controllers;
@@ -68,5 +69,17 @@ public sealed class CompetencyCategoriesController : ControllerBase
         }
 
         return result.ToFailureActionResult(this, traceId);
+    }
+
+    /// <summary>Lightweight list of categories (id + display name) for dropdowns and other screens.</summary>
+    [HttpGet("lookup")]
+    public async Task<IActionResult> GetLookup(
+        [FromQuery] string? search,
+        [FromQuery] int? take,
+        CancellationToken cancellationToken)
+    {
+        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var result = await _service.GetLookupAsync(search, take, cancellationToken);
+        return result.ToApiActionResult(this, traceId);
     }
 }

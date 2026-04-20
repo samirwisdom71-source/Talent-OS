@@ -7,7 +7,9 @@ public sealed class CreateRoleRequestValidator : AbstractValidator<CreateRoleReq
 {
     public CreateRoleRequestValidator()
     {
-        RuleFor(x => x.Name).NotEmpty().MaximumLength(128);
-        RuleFor(x => x.Description).MaximumLength(512);
+        RuleFor(x => x.NameAr).NotEmpty().MaximumLength(128);
+        RuleFor(x => x.NameEn).NotEmpty().MaximumLength(128);
+        RuleFor(x => x.DescriptionAr).MaximumLength(512);
+        RuleFor(x => x.DescriptionEn).MaximumLength(512);
     }
 }

@@ -53,6 +53,8 @@ export class UsersPageComponent implements OnInit {
   readonly createRoleSearch = signal('');
   createModel: CreateUserRequest = {
     userName: '',
+    nameAr: '',
+    nameEn: '',
     email: '',
     password: '',
     employeeId: null,
@@ -68,6 +70,8 @@ export class UsersPageComponent implements OnInit {
   readonly editUserId = signal<string | null>(null);
   editModel: UpdateUserRequest = {
     userName: '',
+    nameAr: '',
+    nameEn: '',
     email: '',
     employeeId: null,
     newPassword: null,
@@ -135,6 +139,8 @@ export class UsersPageComponent implements OnInit {
   openCreate(): void {
     this.createModel = {
       userName: '',
+      nameAr: '',
+      nameEn: '',
       email: '',
       password: '',
       employeeId: null,
@@ -191,6 +197,8 @@ export class UsersPageComponent implements OnInit {
     const body: CreateUserRequest = {
       ...this.createModel,
       userName: this.createModel.userName.trim(),
+      nameAr: this.createModel.nameAr?.trim() ? this.createModel.nameAr.trim() : null,
+      nameEn: this.createModel.nameEn?.trim() ? this.createModel.nameEn.trim() : null,
       email: this.createModel.email.trim(),
       password: this.createModel.password,
       employeeId: this.normalizeNullableGuid(this.createModel.employeeId),
@@ -243,6 +251,8 @@ export class UsersPageComponent implements OnInit {
       next: (u) => {
         this.editModel = {
           userName: u.userName,
+          nameAr: u.nameAr ?? '',
+          nameEn: u.nameEn ?? '',
           email: u.email,
           employeeId: u.employeeId ?? null,
           newPassword: null,
@@ -274,6 +284,8 @@ export class UsersPageComponent implements OnInit {
     this.editBusy.set(true);
     const body: UpdateUserRequest = {
       userName: this.editModel.userName.trim(),
+      nameAr: this.editModel.nameAr?.trim() ? this.editModel.nameAr.trim() : null,
+      nameEn: this.editModel.nameEn?.trim() ? this.editModel.nameEn.trim() : null,
       email: this.editModel.email.trim(),
       employeeId: this.normalizeNullableGuid(this.editModel.employeeId),
       newPassword: this.editModel.newPassword?.trim() ? this.editModel.newPassword.trim() : null,
@@ -423,6 +435,13 @@ export class UsersPageComponent implements OnInit {
     const term = search.trim().toLowerCase();
     if (!term) return this.roles();
     return this.roles().filter((r) => r.name.toLowerCase().includes(term));
+  }
+
+  userDisplayName(user: Pick<UserListItemDto, 'userName' | 'nameAr' | 'nameEn'>): string {
+    if (this.i18n.lang() === 'ar') {
+      return user.nameAr?.trim() || user.nameEn?.trim() || user.userName;
+    }
+    return user.nameEn?.trim() || user.nameAr?.trim() || user.userName;
   }
 
   private roleIdsFromNames(roleNames: readonly string[]): string[] {

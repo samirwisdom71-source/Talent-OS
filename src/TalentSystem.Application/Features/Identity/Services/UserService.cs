@@ -83,6 +83,8 @@ public sealed class UserService : IUserService
         var user = new User
         {
             UserName = userName,
+            NameAr = NormalizeOptionalName(request.NameAr),
+            NameEn = NormalizeOptionalName(request.NameEn),
             Email = email,
             PasswordHash = _passwordHasher.Hash(request.Password),
             IsActive = true,
@@ -151,6 +153,8 @@ public sealed class UserService : IUserService
         }
 
         user.UserName = userName;
+        user.NameAr = NormalizeOptionalName(request.NameAr);
+        user.NameEn = NormalizeOptionalName(request.NameEn);
         user.Email = email;
         user.EmployeeId = request.EmployeeId;
 
@@ -257,7 +261,9 @@ public sealed class UserService : IUserService
             var term = request.Search.Trim();
             query = query.Where(u =>
                 u.UserName.Contains(term) ||
-                u.Email.Contains(term));
+                u.Email.Contains(term) ||
+                (u.NameAr != null && u.NameAr.Contains(term)) ||
+                (u.NameEn != null && u.NameEn.Contains(term)));
         }
 
         var total = await query.CountAsync(cancellationToken).ConfigureAwait(false);
@@ -269,6 +275,8 @@ public sealed class UserService : IUserService
             {
                 Id = u.Id,
                 UserName = u.UserName,
+                NameAr = u.NameAr,
+                NameEn = u.NameEn,
                 Email = u.Email,
                 IsActive = u.IsActive,
                 EmployeeId = u.EmployeeId,
@@ -294,11 +302,16 @@ public sealed class UserService : IUserService
             {
                 u.Id,
                 u.UserName,
+                u.NameAr,
+                u.NameEn,
                 u.Email,
                 u.IsActive,
                 u.EmployeeId,
                 u.LastLoginUtc,
-                RoleNames = u.UserRoles.Select(ur => ur.Role.Name).OrderBy(n => n).ToList()
+                RoleNames = u.UserRoles
+                    .Select(ur => string.IsNullOrWhiteSpace(ur.Role.NameAr) ? ur.Role.NameEn : ur.Role.NameAr)
+                    .OrderBy(n => n)
+                    .ToList()
             })
             .FirstAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -307,6 +320,8 @@ public sealed class UserService : IUserService
         {
             Id = user.Id,
             UserName = user.UserName,
+            NameAr = user.NameAr,
+            NameEn = user.NameEn,
             Email = user.Email,
             IsActive = user.IsActive,
             EmployeeId = user.EmployeeId,
@@ -318,4 +333,14 @@ public sealed class UserService : IUserService
     private static string NormalizeUserName(string userName) => userName.Trim().ToLowerInvariant();
 
     private static string NormalizeEmail(string email) => email.Trim().ToLowerInvariant();
+
+    private static string? NormalizeOptionalName(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        return value.Trim();
+    }
 }

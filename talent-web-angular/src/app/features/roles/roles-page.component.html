@@ -57,8 +57,8 @@
         <tbody>
           @for (row of result()!.items; track row.id) {
             <tr>
-              <td>{{ row.name }}</td>
-              <td>{{ row.description || '-' }}</td>
+              <td>{{ roleDisplayName(row) }}</td>
+              <td>{{ roleDisplayDescription(row) || '-' }}</td>
               <td>
                 <span class="status-chip" [class.status-chip--inactive]="!row.isSystemRole">
                   {{ row.isSystemRole ? ('roles.type.system' | t) : ('roles.type.custom' | t) }}
@@ -92,12 +92,12 @@
       @for (row of result()!.items; track row.id) {
         <article class="card role-card">
           <header class="role-card__head">
-            <h3>{{ row.name }}</h3>
+            <h3>{{ roleDisplayName(row) }}</h3>
             <span class="status-chip" [class.status-chip--inactive]="!row.isSystemRole">
               {{ row.isSystemRole ? ('roles.type.system' | t) : ('roles.type.custom' | t) }}
             </span>
           </header>
-          <p class="role-card__line">{{ row.description || '-' }}</p>
+          <p class="role-card__line">{{ roleDisplayDescription(row) || '-' }}</p>
           <div class="card-actions">
             <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">{{ 'roles.actions.details' | t }}</button>
             <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">{{ 'roles.actions.edit' | t }}</button>
@@ -122,12 +122,20 @@
     <h2>{{ 'roles.create' | t }}</h2>
     <div class="form-grid">
       <label>
-        <span>{{ 'roles.form.name' | t }} <span class="required">*</span></span>
-        <input type="text" [(ngModel)]="createModel.name" />
+        <span>{{ 'roles.form.nameAr' | t }} <span class="required">*</span></span>
+        <input type="text" [(ngModel)]="createModel.nameAr" />
       </label>
       <label>
-        <span>{{ 'roles.form.description' | t }}</span>
-        <input type="text" [(ngModel)]="createModel.description" />
+        <span>{{ 'roles.form.nameEn' | t }} <span class="required">*</span></span>
+        <input type="text" [(ngModel)]="createModel.nameEn" />
+      </label>
+      <label>
+        <span>{{ 'roles.form.descriptionAr' | t }}</span>
+        <input type="text" [(ngModel)]="createModel.descriptionAr" />
+      </label>
+      <label>
+        <span>{{ 'roles.form.descriptionEn' | t }}</span>
+        <input type="text" [(ngModel)]="createModel.descriptionEn" />
       </label>
       <label class="full checkbox-row">
         <input type="checkbox" [(ngModel)]="createModel.isSystemRole" />
@@ -151,11 +159,11 @@
       <div class="details-grid">
         <div class="detail-item">
           <span>{{ 'roles.form.name' | t }}</span>
-          <strong>{{ detailsRole()!.name }}</strong>
+          <strong>{{ roleDisplayName(detailsRole()!) }}</strong>
         </div>
         <div class="detail-item">
           <span>{{ 'roles.form.description' | t }}</span>
-          <strong>{{ detailsRole()!.description || '-' }}</strong>
+          <strong>{{ roleDisplayDescription(detailsRole()!) || '-' }}</strong>
         </div>
         <div class="detail-item">
           <span>{{ 'roles.table.type' | t }}</span>
@@ -179,7 +187,7 @@
                   @if (isDetailsGroupExpanded(group.key)) {
                     <div class="permission-list">
                       @for (permission of group.permissions; track permission.id) {
-                        <span class="permission-tag">{{ permission.name }}</span>
+                        <span class="permission-tag">{{ permissionDisplayName(permission) }}</span>
                       }
                     </div>
                   }
@@ -210,12 +218,20 @@
     <h2>{{ 'roles.edit.title' | t }}</h2>
     <div class="form-grid">
       <label>
-        <span>{{ 'roles.form.name' | t }} <span class="required">*</span></span>
-        <input type="text" [(ngModel)]="editModel.name" />
+        <span>{{ 'roles.form.nameAr' | t }} <span class="required">*</span></span>
+        <input type="text" [(ngModel)]="editModel.nameAr" />
       </label>
       <label>
-        <span>{{ 'roles.form.description' | t }}</span>
-        <input type="text" [(ngModel)]="editModel.description" />
+        <span>{{ 'roles.form.nameEn' | t }} <span class="required">*</span></span>
+        <input type="text" [(ngModel)]="editModel.nameEn" />
+      </label>
+      <label>
+        <span>{{ 'roles.form.descriptionAr' | t }}</span>
+        <input type="text" [(ngModel)]="editModel.descriptionAr" />
+      </label>
+      <label>
+        <span>{{ 'roles.form.descriptionEn' | t }}</span>
+        <input type="text" [(ngModel)]="editModel.descriptionEn" />
       </label>
     </div>
     <div class="modal-actions">
@@ -249,7 +265,7 @@
                   [class.permission-pill--selected]="permissionSelected(permission.id)"
                   (click)="toggleAssignedPermission(permission.id)"
                 >
-                  <span class="permission-pill__name">{{ permission.name }}</span>
+                  <span class="permission-pill__name">{{ permissionDisplayName(permission) }}</span>
                 </button>
               }
             </div>

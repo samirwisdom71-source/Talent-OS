@@ -6,9 +6,13 @@ public sealed class RoleDto
 {
     public Guid Id { get; init; }
 
-    public string Name { get; init; } = string.Empty;
+    public string NameAr { get; init; } = string.Empty;
 
-    public string? Description { get; init; }
+    public string NameEn { get; init; } = string.Empty;
+
+    public string? DescriptionAr { get; init; }
+
+    public string? DescriptionEn { get; init; }
 
     public bool IsSystemRole { get; init; }
 
@@ -19,27 +23,39 @@ public sealed class RoleListItemDto
 {
     public Guid Id { get; init; }
 
-    public string Name { get; init; } = string.Empty;
+    public string NameAr { get; init; } = string.Empty;
 
-    public string? Description { get; init; }
+    public string NameEn { get; init; } = string.Empty;
+
+    public string? DescriptionAr { get; init; }
+
+    public string? DescriptionEn { get; init; }
 
     public bool IsSystemRole { get; init; }
 }
 
 public sealed class CreateRoleRequest
 {
-    public string Name { get; set; } = string.Empty;
+    public string NameAr { get; set; } = string.Empty;
 
-    public string? Description { get; set; }
+    public string NameEn { get; set; } = string.Empty;
+
+    public string? DescriptionAr { get; set; }
+
+    public string? DescriptionEn { get; set; }
 
     public bool IsSystemRole { get; set; }
 }
 
 public sealed class UpdateRoleRequest
 {
-    public string Name { get; set; } = string.Empty;
+    public string NameAr { get; set; } = string.Empty;
 
-    public string? Description { get; set; }
+    public string NameEn { get; set; } = string.Empty;
+
+    public string? DescriptionAr { get; set; }
+
+    public string? DescriptionEn { get; set; }
 }
 
 public sealed class AssignRolePermissionsRequest

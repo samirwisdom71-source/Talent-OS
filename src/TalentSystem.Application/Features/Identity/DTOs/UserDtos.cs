@@ -8,6 +8,10 @@ public sealed class UserDto
 
     public string UserName { get; init; } = string.Empty;
 
+    public string? NameAr { get; init; }
+
+    public string? NameEn { get; init; }
+
     public string Email { get; init; } = string.Empty;
 
     public bool IsActive { get; init; }
@@ -25,6 +29,10 @@ public sealed class UserListItemDto
 
     public string UserName { get; init; } = string.Empty;
 
+    public string? NameAr { get; init; }
+
+    public string? NameEn { get; init; }
+
     public string Email { get; init; } = string.Empty;
 
     public bool IsActive { get; init; }
@@ -38,6 +46,10 @@ public sealed class CreateUserRequest
 {
     public string UserName { get; set; } = string.Empty;
 
+    public string? NameAr { get; set; }
+
+    public string? NameEn { get; set; }
+
     public string Email { get; set; } = string.Empty;
 
     public string Password { get; set; } = string.Empty;
@@ -50,6 +62,10 @@ public sealed class CreateUserRequest
 public sealed class UpdateUserRequest
 {
     public string UserName { get; set; } = string.Empty;
+
+    public string? NameAr { get; set; }
+
+    public string? NameEn { get; set; }
 
     public string Email { get; set; } = string.Empty;
 

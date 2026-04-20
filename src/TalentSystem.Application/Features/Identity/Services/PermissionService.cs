@@ -18,25 +18,50 @@ public sealed class PermissionService : IPermissionService
 
     public async Task<Result> SeedDefaultPermissionsAsync(CancellationToken cancellationToken = default)
     {
+        var existingByCode = await _db.Permissions
+            .ToDictionaryAsync(p => p.Code, cancellationToken)
+            .ConfigureAwait(false);
+
+        var hasChanges = false;
         foreach (var def in PermissionDefinitions.All)
         {
-            var exists = await _db.Permissions.AsNoTracking()
-                .AnyAsync(p => p.Code == def.Code, cancellationToken)
-                .ConfigureAwait(false);
-            if (exists)
+            if (existingByCode.TryGetValue(def.Code, out var existing))
             {
+                // Keep seeded permissions synchronized with latest bilingual labels.
+                if (!string.Equals(existing.NameAr, def.NameAr, StringComparison.Ordinal) ||
+                    !string.Equals(existing.NameEn, def.NameEn, StringComparison.Ordinal) ||
+                    !string.Equals(existing.DescriptionAr, def.DescriptionAr, StringComparison.Ordinal) ||
+                    !string.Equals(existing.DescriptionEn, def.DescriptionEn, StringComparison.Ordinal) ||
+                    !string.Equals(existing.Module, def.Module, StringComparison.Ordinal))
+                {
+                    existing.NameAr = def.NameAr;
+                    existing.NameEn = def.NameEn;
+                    existing.DescriptionAr = def.DescriptionAr;
+                    existing.DescriptionEn = def.DescriptionEn;
+                    existing.Module = def.Module;
+                    hasChanges = true;
+                }
+
                 continue;
             }
 
             _db.Permissions.Add(new Permission
             {
                 Code = def.Code,
-                Name = def.Name,
+                NameAr = def.NameAr,
+                NameEn = def.NameEn,
+                DescriptionAr = def.DescriptionAr,
+                DescriptionEn = def.DescriptionEn,
                 Module = def.Module
             });
+            hasChanges = true;
         }
 
-        await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (hasChanges)
+        {
+            await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
+
         return Result.Ok();
     }
 
@@ -49,7 +74,10 @@ public sealed class PermissionService : IPermissionService
             {
                 Id = p.Id,
                 Code = p.Code,
-                Name = p.Name,
+                NameAr = p.NameAr,
+                NameEn = p.NameEn,
+                DescriptionAr = p.DescriptionAr,
+                DescriptionEn = p.DescriptionEn,
                 Module = p.Module
             })
             .ToListAsync(cancellationToken)

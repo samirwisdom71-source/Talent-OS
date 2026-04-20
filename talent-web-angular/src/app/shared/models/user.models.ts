@@ -1,6 +1,8 @@
 export interface UserListItemDto {
   id: string;
   userName: string;
+  nameAr?: string | null;
+  nameEn?: string | null;
   email: string;
   isActive: boolean;
   employeeId?: string | null;
@@ -19,6 +21,8 @@ export interface UserFilterRequest {
 
 export interface CreateUserRequest {
   userName: string;
+  nameAr?: string | null;
+  nameEn?: string | null;
   email: string;
   password: string;
   employeeId?: string | null;
@@ -27,6 +31,8 @@ export interface CreateUserRequest {
 
 export interface UpdateUserRequest {
   userName: string;
+  nameAr?: string | null;
+  nameEn?: string | null;
   email: string;
   employeeId?: string | null;
   newPassword?: string | null;

@@ -129,6 +129,11 @@
   color: var(--color-muted);
 }
 
+.user-card__line--secondary {
+  font-size: 0.85rem;
+  opacity: 0.92;
+}
+
 .card-actions {
   display: flex;
   gap: 0.5rem;

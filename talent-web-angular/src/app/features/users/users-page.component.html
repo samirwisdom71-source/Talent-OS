@@ -48,6 +48,7 @@
       <table class="data-table">
         <thead>
           <tr>
+            <th>{{ 'users.table.displayName' | t }}</th>
             <th>{{ 'users.table.userName' | t }}</th>
             <th>{{ 'users.table.email' | t }}</th>
             <th>{{ 'common.status' | t }}</th>
@@ -58,6 +59,7 @@
         <tbody>
           @for (row of result()!.items; track row.id) {
             <tr>
+              <td>{{ userDisplayName(row) }}</td>
               <td>{{ row.userName }}</td>
               <td>{{ row.email }}</td>
               <td>
@@ -88,11 +90,12 @@
       @for (row of result()!.items; track row.id) {
         <article class="card user-card">
           <header class="user-card__head">
-            <h3>{{ row.userName }}</h3>
+            <h3>{{ userDisplayName(row) }}</h3>
             <span class="status-chip" [class.status-chip--inactive]="!row.isActive">
               {{ row.isActive ? ('users.status.active' | t) : ('users.status.inactive' | t) }}
             </span>
           </header>
+          <p class="user-card__line user-card__line--secondary">{{ 'users.table.userName' | t }}: {{ row.userName }}</p>
           <p class="user-card__line">{{ row.email }}</p>
           <p class="user-card__line">{{ 'users.table.lastLogin' | t }}: {{ row.lastLoginUtc ? (row.lastLoginUtc | date: 'short') : '-' }}</p>
           <div class="card-actions">
@@ -121,6 +124,14 @@
       <label>
         <span>{{ 'users.form.userName' | t }} <span class="required">*</span></span>
         <input type="text" [(ngModel)]="createModel.userName" />
+      </label>
+      <label>
+        <span>{{ 'users.form.nameAr' | t }}</span>
+        <input type="text" [(ngModel)]="createModel.nameAr" [placeholder]="'users.form.nameArPlaceholder' | t" />
+      </label>
+      <label>
+        <span>{{ 'users.form.nameEn' | t }}</span>
+        <input type="text" [(ngModel)]="createModel.nameEn" [placeholder]="'users.form.nameEnPlaceholder' | t" />
       </label>
       <label>
         <span>{{ 'users.form.email' | t }} <span class="required">*</span></span>
@@ -187,8 +198,20 @@
       <h2>{{ 'users.details.title' | t }}</h2>
       <div class="details-grid">
         <div class="detail-item">
+          <span>{{ 'users.table.displayName' | t }}</span>
+          <strong>{{ userDisplayName(detailsUser()!) }}</strong>
+        </div>
+        <div class="detail-item">
           <span>{{ 'users.form.userName' | t }}</span>
           <strong>{{ detailsUser()!.userName }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'users.form.nameAr' | t }}</span>
+          <strong>{{ detailsUser()!.nameAr?.trim() || '-' }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'users.form.nameEn' | t }}</span>
+          <strong>{{ detailsUser()!.nameEn?.trim() || '-' }}</strong>
         </div>
         <div class="detail-item">
           <span>{{ 'users.form.email' | t }}</span>
@@ -234,6 +257,14 @@
       <label>
         <span>{{ 'users.form.userName' | t }} <span class="required">*</span></span>
         <input type="text" [(ngModel)]="editModel.userName" />
+      </label>
+      <label>
+        <span>{{ 'users.form.nameAr' | t }}</span>
+        <input type="text" [(ngModel)]="editModel.nameAr" [placeholder]="'users.form.nameArPlaceholder' | t" />
+      </label>
+      <label>
+        <span>{{ 'users.form.nameEn' | t }}</span>
+        <input type="text" [(ngModel)]="editModel.nameEn" [placeholder]="'users.form.nameEnPlaceholder' | t" />
       </label>
       <label>
         <span>{{ 'users.form.email' | t }} <span class="required">*</span></span>

@@ -8,6 +8,8 @@ public sealed class UpdateUserRequestValidator : AbstractValidator<UpdateUserReq
     public UpdateUserRequestValidator()
     {
         RuleFor(x => x.UserName).NotEmpty().MaximumLength(128);
+        RuleFor(x => x.NameAr).MaximumLength(128);
+        RuleFor(x => x.NameEn).MaximumLength(128);
         RuleFor(x => x.Email).NotEmpty().EmailAddress().MaximumLength(320);
         RuleFor(x => x.NewPassword)
             .MaximumLength(256)

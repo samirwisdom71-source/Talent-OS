@@ -49,8 +49,10 @@ export class RolesPageComponent implements OnInit {
   readonly createOpen = signal(false);
   readonly createBusy = signal(false);
   createModel: CreateRoleRequest = {
-    name: '',
-    description: '',
+    nameAr: '',
+    nameEn: '',
+    descriptionAr: '',
+    descriptionEn: '',
     isSystemRole: false,
   };
 
@@ -63,8 +65,10 @@ export class RolesPageComponent implements OnInit {
   readonly editBusy = signal(false);
   readonly editRoleId = signal<string | null>(null);
   editModel: UpdateRoleRequest = {
-    name: '',
-    description: '',
+    nameAr: '',
+    nameEn: '',
+    descriptionAr: '',
+    descriptionEn: '',
   };
 
   readonly permissionsOpen = signal(false);
@@ -127,7 +131,7 @@ export class RolesPageComponent implements OnInit {
   }
 
   openCreate(): void {
-    this.createModel = { name: '', description: '', isSystemRole: false };
+    this.createModel = { nameAr: '', nameEn: '', descriptionAr: '', descriptionEn: '', isSystemRole: false };
     this.createOpen.set(true);
   }
 
@@ -138,11 +142,13 @@ export class RolesPageComponent implements OnInit {
 
   saveCreate(): void {
     const body: CreateRoleRequest = {
-      name: this.createModel.name.trim(),
-      description: this.createModel.description?.trim() ? this.createModel.description.trim() : null,
+      nameAr: this.createModel.nameAr.trim(),
+      nameEn: this.createModel.nameEn.trim(),
+      descriptionAr: this.createModel.descriptionAr?.trim() ? this.createModel.descriptionAr.trim() : null,
+      descriptionEn: this.createModel.descriptionEn?.trim() ? this.createModel.descriptionEn.trim() : null,
       isSystemRole: this.createModel.isSystemRole,
     };
-    if (!body.name) {
+    if (!body.nameAr || !body.nameEn) {
       this.toast.show(this.i18n.t('roles.toast.createRequired'), 'error');
       return;
     }
@@ -209,8 +215,10 @@ export class RolesPageComponent implements OnInit {
     this.api.getById(id).subscribe({
       next: (r) => {
         this.editModel = {
-          name: r.name,
-          description: r.description ?? '',
+          nameAr: r.nameAr,
+          nameEn: r.nameEn,
+          descriptionAr: r.descriptionAr ?? '',
+          descriptionEn: r.descriptionEn ?? '',
         };
         this.editBusy.set(false);
       },
@@ -232,10 +240,12 @@ export class RolesPageComponent implements OnInit {
     const id = this.editRoleId();
     if (!id) return;
     const body: UpdateRoleRequest = {
-      name: this.editModel.name.trim(),
-      description: this.editModel.description?.trim() ? this.editModel.description.trim() : null,
+      nameAr: this.editModel.nameAr.trim(),
+      nameEn: this.editModel.nameEn.trim(),
+      descriptionAr: this.editModel.descriptionAr?.trim() ? this.editModel.descriptionAr.trim() : null,
+      descriptionEn: this.editModel.descriptionEn?.trim() ? this.editModel.descriptionEn.trim() : null,
     };
-    if (!body.name) {
+    if (!body.nameAr || !body.nameEn) {
       this.toast.show(this.i18n.t('roles.toast.editRequired'), 'error');
       return;
     }
@@ -325,7 +335,8 @@ export class RolesPageComponent implements OnInit {
     if (!term) return this.permissions();
     return this.permissions().filter(
       (x) =>
-        x.name.toLowerCase().includes(term) ||
+        x.nameAr.toLowerCase().includes(term) ||
+        x.nameEn.toLowerCase().includes(term) ||
         x.code.toLowerCase().includes(term) ||
         x.module.toLowerCase().includes(term),
     );
@@ -359,8 +370,26 @@ export class RolesPageComponent implements OnInit {
       .map(([key, permissions]) => ({
         key,
         label: this.i18n.t(key),
-        permissions: permissions.sort((a, b) => a.name.localeCompare(b.name, this.i18n.lang())),
+        permissions: permissions.sort((a, b) =>
+          this.permissionDisplayName(a).localeCompare(this.permissionDisplayName(b), this.i18n.lang()),
+        ),
       }));
+  }
+
+  roleDisplayName(role: Pick<RoleListItemDto, 'nameAr' | 'nameEn'>): string {
+    return this.i18n.lang() === 'ar' ? role.nameAr || role.nameEn : role.nameEn || role.nameAr;
+  }
+
+  roleDisplayDescription(role: Pick<RoleListItemDto, 'descriptionAr' | 'descriptionEn'>): string | null {
+    return this.i18n.lang() === 'ar'
+      ? role.descriptionAr ?? role.descriptionEn ?? null
+      : role.descriptionEn ?? role.descriptionAr ?? null;
+  }
+
+  permissionDisplayName(permission: Pick<PermissionDto, 'nameAr' | 'nameEn'>): string {
+    return this.i18n.lang() === 'ar'
+      ? permission.nameAr || permission.nameEn
+      : permission.nameEn || permission.nameAr;
   }
 
   private moduleLabelKey(module: string): string {

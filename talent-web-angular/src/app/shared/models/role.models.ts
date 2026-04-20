@@ -1,7 +1,9 @@
 export interface RoleListItemDto {
   id: string;
-  name: string;
-  description?: string | null;
+  nameAr: string;
+  nameEn: string;
+  descriptionAr?: string | null;
+  descriptionEn?: string | null;
   isSystemRole: boolean;
 }
 
@@ -12,7 +14,10 @@ export interface RoleDto extends RoleListItemDto {
 export interface PermissionDto {
   id: string;
   code: string;
-  name: string;
+  nameAr: string;
+  nameEn: string;
+  descriptionAr?: string | null;
+  descriptionEn?: string | null;
   module: string;
 }
 
@@ -23,14 +28,18 @@ export interface RoleFilterRequest {
 }
 
 export interface CreateRoleRequest {
-  name: string;
-  description?: string | null;
+  nameAr: string;
+  nameEn: string;
+  descriptionAr?: string | null;
+  descriptionEn?: string | null;
   isSystemRole: boolean;
 }
 
 export interface UpdateRoleRequest {
-  name: string;
-  description?: string | null;
+  nameAr: string;
+  nameEn: string;
+  descriptionAr?: string | null;
+  descriptionEn?: string | null;
 }
 
 export interface AssignRolePermissionsRequest {
