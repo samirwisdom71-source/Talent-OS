@@ -12,6 +12,12 @@ interface NavItem {
   permissions: readonly string[];
 }
 
+interface NavGroup {
+  id: string;
+  titleKey: string;
+  items: NavItem[];
+}
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -30,57 +36,132 @@ export class SidebarComponent {
   readonly tooltipY = signal(0);
   readonly tooltipSide = signal<'left' | 'right'>('right');
 
-  private readonly allItems: NavItem[] = [
-    { path: '/dashboard', labelKey: 'nav.dashboard', permissions: [] },
-    { path: '/employees', labelKey: 'nav.employees', permissions: [] },
-    { path: '/users', labelKey: 'nav.users', permissions: [PermissionCodes.UserManage] },
-    { path: '/roles', labelKey: 'nav.roles', permissions: [PermissionCodes.RoleManage] },
+  /** Multi-item groups: expanded when id is in this set. Default: all collapsed until the user opens a section. */
+  private readonly expandedGroupIds = signal<ReadonlySet<string>>(new Set<string>());
+
+  private readonly allGroups: NavGroup[] = [
     {
-      path: '/competency-categories',
-      labelKey: 'nav.competencyCategories',
-      permissions: [PermissionCodes.CompetencyEdit],
-    },
-    { path: '/competencies', labelKey: 'nav.competencies', permissions: [PermissionCodes.CompetencyEdit] },
-    { path: '/competency-levels', labelKey: 'nav.competencyLevels', permissions: [PermissionCodes.CompetencyEdit] },
-    { path: '/talent/performance', labelKey: 'nav.performance', permissions: [] },
-    { path: '/talent/potential', labelKey: 'nav.potential', permissions: [] },
-    { path: '/talent/nine-box', labelKey: 'nav.nineBox', permissions: [] },
-    { path: '/succession', labelKey: 'nav.succession', permissions: [] },
-    { path: '/development', labelKey: 'nav.development', permissions: [] },
-    { path: '/marketplace', labelKey: 'nav.marketplace', permissions: [] },
-    { path: '/analytics/executive', labelKey: 'nav.analytics', permissions: [] },
-    {
-      path: '/analytics/intelligence',
-      labelKey: 'nav.intelligence',
-      permissions: [PermissionCodes.IntelligenceView],
-    },
-    { path: '/analytics/insights', labelKey: 'nav.insights', permissions: [PermissionCodes.IntelligenceView] },
-    {
-      path: '/analytics/recommendations',
-      labelKey: 'nav.recommendations',
-      permissions: [PermissionCodes.IntelligenceView],
+      id: 'overview',
+      titleKey: 'nav.group.overview',
+      items: [{ path: '/dashboard', labelKey: 'nav.dashboard', permissions: [] }],
     },
     {
-      path: '/approvals',
-      labelKey: 'nav.approvals',
-      permissions: [PermissionCodes.ApprovalRequestView],
+      id: 'people',
+      titleKey: 'nav.group.people',
+      items: [{ path: '/employees', labelKey: 'nav.employees', permissions: [] }],
     },
-    { path: '/notifications', labelKey: 'nav.notifications', permissions: [] },
     {
-      path: '/notification-templates',
-      labelKey: 'nav.notificationTemplates',
-      permissions: [PermissionCodes.NotificationView],
+      id: 'identity',
+      titleKey: 'nav.group.identity',
+      items: [
+        { path: '/users', labelKey: 'nav.users', permissions: [PermissionCodes.UserManage] },
+        { path: '/roles', labelKey: 'nav.roles', permissions: [PermissionCodes.RoleManage] },
+      ],
     },
-    { path: '/settings', labelKey: 'nav.settings', permissions: [] },
+    {
+      id: 'competencies',
+      titleKey: 'nav.group.competencies',
+      items: [
+        {
+          path: '/competency-categories',
+          labelKey: 'nav.competencyCategories',
+          permissions: [PermissionCodes.CompetencyEdit],
+        },
+        { path: '/competencies', labelKey: 'nav.competencies', permissions: [PermissionCodes.CompetencyEdit] },
+        { path: '/competency-levels', labelKey: 'nav.competencyLevels', permissions: [PermissionCodes.CompetencyEdit] },
+      ],
+    },
+    {
+      id: 'talent',
+      titleKey: 'nav.group.talent',
+      items: [
+        { path: '/talent/performance', labelKey: 'nav.performance', permissions: [] },
+        { path: '/talent/potential', labelKey: 'nav.potential', permissions: [] },
+        { path: '/talent/nine-box', labelKey: 'nav.nineBox', permissions: [] },
+        { path: '/succession', labelKey: 'nav.succession', permissions: [] },
+        { path: '/development', labelKey: 'nav.development', permissions: [] },
+        { path: '/marketplace', labelKey: 'nav.marketplace', permissions: [] },
+      ],
+    },
+    {
+      id: 'analytics',
+      titleKey: 'nav.group.analytics',
+      items: [
+        { path: '/analytics/executive', labelKey: 'nav.analytics', permissions: [] },
+        {
+          path: '/analytics/intelligence',
+          labelKey: 'nav.intelligence',
+          permissions: [PermissionCodes.IntelligenceView],
+        },
+        { path: '/analytics/insights', labelKey: 'nav.insights', permissions: [PermissionCodes.IntelligenceView] },
+        {
+          path: '/analytics/recommendations',
+          labelKey: 'nav.recommendations',
+          permissions: [PermissionCodes.IntelligenceView],
+        },
+      ],
+    },
+    {
+      id: 'workflow',
+      titleKey: 'nav.group.workflow',
+      items: [
+        {
+          path: '/approvals',
+          labelKey: 'nav.approvals',
+          permissions: [PermissionCodes.ApprovalRequestView],
+        },
+      ],
+    },
+    {
+      id: 'notifications',
+      titleKey: 'nav.group.notifications',
+      items: [
+        { path: '/notifications', labelKey: 'nav.notifications', permissions: [] },
+        {
+          path: '/notification-templates',
+          labelKey: 'nav.notificationTemplates',
+          permissions: [PermissionCodes.NotificationView],
+        },
+      ],
+    },
+    {
+      id: 'system',
+      titleKey: 'nav.group.system',
+      items: [{ path: '/settings', labelKey: 'nav.settings', permissions: [] }],
+    },
   ];
 
-  readonly visibleItems = computed(() =>
-    this.allItems.filter((item) => item.permissions.length === 0 || this.auth.hasAnyPermission(item.permissions)),
+  readonly visibleGroups = computed(() =>
+    this.allGroups
+      .map((g) => ({
+        ...g,
+        items: g.items.filter(
+          (item) => item.permissions.length === 0 || this.auth.hasAnyPermission(item.permissions),
+        ),
+      }))
+      .filter((g) => g.items.length > 0),
   );
+
+  readonly visibleFlatItems = computed(() => this.visibleGroups().flatMap((g) => g.items));
 
   readonly brandTitle = () => this.i18n.t('app.title');
   readonly brandSubtitle = () => this.i18n.t('app.subtitle');
   readonly collapseLabel = computed(() => this.i18n.t(this.collapsed() ? 'nav.expand' : 'nav.collapse'));
+
+  isGroupExpanded(groupId: string): boolean {
+    return this.expandedGroupIds().has(groupId);
+  }
+
+  toggleGroup(groupId: string, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.expandedGroupIds.update((current) => {
+      const next = new Set(current);
+      if (next.has(groupId)) next.delete(groupId);
+      else next.add(groupId);
+      return next;
+    });
+  }
 
   toggleCollapsed(): void {
     this.collapsed.update((v) => !v);
@@ -153,5 +234,9 @@ export class SidebarComponent {
       '/settings': 'fa-solid fa-gear',
     };
     return icons[path] ?? 'fa-solid fa-circle-dot';
+  }
+
+  linkExact(path: string): boolean {
+    return path === '/dashboard';
   }
 }

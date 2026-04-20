@@ -56,23 +56,72 @@
     </button>
   </div>
   <nav class="sidebar__nav" aria-label="Primary">
-    @for (item of visibleItems(); track item.path) {
-      <a
-        class="sidebar__link"
-        [attr.data-tooltip]="item.labelKey | t"
-        (mouseenter)="showTooltip($event, tooltipLabel(item.labelKey))"
-        (mouseleave)="hideTooltip()"
-        (blur)="hideTooltip()"
-        (click)="closeMobileSidebar()"
-        [routerLink]="item.path"
-        routerLinkActive="sidebar__link--active"
-        [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
-      >
-        <span class="sidebar__icon" aria-hidden="true">
-          <i [class]="iconFor(item.path)"></i>
-        </span>
-        <span class="sidebar__link-text">{{ item.labelKey | t }}</span>
-      </a>
+    @if (collapsed()) {
+      @for (item of visibleFlatItems(); track item.path) {
+        <a
+          class="sidebar__link"
+          [attr.data-tooltip]="item.labelKey | t"
+          (mouseenter)="showTooltip($event, tooltipLabel(item.labelKey))"
+          (mouseleave)="hideTooltip()"
+          (blur)="hideTooltip()"
+          (click)="closeMobileSidebar()"
+          [routerLink]="item.path"
+          routerLinkActive="sidebar__link--active"
+          [routerLinkActiveOptions]="{ exact: linkExact(item.path) }"
+        >
+          <span class="sidebar__icon" aria-hidden="true">
+            <i [class]="iconFor(item.path)"></i>
+          </span>
+          <span class="sidebar__link-text">{{ item.labelKey | t }}</span>
+        </a>
+      }
+    } @else {
+      @for (group of visibleGroups(); track group.id) {
+        <section class="nav-group">
+          <button
+            type="button"
+            class="nav-group__toggle"
+            [attr.aria-expanded]="isGroupExpanded(group.id)"
+            [attr.aria-controls]="'nav-group-panel-' + group.id"
+            [id]="'nav-group-heading-' + group.id"
+            (click)="toggleGroup(group.id, $event)"
+          >
+            <span class="nav-group__title">{{ group.titleKey | t }}</span>
+            <i
+              class="fa-solid fa-chevron-down nav-group__chevron"
+              [class.nav-group__chevron--open]="isGroupExpanded(group.id)"
+              aria-hidden="true"
+            ></i>
+          </button>
+          @if (isGroupExpanded(group.id)) {
+            <div
+              class="nav-group__panel"
+              [id]="'nav-group-panel-' + group.id"
+              role="region"
+              [attr.aria-labelledby]="'nav-group-heading-' + group.id"
+            >
+              @for (item of group.items; track item.path) {
+                <a
+                  class="sidebar__link sidebar__link--nested"
+                  [attr.data-tooltip]="item.labelKey | t"
+                  (mouseenter)="showTooltip($event, tooltipLabel(item.labelKey))"
+                  (mouseleave)="hideTooltip()"
+                  (blur)="hideTooltip()"
+                  (click)="closeMobileSidebar()"
+                  [routerLink]="item.path"
+                  routerLinkActive="sidebar__link--active"
+                  [routerLinkActiveOptions]="{ exact: linkExact(item.path) }"
+                >
+                  <span class="sidebar__icon" aria-hidden="true">
+                    <i [class]="iconFor(item.path)"></i>
+                  </span>
+                  <span class="sidebar__link-text">{{ item.labelKey | t }}</span>
+                </a>
+              }
+            </div>
+          }
+        </section>
+      }
     }
   </nav>
   @if (tooltipOpen() && collapsed()) {
