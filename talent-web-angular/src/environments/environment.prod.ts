@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
   /** Set at deploy time to your API host, e.g. https://api.yourcompany.com */
-  apiBaseUrl: '',
+  apiBaseUrl: 'https://talentmanagement.runasp.net',
 };

@@ -16,7 +16,7 @@ public sealed class User : AuditableEntity
     public Guid? EmployeeId { get; set; }
 
     public DateTime? LastLoginUtc { get; set; }
-
+    
     public Employee? Employee { get; set; }
 
     public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();

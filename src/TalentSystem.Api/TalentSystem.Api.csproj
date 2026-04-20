@@ -22,4 +22,8 @@
     <ProjectReference Include="..\TalentSystem.Shared\TalentSystem.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>

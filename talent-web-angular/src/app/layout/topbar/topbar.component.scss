@@ -2,46 +2,79 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.75rem;
-  padding: 0.85rem 1.5rem;
+  gap: 0.6rem;
+  padding: 0.75rem 1.25rem;
   border-bottom: 1px solid var(--color-border);
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 40;
 }
 
 .topbar__spacer {
   flex: 1;
 }
 
+.topbar__menu-btn {
+  display: none;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: #fff;
+  color: #334155;
+  border-radius: 10px;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
 .topbar__actions {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.55rem;
 }
 
-.topbar__icon-link {
+.topbar__menu-wrap {
   position: relative;
-  text-decoration: none;
-  padding: 0.35rem 0.45rem;
+}
+
+.topbar__icon-btn,
+.topbar__profile-btn {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: #fff;
   border-radius: 10px;
-  transition: background 0.15s ease;
+  height: 2rem;
+  min-width: 2rem;
+  padding: 0 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  color: #334155;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease;
 }
 
-.topbar__icon-link:hover {
-  background: rgba(15, 23, 42, 0.06);
+.topbar__icon-btn:hover,
+.topbar__profile-btn:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #0369a1;
+  background: rgba(56, 189, 248, 0.08);
 }
 
-.topbar__bell {
-  font-size: 1.1rem;
+.topbar__profile-btn span {
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .topbar__badge {
   position: absolute;
-  top: 0;
-  inset-inline-end: 0;
+  top: -0.25rem;
+  inset-inline-end: -0.25rem;
   min-width: 1.1rem;
   height: 1.1rem;
   padding: 0 0.25rem;
@@ -57,30 +90,216 @@
   border: 1px solid var(--color-border);
   background: #fff;
   border-radius: 999px;
-  padding: 0.35rem 0.85rem;
+  padding: 0.35rem 0.75rem;
   font-size: 0.82rem;
   cursor: pointer;
 }
 
-.topbar__user {
+.topbar__panel {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  inset-inline-end: 0;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: 0 18px 38px rgba(2, 6, 23, 0.16);
+  z-index: 45;
+}
+
+.topbar__panel--notifications {
+  width: min(380px, calc(100vw - 2rem));
+  padding: 0.6rem;
+}
+
+.topbar__panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.45rem;
+}
+
+.topbar__link-btn {
+  border: 0;
+  background: transparent;
+  color: #0369a1;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.topbar__notif-list {
+  display: grid;
+  gap: 0.4rem;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.topbar__notif-item {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 10px;
+  padding: 0.5rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.45rem;
+}
+
+.topbar__notif-main {
+  min-width: 0;
+}
+
+.topbar__notif-title {
+  margin: 0;
   font-size: 0.82rem;
-  color: var(--color-muted);
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.topbar__notif-msg {
+  margin: 0.2rem 0;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.topbar__notif-main time {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.topbar__mini-btn {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.2rem 0.45rem;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.topbar__empty {
+  font-size: 0.8rem;
+  color: #64748b;
+  padding: 0.55rem 0.3rem;
+}
+
+.topbar__panel-link {
+  margin-top: 0.45rem;
+  display: inline-flex;
+  text-decoration: none;
+  color: #0369a1;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.topbar__panel--profile {
+  width: 250px;
+  padding: 0.7rem;
+}
+
+.topbar__identity {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.55rem;
+  padding: 0.45rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.1));
+  border: 1px solid rgba(99, 102, 241, 0.18);
+}
+
+.topbar__identity-avatar {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.75);
+  color: #4f46e5;
+}
+
+.topbar__username {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.topbar__identity-sub {
+  margin: 0.1rem 0 0;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.topbar__profile-link {
+  margin-bottom: 0.45rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  text-decoration: none;
+  color: #0f766e;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border: 1px solid rgba(20, 184, 166, 0.28);
+  border-radius: 10px;
+  padding: 0.45rem 0.7rem;
+  background: rgba(20, 184, 166, 0.1);
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.topbar__profile-link:hover {
+  background: rgba(20, 184, 166, 0.16);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.1);
 }
 
 .topbar__logout {
   border: none;
-  border-radius: 999px;
-  padding: 0.4rem 1rem;
+  width: 100%;
+  border-radius: 10px;
+  padding: 0.45rem 0.85rem;
   font-size: 0.82rem;
+  font-weight: 700;
   cursor: pointer;
-  background: var(--color-surface-strong);
+  background: linear-gradient(135deg, #ef4444, #dc2626);
   color: #fff;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
 }
 
 .topbar__logout:hover {
-  filter: brightness(1.05);
+  filter: brightness(1.05) saturate(1.03);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(220, 38, 38, 0.35);
+}
+
+.topbar__logout:active {
+  transform: translateY(0) scale(0.98);
+}
+
+@media (max-width: 1024px) {
+  .topbar {
+    padding: 0.65rem 0.8rem;
+  }
+
+  .topbar__menu-btn {
+    display: inline-flex;
+  }
+
+  .topbar__actions {
+    gap: 0.4rem;
+  }
+
+  .topbar__profile-btn span {
+    display: none;
+  }
+
+  .topbar__panel--notifications {
+    width: min(340px, calc(100vw - 1rem));
+  }
 }

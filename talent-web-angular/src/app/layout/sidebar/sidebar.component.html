@@ -1,22 +1,90 @@
-<aside class="sidebar">
+<aside
+  class="sidebar"
+  [class.sidebar--collapsed]="collapsed()"
+  [class.sidebar--mobile-open]="layout.mobileSidebarOpen()"
+>
   <div class="sidebar__brand">
-    <div class="sidebar__logo">T</div>
-    <div>
+    <div class="sidebar__logo" aria-hidden="true">
+      <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" class="sidebar__logo-mark">
+        <defs>
+          <linearGradient id="logoFacetA" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f0f9ff" stop-opacity="0.95" />
+            <stop offset="100%" stop-color="#bae6fd" stop-opacity="0.7" />
+          </linearGradient>
+          <linearGradient id="logoFacetB" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0ea5e9" />
+            <stop offset="100%" stop-color="#1e40af" />
+          </linearGradient>
+          <linearGradient id="logoFacetC" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#6366f1" />
+            <stop offset="100%" stop-color="#1e1b4b" />
+          </linearGradient>
+        </defs>
+        <path d="M20 5 L33 15 L20 20 Z" fill="url(#logoFacetA)" />
+        <path d="M7 15 L20 5 L20 20 Z" fill="url(#logoFacetB)" />
+        <path d="M20 20 L33 15 L20 36 Z" fill="url(#logoFacetC)" />
+        <path d="M7 15 L20 20 L20 36 Z" fill="#0f172a" fill-opacity="0.55" />
+        <path
+          d="M20 5 L20 20 L20 36"
+          stroke="#ffffff"
+          stroke-opacity="0.35"
+          stroke-width="0.8"
+          stroke-linecap="round"
+        />
+      </svg>
+    </div>
+    <div class="sidebar__brand-copy">
       <div class="sidebar__title">{{ brandTitle() }}</div>
       <div class="sidebar__subtitle">{{ brandSubtitle() }}</div>
     </div>
+    <button
+      type="button"
+      class="sidebar__collapse"
+      (click)="toggleCollapsed()"
+      [attr.aria-label]="collapseLabel()"
+      [attr.title]="collapseLabel()"
+    >
+      <i
+        class="fa-solid"
+        [class.fa-angles-right]="collapsed()"
+        [class.fa-angles-left]="!collapsed()"
+        aria-hidden="true"
+      ></i>
+    </button>
+    <button type="button" class="sidebar__mobile-close" (click)="closeMobileSidebar()" aria-label="Close menu">
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+    </button>
   </div>
   <nav class="sidebar__nav" aria-label="Primary">
     @for (item of visibleItems(); track item.path) {
       <a
         class="sidebar__link"
+        [attr.data-tooltip]="item.labelKey | t"
+        (mouseenter)="showTooltip($event, tooltipLabel(item.labelKey))"
+        (mouseleave)="hideTooltip()"
+        (blur)="hideTooltip()"
+        (click)="closeMobileSidebar()"
         [routerLink]="item.path"
         routerLinkActive="sidebar__link--active"
         [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
       >
-        <span class="sidebar__icon" aria-hidden="true">{{ iconFor(item.path) }}</span>
+        <span class="sidebar__icon" aria-hidden="true">
+          <i [class]="iconFor(item.path)"></i>
+        </span>
         <span class="sidebar__link-text">{{ item.labelKey | t }}</span>
       </a>
     }
   </nav>
+  @if (tooltipOpen() && collapsed()) {
+    <div
+      class="sidebar__floating-tooltip"
+      [class.sidebar__floating-tooltip--left]="tooltipSide() === 'left'"
+      [class.sidebar__floating-tooltip--right]="tooltipSide() === 'right'"
+      [style.left.px]="tooltipX()"
+      [style.top.px]="tooltipY()"
+      role="tooltip"
+    >
+      {{ tooltipText() }}
+    </div>
+  }
 </aside>

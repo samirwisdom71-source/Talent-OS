@@ -59,6 +59,14 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "bearer",
         BearerFormat = "JWT"
     });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecuritySchemeReference("Bearer", document, null),
+            new List<string>()
+        }
+    });
 });
 
 var app = builder.Build();
@@ -90,6 +98,8 @@ if (app.Configuration.GetValue("IdentitySeed:RunOnStartup", true))
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -98,6 +108,7 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Talent OS API v1");
     });
 }
+ 
 
 // In Development, skip HTTPS redirection so the HTTP Kestrel URL (e.g. :5042) stays on HTTP
 // and browsers calling it from Next.js are not bounced to HTTPS (which often fails with self-signed certs).
@@ -112,11 +123,14 @@ if (trimmedOrigins.Length > 0)
 {
     app.UseCors();
 }
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 app.Run();
 

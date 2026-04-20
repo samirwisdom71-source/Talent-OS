@@ -1,0 +1,185 @@
+using Microsoft.EntityFrameworkCore;
+using TalentSystem.Application.Features.Identity.DTOs;
+using TalentSystem.Application.Features.Identity.Interfaces;
+using TalentSystem.Persistence;
+using TalentSystem.Shared.Results;
+
+namespace TalentSystem.Application.Features.Identity.Services;
+
+public sealed class IdentityLookupService : IIdentityLookupService
+{
+    private const int MaxTake = 200;
+    private readonly TalentDbContext _db;
+
+    public IdentityLookupService(TalentDbContext db)
+    {
+        _db = db;
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetEmployeesAsync(
+        string? search = null,
+        int? take = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _db.Employees
+            .AsNoTracking()
+            .OrderBy(e => e.FullNameAr)
+            .ThenBy(e => e.FullNameEn)
+            .Select(e => new LookupItemDto
+            {
+                Id = e.Id,
+                Name = string.IsNullOrWhiteSpace(e.FullNameAr)
+                    ? e.FullNameEn
+                    : e.FullNameAr,
+                Email = e.Email
+            });
+
+        var employees = await ApplySearchAndTake(query, search, take)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(employees);
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetUsersAsync(
+        string? search = null,
+        int? take = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _db.Users
+            .AsNoTracking()
+            .OrderBy(u => u.UserName)
+            .Select(u => new LookupItemDto
+            {
+                Id = u.Id,
+                Name = u.UserName,
+                Email = u.Email
+            });
+
+        var users = await ApplySearchAndTake(query, search, take)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(users);
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetRolesAsync(
+        string? search = null,
+        int? take = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _db.Roles
+            .AsNoTracking()
+            .OrderBy(r => r.Name)
+            .Select(r => new LookupItemDto
+            {
+                Id = r.Id,
+                Name = r.Name
+            });
+
+        var roles = await ApplySearchAndTake(query, search, take, includeEmailSearch: false)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(roles);
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetPermissionsAsync(
+        string? search = null,
+        int? take = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _db.Permissions
+            .AsNoTracking()
+            .OrderBy(p => p.Module)
+            .ThenBy(p => p.Name)
+            .Select(p => new LookupItemDto
+            {
+                Id = p.Id,
+                Name = p.Name
+            });
+
+        var permissions = await ApplySearchAndTake(query, search, take, includeEmailSearch: false)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(permissions);
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetPositionsAsync(
+        string? search = null,
+        int? take = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _db.Positions
+            .AsNoTracking()
+            .OrderBy(p => p.TitleAr)
+            .ThenBy(p => p.TitleEn)
+            .Select(p => new LookupItemDto
+            {
+                Id = p.Id,
+                Name = string.IsNullOrWhiteSpace(p.TitleAr)
+                    ? p.TitleEn
+                    : p.TitleAr
+            });
+
+        var positions = await ApplySearchAndTake(query, search, take, includeEmailSearch: false)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(positions);
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetOrganizationUnitsAsync(
+        string? search = null,
+        int? take = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _db.OrganizationUnits
+            .AsNoTracking()
+            .OrderBy(o => o.NameAr)
+            .ThenBy(o => o.NameEn)
+            .Select(o => new LookupItemDto
+            {
+                Id = o.Id,
+                Name = string.IsNullOrWhiteSpace(o.NameAr)
+                    ? o.NameEn
+                    : o.NameAr
+            });
+
+        var units = await ApplySearchAndTake(query, search, take, includeEmailSearch: false)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(units);
+    }
+
+    private static IQueryable<LookupItemDto> ApplySearchAndTake(
+        IQueryable<LookupItemDto> query,
+        string? search,
+        int? take,
+        bool includeEmailSearch = true)
+    {
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            if (includeEmailSearch)
+            {
+                query = query.Where(x =>
+                    x.Name.Contains(term) ||
+                    (x.Email != null && x.Email.Contains(term)));
+            }
+            else
+            {
+                query = query.Where(x => x.Name.Contains(term));
+            }
+        }
+
+        if (take.HasValue && take.Value > 0)
+        {
+            query = query.Take(Math.Min(take.Value, MaxTake));
+        }
+
+        return query;
+    }
+}

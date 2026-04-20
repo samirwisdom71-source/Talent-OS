@@ -1,0 +1,49 @@
+<div class="page-head-row">
+  <section class="page-head">
+    <h1>{{ 'profile.title' | t }}</h1>
+    <p class="page-head__sub">{{ 'profile.subtitle' | t }}</p>
+  </section>
+</div>
+
+<section class="profile-grid">
+  <article class="card profile-card profile-card--hero">
+    <div class="profile-avatar" aria-hidden="true">
+      <i class="fa-regular fa-circle-user"></i>
+    </div>
+    <div class="profile-identity">
+      <h2>{{ auth.sessionSnapshot()?.userName || '-' }}</h2>
+      <p>{{ auth.sessionSnapshot()?.email || '-' }}</p>
+    </div>
+  </article>
+
+  <article class="card profile-card">
+    <h3>{{ 'profile.accountInfo' | t }}</h3>
+    <dl class="profile-list">
+      <div>
+        <dt>{{ 'profile.userName' | t }}</dt>
+        <dd>{{ auth.sessionSnapshot()?.userName || '-' }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'profile.email' | t }}</dt>
+        <dd>{{ auth.sessionSnapshot()?.email || '-' }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'profile.sessionExpiry' | t }}</dt>
+        <dd>{{ auth.sessionSnapshot()?.expiresAtUtc ? (auth.sessionSnapshot()!.expiresAtUtc | date: 'medium') : '-' }}</dd>
+      </div>
+    </dl>
+  </article>
+
+  <article class="card profile-card">
+    <h3>{{ 'profile.permissions' | t }}</h3>
+    @if (permissionPages().length > 0) {
+      <div class="permission-tags">
+        @for (page of permissionPages(); track page) {
+          <span class="permission-tag">{{ page }}</span>
+        }
+      </div>
+    } @else {
+      <p class="empty">{{ 'profile.noPermissions' | t }}</p>
+    }
+  </article>
+</section>

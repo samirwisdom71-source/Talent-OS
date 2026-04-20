@@ -77,6 +77,7 @@ public static class ApplicationServiceCollectionExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IPermissionService, PermissionService>();
+        services.AddScoped<IIdentityLookupService, IdentityLookupService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IIdentityDatabaseSeeder, IdentityDatabaseSeeder>();
 

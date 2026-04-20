@@ -9,3 +9,15 @@ D:\samier\enterprise Talent Management System\src\TalentSystem.Shared\obj\Debug\
 D:\samier\enterprise Talent Management System\src\TalentSystem.Shared\obj\Debug\net9.0\refint\TalentSystem.Shared.dll
 D:\samier\enterprise Talent Management System\src\TalentSystem.Shared\obj\Debug\net9.0\TalentSystem.Shared.pdb
 D:\samier\enterprise Talent Management System\src\TalentSystem.Shared\obj\Debug\net9.0\ref\TalentSystem.Shared.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\bin\Debug\net9.0\TalentSystem.Shared.deps.json
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\bin\Debug\net9.0\TalentSystem.Shared.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\bin\Debug\net9.0\TalentSystem.Shared.pdb
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\obj\Debug\net9.0\TalentSystem.Shared.GeneratedMSBuildEditorConfig.editorconfig
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\obj\Debug\net9.0\TalentSystem.Shared.AssemblyInfoInputs.cache
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\obj\Debug\net9.0\TalentSystem.Shared.AssemblyInfo.cs
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\obj\Debug\net9.0\TalentSystem.Shared.csproj.CoreCompileInputs.cache
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\obj\Debug\net9.0\TalentSystem.Shared.sourcelink.json
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\obj\Debug\net9.0\TalentSystem.Shared.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\obj\Debug\net9.0\refint\TalentSystem.Shared.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\obj\Debug\net9.0\TalentSystem.Shared.pdb
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\obj\Debug\net9.0\ref\TalentSystem.Shared.dll

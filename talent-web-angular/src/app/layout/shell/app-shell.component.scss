@@ -1,6 +1,8 @@
 .shell {
   display: flex;
   min-height: 100vh;
+  align-items: flex-start;
+  overflow-x: clip;
   background: var(--color-bg);
   color: var(--color-text);
 }
@@ -10,6 +12,10 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+}
+
+.shell__mobile-overlay {
+  display: none;
 }
 
 .shell__toast {
@@ -84,9 +90,25 @@
 .shell__content {
   flex: 1;
   padding: 1.5rem 1.75rem 2.5rem;
-  max-width: 1400px;
+  // max-width: 1400px;
   width: 100%;
   margin-inline: auto;
+}
+
+@media (max-width: 1024px) {
+  .shell__content {
+    padding: 1rem 0.85rem 1.5rem;
+  }
+
+  .shell__mobile-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    border: 0;
+    background: rgba(2, 6, 23, 0.45);
+    z-index: 60;
+    cursor: pointer;
+  }
 }
 
 .shell__overlay {

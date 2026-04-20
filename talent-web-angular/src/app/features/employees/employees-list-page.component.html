@@ -1,13 +1,14 @@
 <div class="page-head-row">
   <section class="page-head">
-    <h1>الموظفون</h1>
+    <h1>{{ 'employees.title' | t }}</h1>
+    <p class="page-head__sub">{{ 'employees.subtitle' | t }}</p>
   </section>
   @if (auth.hasPermission(PermissionCodes.EmployeeEdit)) {
     <div class="page-actions">
-      <a class="btn-primary btn-primary--icon" routerLink="/employees/create">
+      <button type="button" class="btn-primary btn-primary--icon" (click)="openCreate()">
         <span class="btn-ico" aria-hidden="true">＋</span>
-        إضافة موظف
-      </a>
+        {{ 'employees.create' | t }}
+      </button>
     </div>
   }
 </div>
@@ -18,43 +19,150 @@
     type="search"
     [(ngModel)]="search"
     (keyup.enter)="page = 1; load()"
-    [placeholder]="'common.search' | t"
+    [placeholder]="'employees.search.placeholder' | t"
   />
-  <button type="button" class="btn-primary" (click)="page = 1; load()">بحث</button>
+  <button type="button" class="btn-primary" (click)="page = 1; load()">{{ 'common.search' | t }}</button>
+  <div class="view-mode">
+    <button
+      type="button"
+      class="mode-btn"
+      [class.mode-btn--active]="viewMode() === 'table'"
+      (click)="setViewMode('table')"
+    >
+      {{ 'employees.view.table' | t }}
+    </button>
+    <button
+      type="button"
+      class="mode-btn"
+      [class.mode-btn--active]="viewMode() === 'cards'"
+      (click)="setViewMode('cards')"
+    >
+      {{ 'employees.view.cards' | t }}
+    </button>
+  </div>
 </div>
 
 @if (failed()) {
-  <div class="card card--muted">تعذر تحميل القائمة.</div>
+  <div class="card card--muted">{{ 'employees.error.loadList' | t }}</div>
 } @else if (result()) {
-  <div class="card table-card">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>الرقم</th>
-          <th>الاسم</th>
-          <th>البريد</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (row of result()!.items; track row.id) {
+  @if (viewMode() === 'table') {
+    <div class="card table-card">
+      <table class="data-table">
+        <thead>
           <tr>
-            <td>{{ row.employeeNumber }}</td>
-            <td>{{ displayName(row) }}</td>
-            <td>{{ row.email }}</td>
-            <td class="cell-actions">
-              <a class="link" [routerLink]="['/employees', row.id]">{{ 'common.view' | t }}</a>
-            </td>
+            <th>{{ 'employees.table.employeeNumber' | t }}</th>
+            <th>{{ 'employees.table.name' | t }}</th>
+            <th>{{ 'employees.table.email' | t }}</th>
+            <th class="actions-col-head">{{ 'common.actions' | t }}</th>
           </tr>
-        }
-      </tbody>
-    </table>
-    <div class="pager">
-      <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">السابق</button>
-      <span>{{ result()!.page }} / {{ result()!.totalPages || 1 }}</span>
-      <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">التالي</button>
+        </thead>
+        <tbody>
+          @for (row of result()!.items; track row.id) {
+            <tr>
+              <td>{{ row.employeeNumber }}</td>
+              <td>{{ displayName(row) }}</td>
+              <td>{{ row.email }}</td>
+              <td class="cell-actions">
+                <div class="cell-actions__wrap">
+                  <a class="action-btn action-btn--info" [routerLink]="['/employees', row.id]">{{ 'common.view' | t }}</a>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <div class="pager">
+        <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">{{ 'common.previous' | t }}</button>
+        <span>{{ result()!.page }} / {{ result()!.totalPages || 1 }}</span>
+        <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">{{ 'common.next' | t }}</button>
+      </div>
     </div>
-  </div>
-} @else {
+  } @else {
+    <div class="cards-grid">
+      @for (row of result()!.items; track row.id) {
+        <article class="card employee-card">
+          <header class="employee-card__head">
+            <h3>{{ displayName(row) }}</h3>
+            <span class="employee-no">#{{ row.employeeNumber }}</span>
+          </header>
+          <p class="employee-card__line">{{ row.email }}</p>
+          <div class="card-actions">
+            <a class="action-btn action-btn--info" [routerLink]="['/employees', row.id]">{{ 'common.view' | t }}</a>
+          </div>
+        </article>
+      }
+    </div>
+    <div class="pager card">
+      <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">{{ 'common.previous' | t }}</button>
+      <span>{{ result()!.page }} / {{ result()!.totalPages || 1 }}</span>
+      <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">{{ 'common.next' | t }}</button>
+    </div>
+  }
+} @else if (busy()) {
   <div class="skeleton table-skel"></div>
+}
+
+@if (createOpen()) {
+  <div class="modal-backdrop" (click)="closeCreate()"></div>
+  <section class="modal card" role="dialog" aria-modal="true">
+    <h2>{{ 'employees.create' | t }}</h2>
+    <div class="form-grid">
+      <label>
+        <span>{{ 'employees.form.employeeNumber' | t }} <span class="required">*</span></span>
+        <input
+          type="text"
+          [(ngModel)]="createModel.employeeNumber"
+          [placeholder]="'employees.form.employeeNumber.placeholder' | t"
+        />
+      </label>
+      <label>
+        <span>{{ 'employees.form.fullNameAr' | t }} <span class="required">*</span></span>
+        <input
+          type="text"
+          [(ngModel)]="createModel.fullNameAr"
+          [placeholder]="'employees.form.fullNameAr.placeholder' | t"
+        />
+      </label>
+      <label>
+        <span>{{ 'employees.form.fullNameEn' | t }} <span class="required">*</span></span>
+        <input
+          type="text"
+          [(ngModel)]="createModel.fullNameEn"
+          [placeholder]="'employees.form.fullNameEn.placeholder' | t"
+        />
+      </label>
+      <label>
+        <span>{{ 'employees.form.email' | t }} <span class="required">*</span></span>
+        <input type="email" [(ngModel)]="createModel.email" [placeholder]="'employees.form.email.placeholder' | t" />
+      </label>
+      <label>
+        <span>{{ 'employees.form.organizationUnitId' | t }} <span class="required">*</span></span>
+        <select [(ngModel)]="createModel.organizationUnitId">
+          <option value="">{{ 'employees.form.selectOrganizationUnit' | t }}</option>
+          @for (org of organizations(); track org.id) {
+            <option [value]="org.id">{{ org.name }}</option>
+          }
+        </select>
+        @if (createModel.organizationUnitId) {
+          <small class="picked-label">{{ selectedOrgUnitName() }}</small>
+        }
+      </label>
+      <label>
+        <span>{{ 'employees.form.positionId' | t }} <span class="required">*</span></span>
+        <select [(ngModel)]="createModel.positionId">
+          <option value="">{{ 'employees.form.selectPosition' | t }}</option>
+          @for (position of positions(); track position.id) {
+            <option [value]="position.id">{{ position.name }}</option>
+          }
+        </select>
+        @if (createModel.positionId) {
+          <small class="picked-label">{{ selectedPositionName() }}</small>
+        }
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button type="button" (click)="closeCreate()" [disabled]="createBusy()">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveCreate()" [disabled]="createBusy()">{{ 'users.actions.save' | t }}</button>
+    </div>
+  </section>
 }

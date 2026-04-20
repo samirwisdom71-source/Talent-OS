@@ -1,5 +1,8 @@
-<div class="shell">
+<div class="shell" [class.shell--mobile-sidebar-open]="layout.mobileSidebarOpen()">
   <app-sidebar />
+  @if (layout.mobileSidebarOpen()) {
+    <button type="button" class="shell__mobile-overlay" (click)="closeMobileSidebar()" aria-label="Close menu"></button>
+  }
   <div class="shell__main">
     <app-topbar />
     @if (toast.toast(); as t) {

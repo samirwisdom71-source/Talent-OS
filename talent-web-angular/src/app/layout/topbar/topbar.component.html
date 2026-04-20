@@ -1,14 +1,82 @@
 <header class="topbar">
+  <button
+    type="button"
+    class="topbar__menu-btn"
+    (click)="toggleMobileSidebar()"
+    [attr.aria-label]="'topbar.menu' | t"
+  >
+    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+  </button>
   <div class="topbar__spacer"></div>
   <div class="topbar__actions">
-    <a routerLink="/notifications" class="topbar__icon-link" aria-label="Notifications">
-      <span class="topbar__bell">🔔</span>
+    <div class="topbar__menu-wrap">
+      <button
+        type="button"
+        class="topbar__icon-btn"
+        (click)="toggleNotifications()"
+        [attr.aria-expanded]="notificationsOpen()"
+        [attr.aria-label]="'topbar.notifications' | t"
+      >
+        <i class="fa-regular fa-bell" aria-hidden="true"></i>
+      </button>
       @if (unread() !== null && (unread() ?? 0) > 0) {
         <span class="topbar__badge">{{ unread() }}</span>
       }
-    </a>
+      @if (notificationsOpen()) {
+        <section class="topbar__panel topbar__panel--notifications card">
+          <header class="topbar__panel-head">
+            <strong>{{ 'topbar.notifications' | t }}</strong>
+            <button type="button" class="topbar__link-btn" (click)="markAllRead()">{{ 'topbar.markAllRead' | t }}</button>
+          </header>
+          @if (notificationsBusy()) {
+            <div class="topbar__empty">{{ 'common.loading' | t }}</div>
+          } @else if (notifications().length === 0) {
+            <div class="topbar__empty">{{ 'topbar.noNotifications' | t }}</div>
+          } @else {
+            <div class="topbar__notif-list">
+              @for (item of notifications(); track item.id) {
+                <article class="topbar__notif-item">
+                  <div class="topbar__notif-main">
+                    <p class="topbar__notif-title">{{ item.title }}</p>
+                    <p class="topbar__notif-msg">{{ item.message }}</p>
+                    <time>{{ item.createdOnUtc | date: 'short' }}</time>
+                  </div>
+                  <button type="button" class="topbar__mini-btn" (click)="markRead(item.id)">
+                    {{ 'topbar.markRead' | t }}
+                  </button>
+                </article>
+              }
+            </div>
+          }
+          <a routerLink="/notifications" class="topbar__panel-link">{{ 'topbar.viewAllNotifications' | t }}</a>
+        </section>
+      }
+    </div>
+
     <button type="button" class="topbar__ghost" (click)="toggleLang()">{{ 'login.lang' | t }}</button>
-    <span class="topbar__user">{{ auth.sessionSnapshot()?.email }}</span>
-    <button type="button" class="topbar__logout" (click)="logout()">{{ 'topbar.logout' | t }}</button>
+    <div class="topbar__menu-wrap">
+      <button type="button" class="topbar__profile-btn" (click)="toggleProfile()" [attr.aria-expanded]="profileOpen()">
+        <i class="fa-regular fa-circle-user" aria-hidden="true"></i>
+        <span>{{ 'topbar.account' | t }}</span>
+      </button>
+      @if (profileOpen()) {
+        <section class="topbar__panel topbar__panel--profile card">
+          <div class="topbar__identity">
+            <span class="topbar__identity-avatar" aria-hidden="true">
+              <i class="fa-solid fa-user"></i>
+            </span>
+            <div>
+              <p class="topbar__username">{{ auth.sessionSnapshot()?.userName || '-' }}</p>
+              <p class="topbar__identity-sub">{{ 'topbar.account' | t }}</p>
+            </div>
+          </div>
+          <a routerLink="/profile" class="topbar__profile-link" (click)="profileOpen.set(false)">
+            <i class="fa-regular fa-id-card" aria-hidden="true"></i>
+            {{ 'topbar.viewProfile' | t }}
+          </a>
+          <button type="button" class="topbar__logout" (click)="logout()">{{ 'topbar.logout' | t }}</button>
+        </section>
+      }
+    </div>
   </div>
 </header>

@@ -17,3 +17,23 @@ D:\samier\enterprise Talent Management System\src\TalentSystem.Application\obj\D
 D:\samier\enterprise Talent Management System\src\TalentSystem.Application\obj\Debug\net9.0\ref\TalentSystem.Application.dll
 D:\samier\enterprise Talent Management System\src\TalentSystem.Application\bin\Debug\net9.0\TalentSystem.Persistence.dll
 D:\samier\enterprise Talent Management System\src\TalentSystem.Application\bin\Debug\net9.0\TalentSystem.Persistence.pdb
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\bin\Debug\net9.0\TalentSystem.Application.deps.json
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\bin\Debug\net9.0\TalentSystem.Application.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\bin\Debug\net9.0\TalentSystem.Application.pdb
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\bin\Debug\net9.0\TalentSystem.Domain.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\bin\Debug\net9.0\TalentSystem.Persistence.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\bin\Debug\net9.0\TalentSystem.Shared.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\bin\Debug\net9.0\TalentSystem.Domain.pdb
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\bin\Debug\net9.0\TalentSystem.Shared.pdb
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\bin\Debug\net9.0\TalentSystem.Persistence.pdb
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\obj\Debug\net9.0\TalentSystem.Application.csproj.AssemblyReference.cache
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\obj\Debug\net9.0\TalentSystem.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\obj\Debug\net9.0\TalentSystem.Application.AssemblyInfoInputs.cache
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\obj\Debug\net9.0\TalentSystem.Application.AssemblyInfo.cs
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\obj\Debug\net9.0\TalentSystem.Application.csproj.CoreCompileInputs.cache
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\obj\Debug\net9.0\TalentSystem.Application.sourcelink.json
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\obj\Debug\net9.0\TalentSy.C8467316.Up2Date
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\obj\Debug\net9.0\TalentSystem.Application.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\obj\Debug\net9.0\refint\TalentSystem.Application.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\obj\Debug\net9.0\TalentSystem.Application.pdb
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Application\obj\Debug\net9.0\ref\TalentSystem.Application.dll

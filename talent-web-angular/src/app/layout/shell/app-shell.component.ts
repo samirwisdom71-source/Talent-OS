@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { ErrorDisplayService } from '../../core/services/error-display.service';
 import { LoadingService } from '../../core/services/loading.service';
 import { ToastService } from '../../core/services/toast.service';
+import { LayoutStateService } from '../layout-state.service';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { TopbarComponent } from '../topbar/topbar.component';
 
@@ -17,6 +18,7 @@ export class AppShellComponent {
   readonly loading = inject(LoadingService);
   readonly errors = inject(ErrorDisplayService);
   readonly toast = inject(ToastService);
+  readonly layout = inject(LayoutStateService);
 
   dismissError(): void {
     this.errors.clear();
@@ -24,5 +26,9 @@ export class AppShellComponent {
 
   dismissToast(): void {
     this.toast.dismiss();
+  }
+
+  closeMobileSidebar(): void {
+    this.layout.closeMobileSidebar();
   }
 }

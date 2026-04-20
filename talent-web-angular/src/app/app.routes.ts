@@ -38,6 +38,22 @@ export const routes: Routes = [
           import('./features/employees/employee-detail-page.component').then((m) => m.EmployeeDetailPageComponent),
       },
       {
+        path: 'users',
+        canActivate: [permissionGuard],
+        data: { permissions: ['USER_MANAGE'] },
+        loadComponent: () => import('./features/users/users-page.component').then((m) => m.UsersPageComponent),
+      },
+      {
+        path: 'roles',
+        canActivate: [permissionGuard],
+        data: { permissions: ['ROLE_MANAGE'] },
+        loadComponent: () => import('./features/roles/roles-page.component').then((m) => m.RolesPageComponent),
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./features/profile/profile-page.component').then((m) => m.ProfilePageComponent),
+      },
+      {
         path: 'talent/performance',
         loadComponent: () =>
           import('./features/talent/performance-page.component').then((m) => m.PerformancePageComponent),

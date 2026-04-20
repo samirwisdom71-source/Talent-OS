@@ -17,3 +17,23 @@ D:\samier\enterprise Talent Management System\src\TalentSystem.Persistence\obj\D
 D:\samier\enterprise Talent Management System\src\TalentSystem.Persistence\obj\Debug\net9.0\TalentSystem.Persistence.pdb
 D:\samier\enterprise Talent Management System\src\TalentSystem.Persistence\obj\Debug\net9.0\TalentSystem.Persistence.genruntimeconfig.cache
 D:\samier\enterprise Talent Management System\src\TalentSystem.Persistence\obj\Debug\net9.0\ref\TalentSystem.Persistence.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\bin\Debug\net9.0\TalentSystem.Persistence.deps.json
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\bin\Debug\net9.0\TalentSystem.Persistence.runtimeconfig.json
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\bin\Debug\net9.0\TalentSystem.Persistence.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\bin\Debug\net9.0\TalentSystem.Persistence.pdb
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\bin\Debug\net9.0\TalentSystem.Domain.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\bin\Debug\net9.0\TalentSystem.Shared.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\bin\Debug\net9.0\TalentSystem.Domain.pdb
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\bin\Debug\net9.0\TalentSystem.Shared.pdb
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\TalentSystem.Persistence.csproj.AssemblyReference.cache
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\TalentSystem.Persistence.GeneratedMSBuildEditorConfig.editorconfig
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\TalentSystem.Persistence.AssemblyInfoInputs.cache
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\TalentSystem.Persistence.AssemblyInfo.cs
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\TalentSystem.Persistence.csproj.CoreCompileInputs.cache
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\TalentSystem.Persistence.sourcelink.json
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\TalentSy.79DBF01B.Up2Date
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\TalentSystem.Persistence.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\refint\TalentSystem.Persistence.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\TalentSystem.Persistence.pdb
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\TalentSystem.Persistence.genruntimeconfig.cache
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\ref\TalentSystem.Persistence.dll
