@@ -169,6 +169,74 @@ public sealed class IdentityLookupService : IIdentityLookupService
         return Result<IReadOnlyList<LookupItemDto>>.Ok(units);
     }
 
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetJobGradesAsync(
+        string? search = null,
+        int? take = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _db.JobGrades
+            .AsNoTracking()
+            .OrderBy(x => x.Level)
+            .ThenBy(x => x.Name)
+            .Select(x => new LookupItemDto
+            {
+                Id = x.Id,
+                Name = $"{x.Name} (L{x.Level})"
+            });
+
+        var items = await ApplySearchAndTake(query, search, take, includeEmailSearch: false)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(items);
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetCompetenciesAsync(
+        string? search = null,
+        int? take = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _db.Competencies
+            .AsNoTracking()
+            .OrderBy(x => x.NameAr)
+            .ThenBy(x => x.NameEn)
+            .Select(x => new LookupItemDto
+            {
+                Id = x.Id,
+                Name = string.IsNullOrWhiteSpace(x.NameAr)
+                    ? x.NameEn
+                    : x.NameAr
+            });
+
+        var items = await ApplySearchAndTake(query, search, take, includeEmailSearch: false)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(items);
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetCompetencyLevelsAsync(
+        string? search = null,
+        int? take = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _db.CompetencyLevels
+            .AsNoTracking()
+            .OrderBy(x => x.NumericValue)
+            .ThenBy(x => x.Name)
+            .Select(x => new LookupItemDto
+            {
+                Id = x.Id,
+                Name = $"{x.Name} (L{x.NumericValue})"
+            });
+
+        var items = await ApplySearchAndTake(query, search, take, includeEmailSearch: false)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(items);
+    }
+
     private static IQueryable<LookupItemDto> ApplySearchAndTake(
         IQueryable<LookupItemDto> query,
         string? search,

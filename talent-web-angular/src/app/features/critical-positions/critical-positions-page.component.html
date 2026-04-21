@@ -1,0 +1,337 @@
+<div class="page-head-row cp-head">
+  <section class="page-head">
+    <h1>{{ 'criticalPositions.title' | t }}</h1>
+    <p class="page-head__sub">{{ 'criticalPositions.subtitle' | t }}</p>
+  </section>
+  @if (canManage()) {
+    <div class="page-actions">
+      <button type="button" class="btn-head-primary" (click)="openCreate()">
+        <span class="btn-head-primary__ico" aria-hidden="true">+</span>
+        <span>{{ 'criticalPositions.create' | t }}</span>
+      </button>
+    </div>
+  }
+</div>
+
+<section class="toolbar card cp-toolbar">
+  <div class="toolbar__inner">
+    <label class="toolbar__field">
+      <span class="toolbar__label">{{ 'criticalPositions.filter.position' | t }}</span>
+      <select class="toolbar__select" [(ngModel)]="filterPositionId">
+        <option value="">{{ 'criticalPositions.filter.allPositions' | t }}</option>
+        @for (p of positions(); track p.id) {
+          <option [value]="p.id">{{ p.name }}</option>
+        }
+      </select>
+    </label>
+    <label class="toolbar__field">
+      <span class="toolbar__label">{{ 'criticalPositions.filter.activeScope' | t }}</span>
+      <select class="toolbar__select" [(ngModel)]="filterActiveScope">
+        <option value="active">{{ 'criticalPositions.filter.activeOnly' | t }}</option>
+        <option value="all">{{ 'criticalPositions.filter.includeArchived' | t }}</option>
+      </select>
+    </label>
+    <button type="button" class="btn-toolbar-apply" (click)="page = 1; load()">{{ 'criticalPositions.applyFilter' | t }}</button>
+    <div class="cp-view-mode" role="group" [attr.aria-label]="'criticalPositions.view.table' | t">
+      <button
+        type="button"
+        class="cp-mode-btn"
+        [class.cp-mode-btn--active]="viewMode === 'table'"
+        (click)="viewMode = 'table'"
+      >
+        {{ 'criticalPositions.view.table' | t }}
+      </button>
+      <button
+        type="button"
+        class="cp-mode-btn"
+        [class.cp-mode-btn--active]="viewMode === 'cards'"
+        (click)="viewMode = 'cards'"
+      >
+        {{ 'criticalPositions.view.cards' | t }}
+      </button>
+    </div>
+  </div>
+</section>
+
+@if (viewMode === 'table') {
+  <div class="table-shell card">
+    @if (busy()) {
+      <div class="table-shell__loading">{{ 'common.loading' | t }}</div>
+    }
+    <div class="table-scroll">
+      <table class="data-table cp-table">
+        <thead>
+          <tr>
+            <th>{{ 'criticalPositions.table.position' | t }}</th>
+            <th>{{ 'criticalPositions.table.criticality' | t }}</th>
+            <th>{{ 'criticalPositions.table.risk' | t }}</th>
+            <th>{{ 'criticalPositions.table.status' | t }}</th>
+            <th>{{ 'criticalPositions.table.notes' | t }}</th>
+            <th class="actions-col-head">{{ 'common.actions' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of result()?.items ?? []; track row.id) {
+            <tr>
+              <td><span class="cell-strong">{{ labelFrom(positions(), row.positionId) }}</span></td>
+              <td><span class="level-pill">{{ criticalityLabel(row.criticalityLevel) }}</span></td>
+              <td><span class="level-pill">{{ riskLabel(row.riskLevel) }}</span></td>
+              <td>
+                <span class="level-pill" [class.cp-pill--inactive]="!isRowActive(row)">
+                  {{ recordStatusLabel(row.recordStatus) }}
+                </span>
+              </td>
+              <td class="muted">{{ row.notes || '—' }}</td>
+              <td class="cell-actions">
+                <div class="cell-actions__wrap">
+                  <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">
+                    {{ 'criticalPositions.actions.details' | t }}
+                  </button>
+                  @if (canManage() && isRowActive(row)) {
+                    <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">
+                      {{ 'criticalPositions.actions.edit' | t }}
+                    </button>
+                    <button type="button" class="action-btn action-btn--danger" (click)="openArchiveConfirm(row)">
+                      {{ 'criticalPositions.actions.deactivate' | t }}
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pager cp-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!result()?.hasPreviousPage">
+        {{ 'common.previous' | t }}
+      </button>
+      <span class="pager__meta">{{ result()?.page ?? 1 }} / {{ result()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!result()?.hasNextPage">
+        {{ 'common.next' | t }}
+      </button>
+    </div>
+  </div>
+} @else {
+  <section class="cp-cards-wrap card" [attr.aria-busy]="busy() ? 'true' : 'false'">
+    @if (busy()) {
+      <div class="cp-cards-loading">{{ 'common.loading' | t }}</div>
+    }
+    <div class="cp-cards-grid">
+      @for (row of result()?.items ?? []; track row.id; let i = $index) {
+        <article class="cp-card" [style.animation-delay.ms]="i * 35">
+          <header class="cp-card__head">
+            <strong class="cp-card__title">{{ labelFrom(positions(), row.positionId) }}</strong>
+            <span class="level-pill" [class.cp-pill--inactive]="!isRowActive(row)">
+              {{ recordStatusLabel(row.recordStatus) }}
+            </span>
+          </header>
+          <p class="cp-card__sub muted">
+            {{ 'criticalPositions.table.criticality' | t }}: {{ criticalityLabel(row.criticalityLevel) }} ·
+            {{ 'criticalPositions.table.risk' | t }}: {{ riskLabel(row.riskLevel) }}
+          </p>
+          @if (row.notes) {
+            <p class="cp-card__sub">{{ row.notes }}</p>
+          }
+          <footer class="cp-card__actions">
+            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">
+              {{ 'criticalPositions.actions.details' | t }}
+            </button>
+            @if (canManage() && isRowActive(row)) {
+              <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">
+                {{ 'criticalPositions.actions.edit' | t }}
+              </button>
+              <button type="button" class="action-btn action-btn--danger" (click)="openArchiveConfirm(row)">
+                {{ 'criticalPositions.actions.deactivate' | t }}
+              </button>
+            }
+          </footer>
+        </article>
+      }
+    </div>
+    <div class="pager cp-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!result()?.hasPreviousPage">
+        {{ 'common.previous' | t }}
+      </button>
+      <span class="pager__meta">{{ result()?.page ?? 1 }} / {{ result()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!result()?.hasNextPage">
+        {{ 'common.next' | t }}
+      </button>
+    </div>
+  </section>
+}
+
+@if (createOpen()) {
+  <div class="modal-backdrop" (click)="createOpen.set(false)"></div>
+  <section class="modal cp-modal" role="dialog" aria-modal="true">
+    <header class="cp-modal__head">
+      <div>
+        <h2>{{ 'criticalPositions.createModal.title' | t }}</h2>
+        <p>{{ 'criticalPositions.createModal.subtitle' | t }}</p>
+      </div>
+      <button type="button" class="cp-modal__close" (click)="createOpen.set(false)" [attr.aria-label]="'criticalPositions.modal.close' | t">
+        ×
+      </button>
+    </header>
+    <div class="cp-modal__body">
+      <div class="form-grid">
+        <label class="field field--full">
+          <span>{{ 'criticalPositions.form.position' | t }}</span>
+          <select [(ngModel)]="createModel.positionId" name="cpPos">
+            <option value="">{{ 'criticalPositions.form.selectPosition' | t }}</option>
+            @for (p of positions(); track p.id) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>{{ 'criticalPositions.form.criticality' | t }}</span>
+          <select [(ngModel)]="createModel.criticalityLevel" name="cpCrit">
+            <option [ngValue]="1">{{ 'criticalPositions.form.level.low' | t }}</option>
+            <option [ngValue]="2">{{ 'criticalPositions.form.level.medium' | t }}</option>
+            <option [ngValue]="3">{{ 'criticalPositions.form.level.high' | t }}</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>{{ 'criticalPositions.form.risk' | t }}</span>
+          <select [(ngModel)]="createModel.riskLevel" name="cpRisk">
+            <option [ngValue]="1">{{ 'criticalPositions.form.level.low' | t }}</option>
+            <option [ngValue]="2">{{ 'criticalPositions.form.level.medium' | t }}</option>
+            <option [ngValue]="3">{{ 'criticalPositions.form.level.high' | t }}</option>
+          </select>
+        </label>
+        <label class="field field--full">
+          <span>{{ 'criticalPositions.form.notes' | t }}</span>
+          <textarea [(ngModel)]="createModel.notes" name="cpNotes" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="createOpen.set(false)">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveCreate()">{{ 'criticalPositions.save' | t }}</button>
+    </footer>
+  </section>
+}
+
+@if (detailsOpen() && selected()) {
+  <div class="modal-backdrop" (click)="detailsOpen.set(false)"></div>
+  <section class="modal cp-modal cp-modal--details" role="dialog" aria-modal="true">
+    <header class="cp-modal__head">
+      <div>
+        <h2>{{ 'criticalPositions.detailsModal.title' | t }}</h2>
+        <p>{{ 'criticalPositions.detailsModal.subtitle' | t }}</p>
+      </div>
+      <button type="button" class="cp-modal__close" (click)="detailsOpen.set(false)" [attr.aria-label]="'criticalPositions.modal.close' | t">
+        ×
+      </button>
+    </header>
+    <div class="cp-modal__body">
+      <div class="details-grid">
+        <div class="detail-item">
+          <span>{{ 'criticalPositions.table.position' | t }}</span>
+          <strong>{{ labelFrom(positions(), selected()!.positionId) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'criticalPositions.table.criticality' | t }}</span>
+          <strong>{{ criticalityLabel(selected()!.criticalityLevel) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'criticalPositions.table.risk' | t }}</span>
+          <strong>{{ riskLabel(selected()!.riskLevel) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'criticalPositions.table.status' | t }}</span>
+          <strong>{{ recordStatusLabel(selected()!.recordStatus) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'criticalPositions.form.notes' | t }}</span>
+          <strong>{{ selected()!.notes || '—' }}</strong>
+        </div>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="detailsOpen.set(false)">{{ 'criticalPositions.modal.close' | t }}</button>
+    </footer>
+  </section>
+}
+
+@if (editOpen() && selected()) {
+  <div class="modal-backdrop" (click)="editOpen.set(false)"></div>
+  <section class="modal cp-modal" role="dialog" aria-modal="true">
+    <header class="cp-modal__head">
+      <div>
+        <h2>{{ 'criticalPositions.editModal.title' | t }}</h2>
+        <p>{{ 'criticalPositions.editModal.subtitle' | t }}</p>
+      </div>
+      <button type="button" class="cp-modal__close" (click)="editOpen.set(false)" [attr.aria-label]="'criticalPositions.modal.close' | t">
+        ×
+      </button>
+    </header>
+    <div class="cp-modal__body">
+      <div class="details-grid" style="margin-bottom: 1rem">
+        <div class="detail-item">
+          <span>{{ 'criticalPositions.form.position' | t }}</span>
+          <strong>{{ labelFrom(positions(), selected()!.positionId) }}</strong>
+        </div>
+      </div>
+      <div class="form-grid">
+        <label class="field">
+          <span>{{ 'criticalPositions.form.criticality' | t }}</span>
+          <select [(ngModel)]="editModel.criticalityLevel" name="cpEditCrit">
+            <option [ngValue]="1">{{ 'criticalPositions.form.level.low' | t }}</option>
+            <option [ngValue]="2">{{ 'criticalPositions.form.level.medium' | t }}</option>
+            <option [ngValue]="3">{{ 'criticalPositions.form.level.high' | t }}</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>{{ 'criticalPositions.form.risk' | t }}</span>
+          <select [(ngModel)]="editModel.riskLevel" name="cpEditRisk">
+            <option [ngValue]="1">{{ 'criticalPositions.form.level.low' | t }}</option>
+            <option [ngValue]="2">{{ 'criticalPositions.form.level.medium' | t }}</option>
+            <option [ngValue]="3">{{ 'criticalPositions.form.level.high' | t }}</option>
+          </select>
+        </label>
+        <label class="field field--full">
+          <span>{{ 'criticalPositions.form.notes' | t }}</span>
+          <textarea [(ngModel)]="editModel.notes" name="cpEditNotes" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="editOpen.set(false)">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveEdit()">{{ 'criticalPositions.save' | t }}</button>
+    </footer>
+  </section>
+}
+
+@if (archiveConfirmOpen() && pendingArchiveRow()) {
+  <div class="modal-backdrop" (click)="closeArchiveConfirm()"></div>
+  <section class="modal cp-modal cp-modal--archive" role="dialog" aria-modal="true" aria-labelledby="cp-archive-title">
+    <header class="cp-modal__head cp-modal__head--archive">
+      <div class="cp-modal__head-main">
+        <div class="cp-modal__archive-icon" aria-hidden="true">
+          <i class="fa-solid fa-box-archive"></i>
+        </div>
+        <div class="cp-modal__head-text">
+          <h2 id="cp-archive-title">{{ 'criticalPositions.archiveModal.title' | t }}</h2>
+          <p>{{ 'criticalPositions.archiveModal.lead' | t }}</p>
+        </div>
+      </div>
+      <button type="button" class="cp-modal__close" (click)="closeArchiveConfirm()" [attr.aria-label]="'criticalPositions.modal.close' | t">
+        ×
+      </button>
+    </header>
+    <div class="cp-modal__body">
+      <p class="cp-archive-context">
+        <strong>{{ labelFrom(positions(), pendingArchiveRow()!.positionId) }}</strong>
+      </p>
+      <p class="cp-archive-warning">{{ 'criticalPositions.archiveModal.warning' | t }}</p>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="closeArchiveConfirm()">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary btn-primary--danger" (click)="executeArchive()">
+        {{ 'criticalPositions.archiveModal.confirm' | t }}
+      </button>
+    </footer>
+  </section>
+}

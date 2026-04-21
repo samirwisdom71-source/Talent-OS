@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using TalentSystem.Application.Common;
+using TalentSystem.Application.Features.Identity.DTOs;
 using TalentSystem.Application.Features.Succession.DTOs;
 using TalentSystem.Application.Features.Succession.Interfaces;
 using TalentSystem.Domain.Enums;
@@ -204,6 +205,54 @@ public sealed class SuccessionPlanService : ISuccessionPlanService
             PageSize = pageSize,
             TotalCount = totalCount
         });
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetLookupAsync(
+        SuccessionPlanLookupRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var take = request.Take <= 0 ? PaginationConstants.MaxPageSize : request.Take;
+        if (take > PaginationConstants.MaxPageSize)
+        {
+            take = PaginationConstants.MaxPageSize;
+        }
+
+        IQueryable<SuccessionPlan> query = _db.SuccessionPlans.AsNoTracking();
+
+        if (request.CriticalPositionId is { } cpId && cpId != Guid.Empty)
+        {
+            query = query.Where(x => x.CriticalPositionId == cpId);
+        }
+
+        if (request.Status.HasValue)
+        {
+            query = query.Where(x => x.Status == request.Status.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            var term = request.Search.Trim();
+            query = query.Where(x =>
+                x.PlanName.Contains(term) ||
+                (x.Notes != null && x.Notes.Contains(term)));
+        }
+
+        var rows = await query
+            .OrderByDescending(x => x.CreatedOnUtc)
+            .Take(take)
+            .Select(x => new { x.Id, x.PlanName })
+            .ToListAsync(cancellationToken);
+
+        var list = rows
+            .Select(x => new LookupItemDto
+            {
+                Id = x.Id,
+                Name = string.IsNullOrWhiteSpace(x.PlanName) ? x.Id.ToString() : x.PlanName.Trim(),
+                Email = null
+            })
+            .ToList();
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(list);
     }
 
     public async Task<Result<SuccessionPlanDto>> ActivateAsync(Guid id, CancellationToken cancellationToken = default)

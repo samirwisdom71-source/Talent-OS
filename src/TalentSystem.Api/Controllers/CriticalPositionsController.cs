@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using TalentSystem.Api.Extensions;
+using TalentSystem.Application.Features.Identity.DTOs;
 using TalentSystem.Application.Features.Succession.DTOs;
 using TalentSystem.Application.Features.Succession.Interfaces;
 using TalentSystem.Shared.Api;
@@ -65,6 +66,23 @@ public sealed class CriticalPositionsController : ControllerBase
         if (result.IsSuccess)
         {
             return Ok(ApiResponse<PagedResult<CriticalPositionDto>>.FromSuccess(result.Value!, traceId));
+        }
+
+        return result.ToFailureActionResult(this, traceId);
+    }
+
+    /// <summary>قائمة مختصرة (معرّف المنصب الحرج + اسم عرض من المنصب الوظيفي).</summary>
+    [HttpGet("lookup")]
+    public async Task<IActionResult> GetLookup(
+        [FromQuery] CriticalPositionLookupRequest request,
+        CancellationToken cancellationToken)
+    {
+        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var result = await _service.GetLookupAsync(request, cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return Ok(ApiResponse<IReadOnlyList<LookupItemDto>>.FromSuccess(result.Value!, traceId));
         }
 
         return result.ToFailureActionResult(this, traceId);

@@ -1,3 +1,4 @@
+using TalentSystem.Application.Features.Identity.DTOs;
 using TalentSystem.Application.Features.Succession.DTOs;
 using TalentSystem.Shared.Api;
 using TalentSystem.Shared.Results;
@@ -19,6 +20,10 @@ public interface ISuccessionPlanService
 
     Task<Result<PagedResult<SuccessionPlanDto>>> GetPagedAsync(
         SuccessionPlanFilterRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<IReadOnlyList<LookupItemDto>>> GetLookupAsync(
+        SuccessionPlanLookupRequest request,
         CancellationToken cancellationToken = default);
 
     Task<Result<SuccessionPlanDto>> ActivateAsync(Guid id, CancellationToken cancellationToken = default);

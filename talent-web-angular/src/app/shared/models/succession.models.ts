@@ -47,3 +47,24 @@ export interface CreateSuccessionPlanRequest {
   planName: string;
   notes?: string | null;
 }
+
+/** PUT /api/succession-plans/{id} */
+export interface UpdateSuccessionPlanRequest {
+  planName: string;
+  notes?: string | null;
+}
+
+/** POST /api/critical-positions */
+export interface CreateCriticalPositionRequest {
+  positionId: string;
+  criticalityLevel: number;
+  riskLevel: number;
+  notes?: string | null;
+}
+
+/** PUT /api/critical-positions/{id} */
+export interface UpdateCriticalPositionRequest {
+  criticalityLevel: number;
+  riskLevel: number;
+  notes?: string | null;
+}

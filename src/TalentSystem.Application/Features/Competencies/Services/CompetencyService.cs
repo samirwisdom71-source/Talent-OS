@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using TalentSystem.Application.Common;
+using TalentSystem.Application.Features.Identity.DTOs;
 using TalentSystem.Application.Features.Competencies.DTOs;
 using TalentSystem.Application.Features.Competencies.Interfaces;
 using TalentSystem.Domain.Competencies;
@@ -191,6 +192,69 @@ public sealed class CompetencyService : ICompetencyService
             PageSize = pageSize,
             TotalCount = totalCount
         });
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetLookupAsync(
+        CompetencyLookupRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var take = request.Take <= 0 ? PaginationConstants.MaxPageSize : request.Take;
+        if (take > PaginationConstants.MaxPageSize)
+        {
+            take = PaginationConstants.MaxPageSize;
+        }
+
+        var preferEn = string.Equals(request.Lang, "en", StringComparison.OrdinalIgnoreCase);
+
+        IQueryable<Competency> query = _db.Competencies.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            var term = request.Search.Trim();
+            query = query.Where(x =>
+                x.Code.Contains(term) ||
+                x.NameEn.Contains(term) ||
+                x.NameAr.Contains(term));
+        }
+
+        var rows = await query
+            .OrderBy(x => x.Code)
+            .Take(take)
+            .Select(x => new { x.Id, x.NameAr, x.NameEn, x.Code })
+            .ToListAsync(cancellationToken);
+
+        var list = rows
+            .Select(x =>
+            {
+                var baseName = preferEn
+                    ? PickBilingualName(x.NameEn, x.NameAr, x.Id)
+                    : PickBilingualName(x.NameAr, x.NameEn, x.Id);
+                var display = string.IsNullOrWhiteSpace(x.Code) ? baseName : $"{baseName} ({x.Code})";
+                return new LookupItemDto
+                {
+                    Id = x.Id,
+                    Name = display,
+                    Email = null
+                };
+            })
+            .ToList();
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(list);
+    }
+
+    private static string PickBilingualName(string? primary, string? secondary, Guid id)
+    {
+        if (!string.IsNullOrWhiteSpace(primary))
+        {
+            return primary.Trim();
+        }
+
+        if (!string.IsNullOrWhiteSpace(secondary))
+        {
+            return secondary.Trim();
+        }
+
+        return id.ToString();
     }
 
     private static CompetencyDto MapToDto(Competency entity) =>

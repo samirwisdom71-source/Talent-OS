@@ -37,3 +37,7 @@ D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSyste
 D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\TalentSystem.Persistence.pdb
 D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\TalentSystem.Persistence.genruntimeconfig.cache
 D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Persistence\obj\Debug\net9.0\ref\TalentSystem.Persistence.dll
+C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Persistence.deps.json
+C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Persistence.runtimeconfig.json
+C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Persistence.dll
+C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Persistence.pdb

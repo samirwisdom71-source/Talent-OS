@@ -27,6 +27,30 @@ export class IdentityLookupsApiService {
     return this.get('/organization-units', search, take);
   }
 
+  getJobGrades(search?: string, take?: number) {
+    return this.get('/job-grades', search, take);
+  }
+
+  getCompetencies(search?: string, take?: number) {
+    return this.get('/competencies', search, take);
+  }
+
+  getCompetencyLevels(search?: string, take?: number) {
+    return this.get('/competency-levels', search, take);
+  }
+
+  /** @deprecated استخدم `PerformanceCyclesLookupService.loadLookupItems`. */
+  getPerformanceCycles(search?: string, take = 100) {
+    const params = toHttpParams({
+      take,
+      search: search ?? undefined,
+      lang: 'ar',
+    });
+    return this.http
+      .get<ApiResponse<LookupItemDto[]>>(apiUrl('/api/performance-cycles/lookup'), { params })
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
   private get(path: string, search?: string, take?: number) {
     const params = toHttpParams({
       search: search ?? undefined,

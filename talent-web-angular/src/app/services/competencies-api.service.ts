@@ -9,6 +9,7 @@ import {
   CreateCompetencyRequest,
   UpdateCompetencyRequest,
 } from '../shared/models/competency.models';
+import { LookupItemDto } from '../shared/models/lookup.models';
 import { toHttpParams, unwrapApiResponse } from '../shared/utils/api-helpers';
 
 @Injectable({ providedIn: 'root' })
@@ -24,6 +25,18 @@ export class CompetenciesApiService {
     });
     return this.http
       .get<ApiResponse<PagedResult<CompetencyDto>>>(this.base, { params })
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  /** GET /api/competencies/lookup */
+  getLookup(filter: { search?: string | null; take?: number; lang?: 'ar' | 'en' }) {
+    const params = toHttpParams({
+      search: filter.search ?? undefined,
+      take: filter.take ?? 200,
+      lang: filter.lang ?? 'ar',
+    });
+    return this.http
+      .get<ApiResponse<LookupItemDto[]>>(`${this.base}/lookup`, { params })
       .pipe(map((r) => unwrapApiResponse(r)));
   }
 

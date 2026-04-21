@@ -1,0 +1,52 @@
+<div class="page-head-row sp-head">
+  <section class="page-head">
+    <h1>{{ 'successionAnalytics.title' | t }}</h1>
+    <p class="page-head__sub">{{ 'successionAnalytics.subtitle' | t }}</p>
+  </section>
+</div>
+
+@if (busy()) {
+  <div class="card card--muted">{{ 'common.loading' | t }}</div>
+} @else if (failed()) {
+  <div class="card card--muted">{{ 'successionAnalytics.error.load' | t }}</div>
+} @else if (summary()) {
+  <div class="card card--interactive stat-block">
+    <h2 class="sp-section-title">{{ 'successionAnalytics.section.summary' | t }}</h2>
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat__label">{{ 'successionAnalytics.stats.activePlans' | t }}</div>
+        <div class="stat__value">{{ summary()!.activeSuccessionPlans }}/{{ summary()!.totalSuccessionPlans }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat__label">{{ 'successionAnalytics.stats.activeCritical' | t }}</div>
+        <div class="stat__value">{{ summary()!.activeCriticalPositions }}/{{ summary()!.totalCriticalPositions }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat__label">{{ 'successionAnalytics.stats.primarySuccessor' | t }}</div>
+        <div class="stat__value">{{ summary()!.plansWithPrimarySuccessor }}</div>
+      </div>
+      <div class="stat">
+        <div class="stat__label">{{ 'successionAnalytics.stats.readyNowPlans' | t }}</div>
+        <div class="stat__value">{{ summary()!.plansWithReadyNowSuccessor }}</div>
+      </div>
+      @if (summary()!.averageCoverageScore != null) {
+        <div class="stat">
+          <div class="stat__label">{{ 'successionAnalytics.stats.avgCoverage' | t }}</div>
+          <div class="stat__value">{{ summary()!.averageCoverageScore | number: '1.0-2' }}</div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="card card--interactive stat-block">
+    <h2 class="sp-section-title">{{ 'successionAnalytics.section.readiness' | t }}</h2>
+    <ul class="readiness-list">
+      @for (row of summary()!.successorReadinessBreakdown; track row.value) {
+        <li>
+          <span class="readiness-list__label">{{ readinessLabel(row) }}</span>
+          <span class="level-pill">{{ row.count }}</span>
+        </li>
+      }
+    </ul>
+  </div>
+}

@@ -83,4 +83,37 @@ public sealed class IdentityLookupsController : ControllerBase
         var result = await _identityLookupService.GetOrganizationUnitsAsync(search, take, cancellationToken);
         return result.ToApiActionResult(this, traceId);
     }
+
+    [HttpGet("job-grades")]
+    public async Task<IActionResult> GetJobGrades(
+        [FromQuery] string? search,
+        [FromQuery] int? take,
+        CancellationToken cancellationToken)
+    {
+        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var result = await _identityLookupService.GetJobGradesAsync(search, take, cancellationToken);
+        return result.ToApiActionResult(this, traceId);
+    }
+
+    [HttpGet("competencies")]
+    public async Task<IActionResult> GetCompetencies(
+        [FromQuery] string? search,
+        [FromQuery] int? take,
+        CancellationToken cancellationToken)
+    {
+        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var result = await _identityLookupService.GetCompetenciesAsync(search, take, cancellationToken);
+        return result.ToApiActionResult(this, traceId);
+    }
+
+    [HttpGet("competency-levels")]
+    public async Task<IActionResult> GetCompetencyLevels(
+        [FromQuery] string? search,
+        [FromQuery] int? take,
+        CancellationToken cancellationToken)
+    {
+        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var result = await _identityLookupService.GetCompetencyLevelsAsync(search, take, cancellationToken);
+        return result.ToApiActionResult(this, traceId);
+    }
 }

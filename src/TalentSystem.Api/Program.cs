@@ -1,6 +1,9 @@
+using System.Diagnostics;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.OpenApi;
+using TalentSystem.Shared.Api;
 using TalentSystem.Api.Middleware;
 using TalentSystem.Application.DependencyInjection;
 using TalentSystem.Application.Features.Identity.Interfaces;
@@ -130,7 +133,33 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapFallbackToFile("index.html");
+
+// Do not serve SPA index.html for unknown /api/* routes — that returns HTML with 200 and breaks JSON clients ("Http failure during parsing").
+var webRoot = app.Environment.WebRootPath;
+var indexHtmlPath = string.IsNullOrWhiteSpace(webRoot) ? null : Path.Combine(webRoot, "index.html");
+app.MapFallback(async (HttpContext ctx) =>
+{
+    if (ctx.Request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase))
+    {
+        var traceId = Activity.Current?.Id ?? ctx.TraceIdentifier;
+        ctx.Response.StatusCode = StatusCodes.Status404NotFound;
+        var payload = ApiResponse<object>.FromFailure(
+            new[] { "The requested API endpoint was not found." },
+            traceId);
+        var jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        await ctx.Response.WriteAsJsonAsync(payload, jsonOptions);
+        return;
+    }
+
+    if (indexHtmlPath is not null && File.Exists(indexHtmlPath))
+    {
+        ctx.Response.ContentType = "text/html; charset=utf-8";
+        await ctx.Response.SendFileAsync(indexHtmlPath);
+        return;
+    }
+
+    ctx.Response.StatusCode = StatusCodes.Status404NotFound;
+});
 
 app.Run();
 

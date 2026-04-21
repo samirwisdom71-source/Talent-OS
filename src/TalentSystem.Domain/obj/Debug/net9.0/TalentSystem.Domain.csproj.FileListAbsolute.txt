@@ -29,3 +29,6 @@ D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSyste
 D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Domain\obj\Debug\net9.0\refint\TalentSystem.Domain.dll
 D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Domain\obj\Debug\net9.0\TalentSystem.Domain.pdb
 D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Domain\obj\Debug\net9.0\ref\TalentSystem.Domain.dll
+C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Domain.deps.json
+C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Domain.dll
+C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Domain.pdb

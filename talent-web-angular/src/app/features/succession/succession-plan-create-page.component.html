@@ -1,4 +1,11 @@
-<a routerLink="/succession" class="back-link">← التعاقب</a>
+<a routerLink="/succession" class="back-link">
+  <span class="back-link__ico" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  </span>
+  <span class="back-link__label">التعاقب</span>
+</a>
 <section class="page-head">
   <h1>خطة تعاقب جديدة</h1>
 </section>
@@ -9,7 +16,7 @@
       <select class="select" [(ngModel)]="model.criticalPositionId" name="cp">
         <option value="">— اختر —</option>
         @for (p of positions(); track p.id) {
-          <option [value]="p.id">حرج {{ p.id.slice(0, 8) }}… · منصب {{ p.positionId.slice(0, 8) }}…</option>
+          <option [value]="p.id">{{ criticalPositionOptionLabel(p) }}</option>
         }
       </select>
     </label>

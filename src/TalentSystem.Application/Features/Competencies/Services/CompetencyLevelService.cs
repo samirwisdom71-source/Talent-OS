@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using TalentSystem.Application.Common;
+using TalentSystem.Application.Features.Identity.DTOs;
 using TalentSystem.Application.Features.Competencies.DTOs;
 using TalentSystem.Application.Features.Competencies.Interfaces;
 using TalentSystem.Domain.Competencies;
@@ -164,6 +165,44 @@ public sealed class CompetencyLevelService : ICompetencyLevelService
             PageSize = pageSize,
             TotalCount = totalCount
         });
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetLookupAsync(
+        CompetencyLevelLookupRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var take = request.Take <= 0 ? PaginationConstants.MaxPageSize : request.Take;
+        if (take > PaginationConstants.MaxPageSize)
+        {
+            take = PaginationConstants.MaxPageSize;
+        }
+
+        IQueryable<CompetencyLevel> query = _db.CompetencyLevels.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            var term = request.Search.Trim();
+            query = query.Where(x =>
+                x.Name.Contains(term) ||
+                (x.Description != null && x.Description.Contains(term)));
+        }
+
+        var rows = await query
+            .OrderBy(x => x.NumericValue)
+            .Take(take)
+            .Select(x => new { x.Id, x.Name, x.NumericValue })
+            .ToListAsync(cancellationToken);
+
+        var list = rows
+            .Select(x => new LookupItemDto
+            {
+                Id = x.Id,
+                Name = $"{x.Name.Trim()} (L{x.NumericValue})",
+                Email = null
+            })
+            .ToList();
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(list);
     }
 
     private static CompetencyLevelDto MapToDto(CompetencyLevel entity) =>

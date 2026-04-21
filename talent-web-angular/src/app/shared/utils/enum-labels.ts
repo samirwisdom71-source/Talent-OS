@@ -91,6 +91,7 @@ const SUCCESSION_PLAN_STATUS: Record<number, { ar: string; en: string }> = {
   1: { ar: 'مسودة', en: 'Draft' },
   2: { ar: 'نشط', en: 'Active' },
   3: { ar: 'مغلق', en: 'Closed' },
+  4: { ar: 'مؤرشف', en: 'Archived' },
 };
 
 const POTENTIAL_ASSESSMENT_STATUS: Record<number, { ar: string; en: string }> = {
@@ -143,6 +144,12 @@ const LOW_MED_HIGH: Record<number, { ar: string; en: string }> = {
   3: { ar: 'مرتفع', en: 'High' },
 };
 
+const RECORD_STATUS: Record<number, { ar: string; en: string }> = {
+  1: { ar: 'نشط', en: 'Active' },
+  2: { ar: 'مؤرشف', en: 'Archived' },
+  3: { ar: 'محذوف', en: 'Deleted' },
+};
+
 const NOTIFICATION_CHANNEL: Record<number, { ar: string; en: string }> = {
   1: { ar: 'داخل التطبيق', en: 'In-app' },
   2: { ar: 'بريد', en: 'Email' },
@@ -181,6 +188,7 @@ export const EnumLabels = {
   opportunityType: (lang: UiLang, v: number | null | undefined) => mapNum(lang, OPPORTUNITY_TYPE, v),
   criticalityLevel: (lang: UiLang, v: number | null | undefined) => mapNum(lang, LOW_MED_HIGH, v),
   successionRiskLevel: (lang: UiLang, v: number | null | undefined) => mapNum(lang, LOW_MED_HIGH, v),
+  recordStatus: (lang: UiLang, v: number | null | undefined) => mapNum(lang, RECORD_STATUS, v),
   notificationChannel: (lang: UiLang, v: number | null | undefined) => mapNum(lang, NOTIFICATION_CHANNEL, v),
   notificationType: (lang: UiLang, v: number | null | undefined) => mapNum(lang, NOTIFICATION_TYPE, v),
 };

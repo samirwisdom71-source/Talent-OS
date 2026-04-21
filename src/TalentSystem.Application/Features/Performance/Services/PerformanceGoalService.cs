@@ -264,7 +264,7 @@ public sealed class PerformanceGoalService : IPerformanceGoalService
         }
 
         var othersSum = await query
-            .Where(x => StatusCountsTowardWeightCap(x.Status))
+            .Where(x => x.Status == PerformanceGoalStatus.Draft || x.Status == PerformanceGoalStatus.Active)
             .SumAsync(x => x.Weight, cancellationToken);
 
         var additionalContribution = StatusCountsTowardWeightCap(additionalStatus) ? additionalWeight : 0m;

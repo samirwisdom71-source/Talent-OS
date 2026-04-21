@@ -1,5 +1,6 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { DomainAnalyticsApiService } from '../../services/domain-analytics-api.service';
 import { PerformanceCyclesApiService } from '../../services/performance-cycles-api.service';
@@ -12,9 +13,9 @@ import { EnumLabels, UiLang } from '../../shared/utils/enum-labels';
 @Component({
   selector: 'app-performance-page',
   standalone: true,
-  imports: [DatePipe, DecimalPipe],
+  imports: [DatePipe, DecimalPipe, RouterLink],
   templateUrl: './performance-page.component.html',
-  styleUrl: './talent-pages.component.scss',
+  styleUrl: './performance-page.component.scss',
 })
 export class PerformancePageComponent implements OnInit {
   private readonly api = inject(PerformanceCyclesApiService);
@@ -56,5 +57,11 @@ export class PerformancePageComponent implements OnInit {
 
   cycleStatusLabel(s: number): string {
     return EnumLabels.performanceCycleStatus(this.lang(), s);
+  }
+
+  completionRate(): number {
+    const s = this.summary();
+    if (!s || s.totalGoals === 0) return 0;
+    return Math.round((s.completedGoals / s.totalGoals) * 100);
   }
 }

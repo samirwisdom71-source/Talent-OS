@@ -1,0 +1,292 @@
+<div class="page-head-row sp-head">
+  <section class="page-head">
+    <h1>{{ 'talentScoresAdmin.title' | t }}</h1>
+    <p class="page-head__sub">{{ 'talentScoresAdmin.subtitle' | t }}</p>
+  </section>
+  @if (canManage()) {
+    <div class="page-actions">
+      <button type="button" class="btn-head-primary" (click)="openCalculate()">
+        <span class="btn-head-primary__ico" aria-hidden="true">+</span>
+        <span>{{ 'talentScoresAdmin.calculate' | t }}</span>
+      </button>
+      <button type="button" class="btn-ghost" (click)="openRecalculate()">{{ 'talentScoresAdmin.recalculate' | t }}</button>
+    </div>
+  }
+</div>
+
+<section class="toolbar card sp-toolbar">
+  <div class="toolbar__inner">
+    <div class="toolbar__field toolbar__field--combo">
+      <span class="toolbar__label">{{ 'talentScoresAdmin.filter.employee' | t }}</span>
+      <app-lookup-search-combo
+        kind="employee"
+        [(value)]="filterEmployeeId"
+        [placeholder]="('talentClassificationsAdmin.combo.searchEmployee' | t)"
+      />
+    </div>
+    <div class="toolbar__field toolbar__field--combo">
+      <span class="toolbar__label">{{ 'talentScoresAdmin.filter.cycle' | t }}</span>
+      <app-lookup-search-combo
+        kind="performanceCycle"
+        [(value)]="filterPerformanceCycleId"
+        [placeholder]="('talentClassificationsAdmin.combo.searchCycle' | t)"
+      />
+    </div>
+    <label class="toolbar__field">
+      <span class="toolbar__label">{{ 'talentScoresAdmin.filter.minFinal' | t }}</span>
+      <input class="toolbar__select" type="number" step="0.01" [(ngModel)]="filterMinFinal" />
+    </label>
+    <label class="toolbar__field">
+      <span class="toolbar__label">{{ 'talentScoresAdmin.filter.maxFinal' | t }}</span>
+      <input class="toolbar__select" type="number" step="0.01" [(ngModel)]="filterMaxFinal" />
+    </label>
+    <button type="button" class="btn-toolbar-apply" (click)="applyFilters()">{{ 'talentAnalytics.apply' | t }}</button>
+    <div class="sp-view-mode" role="group" [attr.aria-label]="'common.view' | t">
+      <button type="button" class="sp-mode-btn" [class.sp-mode-btn--active]="viewMode() === 'table'" (click)="viewMode.set('table')">
+        {{ 'successionPlansList.view.table' | t }}
+      </button>
+      <button type="button" class="sp-mode-btn" [class.sp-mode-btn--active]="viewMode() === 'cards'" (click)="viewMode.set('cards')">
+        {{ 'successionPlansList.view.cards' | t }}
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="card ta-lookup">
+  <h2 class="ta-section-title">{{ 'talentScoresAdmin.lookup.title' | t }}</h2>
+  <p class="muted">{{ 'talentScoresAdmin.lookup.subtitle' | t }}</p>
+  <div class="toolbar__inner lookup-row lookup-row--combo">
+    <div class="toolbar__field toolbar__field--combo">
+      <span class="toolbar__label">{{ 'talentScoresAdmin.filter.employee' | t }}</span>
+      <app-lookup-search-combo kind="employee" [(value)]="lookupEmployeeId" [placeholder]="('talentClassificationsAdmin.combo.searchEmployee' | t)" />
+    </div>
+    <div class="toolbar__field toolbar__field--combo">
+      <span class="toolbar__label">{{ 'talentScoresAdmin.filter.cycle' | t }}</span>
+      <app-lookup-search-combo kind="performanceCycle" [(value)]="lookupCycleId" [placeholder]="('talentClassificationsAdmin.combo.searchCycle' | t)" />
+    </div>
+    <button type="button" class="btn-toolbar-apply" (click)="runLookup()" [disabled]="lookupBusy()">
+      {{ 'talentClassificationsAdmin.lookup.run' | t }}
+    </button>
+  </div>
+  @if (lookupBusy()) {
+    <p class="muted">{{ 'common.loading' | t }}</p>
+  } @else if (lookupResult()) {
+    <div class="details-grid lookup-result">
+      <div class="detail-item">
+        <span>{{ 'talentScoresAdmin.table.final' | t }}</span><strong>{{ lookupResult()!.finalScore | number: '1.0-4' }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>{{ 'talentScoresAdmin.table.performance' | t }}</span><strong>{{ lookupResult()!.performanceScore | number: '1.0-4' }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>{{ 'talentScoresAdmin.table.potential' | t }}</span><strong>{{ lookupResult()!.potentialScore | number: '1.0-4' }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>{{ 'talentScoresAdmin.table.version' | t }}</span><strong>{{ lookupResult()!.calculationVersion }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>{{ 'talentScoresAdmin.table.calculatedOn' | t }}</span>
+        <strong>{{ lookupResult()!.calculatedOnUtc | date: 'yyyy-MM-dd HH:mm' }}</strong>
+      </div>
+    </div>
+  }
+</section>
+
+@if (failed()) {
+  <div class="card card--muted">{{ 'talentScoresAdmin.error.loadList' | t }}</div>
+} @else if (viewMode() === 'table') {
+  <div class="table-shell card">
+    @if (busy()) {
+      <div class="table-shell__loading">{{ 'common.loading' | t }}</div>
+    }
+    <div class="table-scroll">
+      <table class="data-table sp-table">
+        <thead>
+          <tr>
+            <th>{{ 'talentScoresAdmin.table.employee' | t }}</th>
+            <th>{{ 'talentScoresAdmin.table.cycle' | t }}</th>
+            <th>{{ 'talentScoresAdmin.table.final' | t }}</th>
+            <th>{{ 'talentScoresAdmin.table.weights' | t }}</th>
+            <th>{{ 'talentScoresAdmin.table.calculatedOn' | t }}</th>
+            <th class="actions-col-head">{{ 'common.actions' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of result()?.items ?? []; track row.id) {
+            <tr>
+              <td>
+                <span class="cell-strong">{{ employeeName(row.employeeId) }}</span>
+              </td>
+              <td class="muted">{{ cycleName(row.performanceCycleId) }}</td>
+              <td><span class="level-pill">{{ row.finalScore | number: '1.0-4' }}</span></td>
+              <td class="muted">{{ row.performanceWeight | number: '1.0-2' }} / {{ row.potentialWeight | number: '1.0-2' }}</td>
+              <td class="muted">{{ row.calculatedOnUtc | date: 'yyyy-MM-dd' }}</td>
+              <td class="cell-actions">
+                <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">
+                  {{ 'successionPlansList.actions.details' | t }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pager sp-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!result()?.hasPreviousPage">{{ 'common.previous' | t }}</button>
+      <span class="pager__meta">{{ result()?.page ?? 1 }} / {{ result()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!result()?.hasNextPage">{{ 'common.next' | t }}</button>
+    </div>
+  </div>
+} @else {
+  <section class="sp-cards-wrap card" [attr.aria-busy]="busy() ? 'true' : 'false'">
+    @if (busy()) {
+      <div class="sp-cards-loading">{{ 'common.loading' | t }}</div>
+    }
+    <div class="sp-cards-grid">
+      @for (row of result()?.items ?? []; track row.id; let i = $index) {
+        <article class="sp-card" [style.animation-delay.ms]="i * 35">
+          <header class="sp-card__head">
+            <strong class="sp-card__title">{{ employeeName(row.employeeId) }}</strong>
+            <span class="level-pill">{{ row.finalScore | number: '1.0-4' }}</span>
+          </header>
+          <p class="sp-card__sub muted">{{ cycleName(row.performanceCycleId) }}</p>
+          <p class="sp-card__sub muted">{{ row.calculatedOnUtc | date: 'yyyy-MM-dd' }}</p>
+          <footer class="sp-card__actions">
+            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">
+              {{ 'successionPlansList.actions.details' | t }}
+            </button>
+          </footer>
+        </article>
+      }
+    </div>
+    <div class="pager sp-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!result()?.hasPreviousPage">{{ 'common.previous' | t }}</button>
+      <span class="pager__meta">{{ result()?.page ?? 1 }} / {{ result()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!result()?.hasNextPage">{{ 'common.next' | t }}</button>
+    </div>
+  </section>
+}
+
+@if (detailsOpen() && selected()) {
+  <div class="modal-backdrop" (click)="detailsOpen.set(false)"></div>
+  <section class="modal sp-modal sp-modal--details" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'talentScoresAdmin.detailsModal.title' | t }}</h2>
+        <p>{{ employeeName(selected()!.employeeId) }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="detailsOpen.set(false)" [attr.aria-label]="'successorCandidates.modal.close' | t">×</button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="details-grid">
+        <div class="detail-item">
+          <span>{{ 'talentScoresAdmin.table.cycle' | t }}</span><strong>{{ cycleName(selected()!.performanceCycleId) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'talentScoresAdmin.table.final' | t }}</span><strong>{{ selected()!.finalScore | number: '1.0-4' }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'talentScoresAdmin.table.performance' | t }}</span><strong>{{ selected()!.performanceScore | number: '1.0-4' }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'talentScoresAdmin.table.potential' | t }}</span><strong>{{ selected()!.potentialScore | number: '1.0-4' }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'talentScoresAdmin.table.weights' | t }}</span>
+          <strong>{{ selected()!.performanceWeight | number: '1.0-2' }} / {{ selected()!.potentialWeight | number: '1.0-2' }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'talentScoresAdmin.table.version' | t }}</span><strong>{{ selected()!.calculationVersion }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'successionPlansList.form.notes' | t }}</span><strong>{{ selected()!.notes || '—' }}</strong>
+        </div>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="detailsOpen.set(false)">{{ 'successorCandidates.modal.close' | t }}</button>
+    </footer>
+  </section>
+}
+
+@if (calculateOpen()) {
+  <div class="modal-backdrop" (click)="calculateOpen.set(false)"></div>
+  <section class="modal sp-modal" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'talentScoresAdmin.calculateModal.title' | t }}</h2>
+        <p>{{ 'talentScoresAdmin.calculateModal.subtitle' | t }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="calculateOpen.set(false)" [attr.aria-label]="'successorCandidates.modal.close' | t">×</button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="form-grid">
+        <div class="field field--full">
+          <span class="field-label">{{ 'talentClassificationsAdmin.form.employee' | t }}</span>
+          <app-lookup-search-combo
+            kind="employee"
+            [(value)]="calculateModel.employeeId"
+            [placeholder]="('talentClassificationsAdmin.combo.searchEmployee' | t)"
+          />
+        </div>
+        <div class="field field--full">
+          <span class="field-label">{{ 'talentScoresAdmin.filter.cycle' | t }}</span>
+          <app-lookup-search-combo
+            kind="performanceCycle"
+            [(value)]="calculateModel.performanceCycleId"
+            [placeholder]="('talentClassificationsAdmin.combo.searchCycle' | t)"
+          />
+        </div>
+        <label class="field field--full">
+          <span>{{ 'successionPlansList.form.notes' | t }}</span>
+          <textarea [(ngModel)]="calculateModel.notes" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="calculateOpen.set(false)">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveCalculate()">{{ 'criticalPositions.save' | t }}</button>
+    </footer>
+  </section>
+}
+
+@if (recalculateOpen()) {
+  <div class="modal-backdrop" (click)="recalculateOpen.set(false)"></div>
+  <section class="modal sp-modal" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'talentScoresAdmin.recalculateModal.title' | t }}</h2>
+        <p>{{ 'talentScoresAdmin.recalculateModal.subtitle' | t }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="recalculateOpen.set(false)" [attr.aria-label]="'successorCandidates.modal.close' | t">×</button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="form-grid">
+        <div class="field field--full">
+          <span class="field-label">{{ 'talentClassificationsAdmin.form.employee' | t }}</span>
+          <app-lookup-search-combo
+            kind="employee"
+            [(value)]="recalculateModel.employeeId"
+            [placeholder]="('talentClassificationsAdmin.combo.searchEmployee' | t)"
+          />
+        </div>
+        <div class="field field--full">
+          <span class="field-label">{{ 'talentScoresAdmin.filter.cycle' | t }}</span>
+          <app-lookup-search-combo
+            kind="performanceCycle"
+            [(value)]="recalculateModel.performanceCycleId"
+            [placeholder]="('talentClassificationsAdmin.combo.searchCycle' | t)"
+          />
+        </div>
+        <label class="field field--full">
+          <span>{{ 'successionPlansList.form.notes' | t }}</span>
+          <textarea [(ngModel)]="recalculateModel.notes" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="recalculateOpen.set(false)">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveRecalculate()">{{ 'criticalPositions.save' | t }}</button>
+    </footer>
+  </section>
+}

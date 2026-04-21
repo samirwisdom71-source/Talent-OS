@@ -1,4 +1,11 @@
-<a routerLink="/marketplace" class="back-link">← الفرص</a>
+<a routerLink="/marketplace" class="back-link">
+  <span class="back-link__ico" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  </span>
+  <span class="back-link__label">الفرص</span>
+</a>
 @if (failed()) {
   <div class="card card--muted">تعذر التحميل.</div>
 } @else if (opp()) {

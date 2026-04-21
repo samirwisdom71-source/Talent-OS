@@ -1,0 +1,313 @@
+<div class="page-head-row sp-head">
+  <section class="page-head">
+    <h1>{{ 'successionPlansList.title' | t }}</h1>
+    <p class="page-head__sub">{{ 'successionPlansList.subtitle' | t }}</p>
+  </section>
+  <div class="page-actions">
+    @if (canManage()) {
+      <button type="button" class="btn-head-primary" (click)="openCreate()">
+        <span class="btn-head-primary__ico" aria-hidden="true">+</span>
+        <span>{{ 'successionPlansList.create' | t }}</span>
+      </button>
+      <a class="link" routerLink="/succession/plans/create">{{ 'successionPlansList.openFullCreate' | t }}</a>
+    }
+  </div>
+</div>
+
+<section class="toolbar card sp-toolbar">
+  <div class="toolbar__inner">
+    <label class="toolbar__field">
+      <span class="toolbar__label">{{ 'successionPlansList.filter.criticalPosition' | t }}</span>
+      <select class="toolbar__select" [(ngModel)]="filterCriticalPositionId" (ngModelChange)="page = 1; load()">
+        <option value="">{{ 'successionPlansList.filter.all' | t }}</option>
+        @for (p of criticalPositions(); track p.id) {
+          <option [value]="p.id">{{ p.name }}</option>
+        }
+      </select>
+    </label>
+    <label class="toolbar__field">
+      <span class="toolbar__label">{{ 'successionPlansList.filter.cycle' | t }}</span>
+      <select class="toolbar__select" [(ngModel)]="filterPerformanceCycleId" (ngModelChange)="page = 1; load()">
+        <option value="">{{ 'successionPlansList.filter.all' | t }}</option>
+        @for (c of cycles(); track c.id) {
+          <option [value]="c.id">{{ c.name }}</option>
+        }
+      </select>
+    </label>
+    <div class="sp-view-mode" role="group" [attr.aria-label]="'common.view' | t">
+      <button
+        type="button"
+        class="sp-mode-btn"
+        [class.sp-mode-btn--active]="viewMode() === 'table'"
+        (click)="viewMode.set('table')"
+      >
+        {{ 'successionPlansList.view.table' | t }}
+      </button>
+      <button
+        type="button"
+        class="sp-mode-btn"
+        [class.sp-mode-btn--active]="viewMode() === 'cards'"
+        (click)="viewMode.set('cards')"
+      >
+        {{ 'successionPlansList.view.cards' | t }}
+      </button>
+    </div>
+  </div>
+</section>
+
+@if (failed()) {
+  <div class="card card--muted">{{ 'successionPlansList.error.loadList' | t }}</div>
+} @else if (viewMode() === 'table') {
+  <div class="table-shell card">
+    @if (busy()) {
+      <div class="table-shell__loading">{{ 'common.loading' | t }}</div>
+    }
+    <div class="table-scroll">
+      <table class="data-table sp-table">
+        <thead>
+          <tr>
+            <th>{{ 'successionPlansList.table.planName' | t }}</th>
+            <th>{{ 'successionPlansList.table.criticalPosition' | t }}</th>
+            <th>{{ 'successionPlansList.table.cycle' | t }}</th>
+            <th>{{ 'successionPlansList.table.status' | t }}</th>
+            <th>{{ 'successionPlansList.table.coverage' | t }}</th>
+            <th class="actions-col-head">{{ 'common.actions' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of result()?.items ?? []; track row.id) {
+            <tr>
+              <td><span class="cell-strong">{{ row.planName }}</span></td>
+              <td class="muted">{{ labelFrom(criticalPositions(), row.criticalPositionId) }}</td>
+              <td class="muted">{{ labelFrom(cycles(), row.performanceCycleId) }}</td>
+              <td>
+                <span class="level-pill">{{ planStatusLabel(row.status) }}</span>
+              </td>
+              <td class="muted">
+                @if (row.coverageSnapshot) {
+                  {{ row.coverageSnapshot.coverageScore | number: '1.0-2' }} · {{ row.coverageSnapshot.totalCandidates }}
+                } @else {
+                  —
+                }
+              </td>
+              <td class="cell-actions">
+                <div class="cell-actions__wrap">
+                  <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">
+                    {{ 'successionPlansList.actions.details' | t }}
+                  </button>
+                  <a class="action-btn action-btn--info" [routerLink]="['/succession/plans', row.id]">{{
+                    'successionPlansList.actions.openPlan' | t
+                  }}</a>
+                  @if (canManage()) {
+                    <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">
+                      {{ 'successionPlansList.actions.edit' | t }}
+                    </button>
+                    @if (canActivate(row)) {
+                      <button type="button" class="action-btn action-btn--danger" (click)="activate(row)">
+                        {{ 'successionPlansList.actions.activate' | t }}
+                      </button>
+                    }
+                    @if (canClose(row)) {
+                      <button type="button" class="action-btn action-btn--edit" (click)="close(row)">
+                        {{ 'successionPlansList.actions.close' | t }}
+                      </button>
+                    }
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pager sp-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!result()?.hasPreviousPage">
+        {{ 'common.previous' | t }}
+      </button>
+      <span class="pager__meta">{{ result()?.page ?? 1 }} / {{ result()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!result()?.hasNextPage">
+        {{ 'common.next' | t }}
+      </button>
+    </div>
+  </div>
+} @else {
+  <section class="sp-cards-wrap card" [attr.aria-busy]="busy() ? 'true' : 'false'">
+    @if (busy()) {
+      <div class="sp-cards-loading">{{ 'common.loading' | t }}</div>
+    }
+    <div class="sp-cards-grid">
+      @for (row of result()?.items ?? []; track row.id; let i = $index) {
+        <article class="sp-card" [style.animation-delay.ms]="i * 35">
+          <header class="sp-card__head">
+            <strong class="sp-card__title">{{ row.planName }}</strong>
+            <span class="level-pill">{{ planStatusLabel(row.status) }}</span>
+          </header>
+          <p class="sp-card__sub muted">{{ labelFrom(criticalPositions(), row.criticalPositionId) }}</p>
+          <p class="sp-card__sub muted">{{ labelFrom(cycles(), row.performanceCycleId) }}</p>
+          <footer class="sp-card__actions">
+            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">
+              {{ 'successionPlansList.actions.details' | t }}
+            </button>
+            <a class="action-btn action-btn--info" [routerLink]="['/succession/plans', row.id]">{{
+              'successionPlansList.actions.openPlan' | t
+            }}</a>
+            @if (canManage()) {
+              <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">
+                {{ 'successionPlansList.actions.edit' | t }}
+              </button>
+              @if (canActivate(row)) {
+                <button type="button" class="action-btn action-btn--danger" (click)="activate(row)">
+                  {{ 'successionPlansList.actions.activate' | t }}
+                </button>
+              }
+              @if (canClose(row)) {
+                <button type="button" class="action-btn action-btn--edit" (click)="close(row)">
+                  {{ 'successionPlansList.actions.close' | t }}
+                </button>
+              }
+            }
+          </footer>
+        </article>
+      }
+    </div>
+    <div class="pager sp-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!result()?.hasPreviousPage">
+        {{ 'common.previous' | t }}
+      </button>
+      <span class="pager__meta">{{ result()?.page ?? 1 }} / {{ result()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!result()?.hasNextPage">
+        {{ 'common.next' | t }}
+      </button>
+    </div>
+  </section>
+}
+
+@if (createOpen()) {
+  <div class="modal-backdrop" (click)="createOpen.set(false)"></div>
+  <section class="modal sp-modal" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'successionPlansList.createModal.title' | t }}</h2>
+        <p>{{ 'successionPlansList.createModal.subtitle' | t }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="createOpen.set(false)" [attr.aria-label]="'successionPlansList.modal.close' | t">
+        ×
+      </button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="form-grid">
+        <label class="field field--full">
+          <span>{{ 'successionPlansList.form.planName' | t }}</span>
+          <input [(ngModel)]="createModel.planName" />
+        </label>
+        <label class="field field--full">
+          <span>{{ 'successionPlansList.form.criticalPosition' | t }}</span>
+          <select [(ngModel)]="createModel.criticalPositionId">
+            <option value="">{{ 'successionPlansList.form.select' | t }}</option>
+            @for (p of criticalPositions(); track p.id) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="field field--full">
+          <span>{{ 'successionPlansList.form.cycle' | t }}</span>
+          <select [(ngModel)]="createModel.performanceCycleId">
+            <option value="">{{ 'successionPlansList.form.select' | t }}</option>
+            @for (c of cycles(); track c.id) {
+              <option [value]="c.id">{{ c.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="field field--full">
+          <span>{{ 'successionPlansList.form.notes' | t }}</span>
+          <textarea [(ngModel)]="createModel.notes" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="createOpen.set(false)">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveCreate()">{{ 'criticalPositions.save' | t }}</button>
+    </footer>
+  </section>
+}
+
+@if (detailsOpen() && selected()) {
+  <div class="modal-backdrop" (click)="detailsOpen.set(false)"></div>
+  <section class="modal sp-modal sp-modal--details" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'successionPlansList.detailsModal.title' | t }}</h2>
+        <p>{{ 'successionPlansList.detailsModal.subtitle' | t }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="detailsOpen.set(false)" [attr.aria-label]="'successionPlansList.modal.close' | t">
+        ×
+      </button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="details-grid">
+        <div class="detail-item">
+          <span>{{ 'successionPlansList.table.planName' | t }}</span><strong>{{ selected()!.planName }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'successionPlansList.table.status' | t }}</span><strong>{{ planStatusLabel(selected()!.status) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'successionPlansList.table.criticalPosition' | t }}</span>
+          <strong>{{ labelFrom(criticalPositions(), selected()!.criticalPositionId) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'successionPlansList.table.cycle' | t }}</span>
+          <strong>{{ labelFrom(cycles(), selected()!.performanceCycleId) }}</strong>
+        </div>
+        @if (selected()!.coverageSnapshot) {
+          <div class="detail-item">
+            <span>{{ 'successionPlansList.details.coverageScore' | t }}</span>
+            <strong>{{ selected()!.coverageSnapshot!.coverageScore | number: '1.0-2' }}</strong>
+          </div>
+          <div class="detail-item">
+            <span>{{ 'successionPlansList.details.candidates' | t }}</span>
+            <strong>{{ selected()!.coverageSnapshot!.totalCandidates }}</strong>
+          </div>
+        }
+        <div class="detail-item">
+          <span>{{ 'successionPlansList.form.notes' | t }}</span><strong>{{ selected()!.notes || '—' }}</strong>
+        </div>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <a class="btn-primary" [routerLink]="['/succession/plans', selected()!.id]">{{ 'successionPlansList.actions.openPlan' | t }}</a>
+      <button type="button" class="btn-ghost" (click)="detailsOpen.set(false)">{{ 'successionPlansList.modal.close' | t }}</button>
+    </footer>
+  </section>
+}
+
+@if (editOpen() && selected()) {
+  <div class="modal-backdrop" (click)="editOpen.set(false)"></div>
+  <section class="modal sp-modal" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'successionPlansList.editModal.title' | t }}</h2>
+        <p>{{ 'successionPlansList.editModal.subtitle' | t }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="editOpen.set(false)" [attr.aria-label]="'successionPlansList.modal.close' | t">
+        ×
+      </button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="form-grid">
+        <label class="field field--full">
+          <span>{{ 'successionPlansList.form.planName' | t }}</span>
+          <input [(ngModel)]="editModel.planName" />
+        </label>
+        <label class="field field--full">
+          <span>{{ 'successionPlansList.form.notes' | t }}</span>
+          <textarea [(ngModel)]="editModel.notes" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="editOpen.set(false)">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveEdit()">{{ 'criticalPositions.save' | t }}</button>
+    </footer>
+  </section>
+}

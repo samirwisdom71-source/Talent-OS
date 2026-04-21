@@ -1,3 +1,4 @@
+using TalentSystem.Application.Features.Identity.DTOs;
 using TalentSystem.Application.Features.Competencies.DTOs;
 using TalentSystem.Shared.Api;
 using TalentSystem.Shared.Results;
@@ -19,5 +20,9 @@ public interface ICompetencyService
 
     Task<Result<PagedResult<CompetencyDto>>> GetPagedAsync(
         CompetencyFilterRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<IReadOnlyList<LookupItemDto>>> GetLookupAsync(
+        CompetencyLookupRequest request,
         CancellationToken cancellationToken = default);
 }

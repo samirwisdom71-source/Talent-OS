@@ -31,3 +31,34 @@ export interface PotentialAssessmentFilterRequest {
   potentialLevel?: number | null;
   status?: number | null;
 }
+
+export interface PotentialAssessmentFactorItemDto {
+  factorName: string;
+  score: number;
+  weight: number;
+  notes?: string | null;
+}
+
+export interface CreatePotentialAssessmentRequest {
+  employeeId: string;
+  performanceCycleId: string;
+  assessedByEmployeeId: string;
+  agilityScore: number;
+  leadershipScore: number;
+  growthScore: number;
+  mobilityScore: number;
+  comments?: string | null;
+  status: number;
+  factors: PotentialAssessmentFactorItemDto[];
+}
+
+export interface UpdatePotentialAssessmentRequest {
+  assessedByEmployeeId: string;
+  agilityScore: number;
+  leadershipScore: number;
+  growthScore: number;
+  mobilityScore: number;
+  comments?: string | null;
+  status: number;
+  factors: PotentialAssessmentFactorItemDto[];
+}

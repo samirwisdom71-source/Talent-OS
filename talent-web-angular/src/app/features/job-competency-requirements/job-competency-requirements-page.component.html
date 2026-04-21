@@ -1,0 +1,245 @@
+<div class="page-head-row jcr-head">
+  <section class="page-head">
+    <h1>متطلبات كفاءات الوظائف</h1>
+    <p class="page-head__sub">ربط المنصب بالكفاءة والمستوى المطلوب — فلاتر اختيارية ثم تطبيق.</p>
+  </section>
+  <div class="page-actions">
+    <button type="button" class="btn-head-primary" (click)="openCreate()">
+      <span class="btn-head-primary__ico" aria-hidden="true">+</span>
+      <span>متطلب جديد</span>
+    </button>
+  </div>
+</div>
+
+<section class="toolbar card jcr-toolbar">
+  <div class="toolbar__inner">
+    <label class="toolbar__field">
+      <span class="toolbar__label">المنصب</span>
+      <select class="toolbar__select" [(ngModel)]="filterPositionId">
+        <option value="">كل المناصب</option>
+        @for (p of positions(); track p.id) {
+          <option [value]="p.id">{{ p.name }}</option>
+        }
+      </select>
+    </label>
+    <label class="toolbar__field">
+      <span class="toolbar__label">الكفاءة</span>
+      <select class="toolbar__select" [(ngModel)]="filterCompetencyId">
+        <option value="">كل الكفاءات</option>
+        @for (c of competencies(); track c.id) {
+          <option [value]="c.id">{{ c.name }}</option>
+        }
+      </select>
+    </label>
+    <button type="button" class="btn-toolbar-apply" (click)="page = 1; load()">تطبيق الفلتر</button>
+    <div class="jcr-view-mode" role="group" aria-label="طريقة العرض">
+      <button
+        type="button"
+        class="jcr-mode-btn"
+        [class.jcr-mode-btn--active]="viewMode === 'table'"
+        (click)="viewMode = 'table'"
+      >
+        جدول
+      </button>
+      <button
+        type="button"
+        class="jcr-mode-btn"
+        [class.jcr-mode-btn--active]="viewMode === 'cards'"
+        (click)="viewMode = 'cards'"
+      >
+        بطاقات
+      </button>
+    </div>
+  </div>
+</section>
+
+@if (viewMode === 'table') {
+  <div class="table-shell card">
+    @if (busy()) {
+      <div class="table-shell__loading">جاري التحميل…</div>
+    }
+    <div class="table-scroll">
+      <table class="data-table jcr-table">
+        <thead>
+          <tr>
+            <th>المنصب</th>
+            <th>الكفاءة</th>
+            <th>المستوى المطلوب</th>
+            <th class="actions-col-head">إجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of result()?.items ?? []; track row.id) {
+            <tr>
+              <td><span class="cell-strong">{{ labelFrom(positions(), row.positionId) }}</span></td>
+              <td class="muted">{{ labelFrom(competencies(), row.competencyId) }}</td>
+              <td><span class="level-pill">{{ labelFrom(competencyLevels(), row.requiredLevelId) }}</span></td>
+              <td class="cell-actions">
+                <div class="cell-actions__wrap">
+                  <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">تفاصيل</button>
+                  <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">تعديل</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pager jcr-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!result()?.hasPreviousPage">السابق</button>
+      <span class="pager__meta">{{ result()?.page ?? 1 }} / {{ result()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!result()?.hasNextPage">التالي</button>
+    </div>
+  </div>
+} @else {
+  <section class="jcr-cards-wrap card" [attr.aria-busy]="busy() ? 'true' : 'false'">
+    @if (busy()) {
+      <div class="jcr-cards-loading">جاري التحميل…</div>
+    }
+    <div class="jcr-cards-grid">
+      @for (row of result()?.items ?? []; track row.id; let i = $index) {
+        <article class="jcr-card" [style.animation-delay.ms]="i * 35">
+          <header class="jcr-card__head">
+            <strong class="jcr-card__title">{{ labelFrom(positions(), row.positionId) }}</strong>
+            <span class="level-pill">{{ labelFrom(competencyLevels(), row.requiredLevelId) }}</span>
+          </header>
+          <p class="jcr-card__sub muted">{{ labelFrom(competencies(), row.competencyId) }}</p>
+          <footer class="jcr-card__actions">
+            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">تفاصيل</button>
+            <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">تعديل</button>
+          </footer>
+        </article>
+      }
+    </div>
+    <div class="pager jcr-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!result()?.hasPreviousPage">السابق</button>
+      <span class="pager__meta">{{ result()?.page ?? 1 }} / {{ result()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!result()?.hasNextPage">التالي</button>
+    </div>
+  </section>
+}
+
+@if (createOpen()) {
+  <div class="modal-backdrop" (click)="createOpen.set(false)"></div>
+  <section class="modal jcr-modal" role="dialog" aria-modal="true">
+    <header class="jcr-modal__head">
+      <div>
+        <h2>إنشاء متطلب كفاءة</h2>
+        <p>اختر المنصب والكفاءة والمستوى المطلوب.</p>
+      </div>
+      <button type="button" class="jcr-modal__close" (click)="createOpen.set(false)" aria-label="إغلاق">×</button>
+    </header>
+    <div class="jcr-modal__body">
+      <div class="form-grid">
+        <label class="field">
+          <span>المنصب</span>
+          <select [(ngModel)]="createModel.positionId">
+            <option value="">اختر المنصب</option>
+            @for (p of positions(); track p.id) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>الكفاءة</span>
+          <select [(ngModel)]="createModel.competencyId">
+            <option value="">اختر الكفاءة</option>
+            @for (c of competencies(); track c.id) {
+              <option [value]="c.id">{{ c.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="field field--full">
+          <span>المستوى المطلوب</span>
+          <select [(ngModel)]="createModel.requiredLevelId">
+            <option value="">اختر المستوى</option>
+            @for (l of competencyLevels(); track l.id) {
+              <option [value]="l.id">{{ l.name }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="createOpen.set(false)">إلغاء</button>
+      <button type="button" class="btn-primary" (click)="saveCreate()">حفظ</button>
+    </footer>
+  </section>
+}
+
+@if (detailsOpen() && selected()) {
+  <div class="modal-backdrop" (click)="detailsOpen.set(false)"></div>
+  <section class="modal jcr-modal jcr-modal--details" role="dialog" aria-modal="true">
+    <header class="jcr-modal__head">
+      <div>
+        <h2>تفاصيل المتطلب</h2>
+        <p>عرض الربط الحالي.</p>
+      </div>
+      <button type="button" class="jcr-modal__close" (click)="detailsOpen.set(false)" aria-label="إغلاق">×</button>
+    </header>
+    <div class="jcr-modal__body">
+      <div class="details-grid">
+        <div class="detail-item">
+          <span>المنصب</span>
+          <strong>{{ labelFrom(positions(), selected()!.positionId) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>الكفاءة</span>
+          <strong>{{ labelFrom(competencies(), selected()!.competencyId) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>المستوى</span>
+          <strong>{{ labelFrom(competencyLevels(), selected()!.requiredLevelId) }}</strong>
+        </div>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="detailsOpen.set(false)">إغلاق</button>
+    </footer>
+  </section>
+}
+
+@if (editOpen() && selected()) {
+  <div class="modal-backdrop" (click)="editOpen.set(false)"></div>
+  <section class="modal jcr-modal" role="dialog" aria-modal="true">
+    <header class="jcr-modal__head">
+      <div>
+        <h2>تعديل متطلب الكفاءة</h2>
+        <p>عدّل المنصب أو الكفاءة أو المستوى.</p>
+      </div>
+      <button type="button" class="jcr-modal__close" (click)="editOpen.set(false)" aria-label="إغلاق">×</button>
+    </header>
+    <div class="jcr-modal__body">
+      <div class="form-grid">
+        <label class="field">
+          <span>المنصب</span>
+          <select [(ngModel)]="editModel.positionId">
+            @for (p of positions(); track p.id) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>الكفاءة</span>
+          <select [(ngModel)]="editModel.competencyId">
+            @for (c of competencies(); track c.id) {
+              <option [value]="c.id">{{ c.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="field field--full">
+          <span>المستوى المطلوب</span>
+          <select [(ngModel)]="editModel.requiredLevelId">
+            @for (l of competencyLevels(); track l.id) {
+              <option [value]="l.id">{{ l.name }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="editOpen.set(false)">إلغاء</button>
+      <button type="button" class="btn-primary" (click)="saveEdit()">حفظ التعديل</button>
+    </footer>
+  </section>
+}

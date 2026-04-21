@@ -1,9 +1,100 @@
 .back-link {
-  display: inline-block;
-  margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 1.25rem;
+  padding: 0.45rem 1.1rem 0.45rem 0.5rem;
+  border-radius: 999px;
   text-decoration: none;
   color: var(--color-accent-strong);
   font-size: 0.9rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(14, 165, 233, 0.08));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+  box-shadow: 0 6px 18px -12px rgba(14, 165, 233, 0.55);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.22s var(--ease-out),
+    box-shadow 0.22s ease,
+    color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+html[dir='rtl'] .back-link {
+  padding: 0.45rem 0.5rem 0.45rem 1.1rem;
+}
+
+.back-link__ico {
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px -4px rgba(79, 70, 229, 0.55);
+  transition:
+    transform 0.22s var(--ease-out),
+    box-shadow 0.22s ease;
+}
+
+.back-link__ico svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+html[dir='rtl'] .back-link__ico svg {
+  transform: scaleX(-1);
+}
+
+.back-link:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(14, 165, 233, 0.16));
+  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  color: #0c4a6e;
+  transform: translateX(3px);
+  box-shadow: 0 10px 24px -12px rgba(14, 165, 233, 0.55);
+}
+
+html[dir='rtl'] .back-link:hover {
+  transform: translateX(-3px);
+}
+
+.back-link:hover .back-link__ico {
+  transform: translateX(-2px);
+  box-shadow: 0 6px 16px -4px rgba(79, 70, 229, 0.65);
+}
+
+html[dir='rtl'] .back-link:hover .back-link__ico {
+  transform: translateX(2px);
+}
+
+.back-link:active {
+  transform: translateX(1px) scale(0.98);
+}
+
+html[dir='rtl'] .back-link:active {
+  transform: translateX(-1px) scale(0.98);
+}
+
+.back-link:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(14, 165, 233, 0.25),
+    0 10px 24px -12px rgba(14, 165, 233, 0.55);
+}
+
+.back-link--hero {
+  padding: 0.5rem 1.25rem 0.5rem 0.55rem;
+  font-size: 0.92rem;
+}
+
+html[dir='rtl'] .back-link--hero {
+  padding: 0.5rem 0.55rem 0.5rem 1.25rem;
 }
 
 .grid {

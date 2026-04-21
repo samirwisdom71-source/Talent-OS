@@ -1,0 +1,279 @@
+<div class="page-head-row sp-head">
+  <section class="page-head">
+    <h1>{{ 'scoringPolicies.title' | t }}</h1>
+    <p class="page-head__sub">{{ 'scoringPolicies.subtitle' | t }}</p>
+  </section>
+  @if (canManage()) {
+    <div class="page-actions">
+      <button type="button" class="btn-head-primary" (click)="openCreate()">
+        <span class="btn-head-primary__ico" aria-hidden="true">+</span>
+        <span>{{ 'scoringPolicies.create' | t }}</span>
+      </button>
+    </div>
+  }
+</div>
+
+<section class="toolbar card sp-toolbar">
+  <div class="toolbar__inner">
+    <label class="toolbar__field">
+      <span class="toolbar__label">{{ 'scoringPolicies.search.label' | t }}</span>
+      <input
+        class="toolbar__select"
+        type="search"
+        [(ngModel)]="search"
+        (keyup.enter)="page = 1; load()"
+        [placeholder]="'scoringPolicies.search.placeholder' | t"
+      />
+    </label>
+    <button type="button" class="btn-toolbar-apply" (click)="page = 1; load()">{{ 'common.search' | t }}</button>
+    <div class="sp-view-mode" role="group" [attr.aria-label]="'common.view' | t">
+      <button
+        type="button"
+        class="sp-mode-btn"
+        [class.sp-mode-btn--active]="viewMode() === 'table'"
+        (click)="viewMode.set('table')"
+      >
+        {{ 'scoringPolicies.view.table' | t }}
+      </button>
+      <button
+        type="button"
+        class="sp-mode-btn"
+        [class.sp-mode-btn--active]="viewMode() === 'cards'"
+        (click)="viewMode.set('cards')"
+      >
+        {{ 'scoringPolicies.view.cards' | t }}
+      </button>
+    </div>
+  </div>
+</section>
+
+@if (failed()) {
+  <div class="card card--muted">{{ 'scoringPolicies.error.loadList' | t }}</div>
+} @else if (viewMode() === 'table') {
+  <div class="table-shell card">
+    @if (busy()) {
+      <div class="table-shell__loading">{{ 'common.loading' | t }}</div>
+    }
+    <div class="table-scroll">
+      <table class="data-table sp-table">
+        <thead>
+          <tr>
+            <th>{{ 'scoringPolicies.table.name' | t }}</th>
+            <th>{{ 'scoringPolicies.table.version' | t }}</th>
+            <th>{{ 'scoringPolicies.table.weights' | t }}</th>
+            <th>{{ 'scoringPolicies.table.effectiveFrom' | t }}</th>
+            <th>{{ 'scoringPolicies.table.status' | t }}</th>
+            <th class="actions-col-head">{{ 'common.actions' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of result()?.items ?? []; track row.id) {
+            <tr>
+              <td><span class="cell-strong">{{ row.name }}</span></td>
+              <td class="muted">{{ row.version }}</td>
+              <td>
+                <span class="level-pill">{{ row.performanceWeight | number: '1.0-2' }} / {{ row.potentialWeight | number: '1.0-2' }}</span>
+              </td>
+              <td class="muted">{{ row.effectiveFromUtc | date: 'yyyy-MM-dd' }}</td>
+              <td>
+                <span class="level-pill" [class.sp-pill--inactive]="row.recordStatus !== 1">
+                  {{ recordStatusLabel(row.recordStatus) }}
+                </span>
+              </td>
+              <td class="cell-actions">
+                <div class="cell-actions__wrap">
+                  <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">
+                    {{ 'scoringPolicies.actions.details' | t }}
+                  </button>
+                  @if (canManage()) {
+                    <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">
+                      {{ 'scoringPolicies.actions.edit' | t }}
+                    </button>
+                    @if (canActivate(row)) {
+                      <button type="button" class="action-btn action-btn--danger" (click)="activate(row)">
+                        {{ 'scoringPolicies.actions.activate' | t }}
+                      </button>
+                    }
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pager sp-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!result()?.hasPreviousPage">
+        {{ 'common.previous' | t }}
+      </button>
+      <span class="pager__meta">{{ result()?.page ?? 1 }} / {{ result()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!result()?.hasNextPage">
+        {{ 'common.next' | t }}
+      </button>
+    </div>
+  </div>
+} @else {
+  <section class="sp-cards-wrap card" [attr.aria-busy]="busy() ? 'true' : 'false'">
+    @if (busy()) {
+      <div class="sp-cards-loading">{{ 'common.loading' | t }}</div>
+    }
+    <div class="sp-cards-grid">
+      @for (row of result()?.items ?? []; track row.id; let i = $index) {
+        <article class="sp-card" [style.animation-delay.ms]="i * 35">
+          <header class="sp-card__head">
+            <strong class="sp-card__title">{{ row.name }}</strong>
+            <span class="level-pill" [class.sp-pill--inactive]="row.recordStatus !== 1">{{ recordStatusLabel(row.recordStatus) }}</span>
+          </header>
+          <p class="sp-card__sub muted">{{ row.version }}</p>
+          <p class="sp-card__sub">
+            {{ 'scoringPolicies.table.weights' | t }}:
+            <span class="level-pill">{{ row.performanceWeight | number: '1.0-2' }} / {{ row.potentialWeight | number: '1.0-2' }}</span>
+          </p>
+          <p class="sp-card__sub muted">{{ 'scoringPolicies.table.effectiveFrom' | t }}: {{ row.effectiveFromUtc | date: 'yyyy-MM-dd' }}</p>
+          <footer class="sp-card__actions">
+            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">{{ 'scoringPolicies.actions.details' | t }}</button>
+            @if (canManage()) {
+              <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">{{ 'scoringPolicies.actions.edit' | t }}</button>
+              @if (canActivate(row)) {
+                <button type="button" class="action-btn action-btn--danger" (click)="activate(row)">{{ 'scoringPolicies.actions.activate' | t }}</button>
+              }
+            }
+          </footer>
+        </article>
+      }
+    </div>
+    <div class="pager sp-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!result()?.hasPreviousPage">{{ 'common.previous' | t }}</button>
+      <span class="pager__meta">{{ result()?.page ?? 1 }} / {{ result()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!result()?.hasNextPage">{{ 'common.next' | t }}</button>
+    </div>
+  </section>
+}
+
+@if (createOpen()) {
+  <div class="modal-backdrop" (click)="createOpen.set(false)"></div>
+  <section class="modal sp-modal" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'scoringPolicies.createModal.title' | t }}</h2>
+        <p>{{ 'scoringPolicies.createModal.subtitle' | t }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="createOpen.set(false)" [attr.aria-label]="'scoringPolicies.modal.close' | t">×</button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="form-grid">
+        <label class="field">
+          <span>{{ 'scoringPolicies.form.name' | t }}</span>
+          <input [(ngModel)]="createModel.name" />
+        </label>
+        <label class="field">
+          <span>{{ 'scoringPolicies.form.version' | t }}</span>
+          <input [(ngModel)]="createModel.version" />
+        </label>
+        <label class="field">
+          <span>{{ 'scoringPolicies.form.performanceWeight' | t }}</span>
+          <input type="number" step="0.01" [(ngModel)]="createModel.performanceWeight" />
+        </label>
+        <label class="field">
+          <span>{{ 'scoringPolicies.form.potentialWeight' | t }}</span>
+          <input type="number" step="0.01" [(ngModel)]="createModel.potentialWeight" />
+        </label>
+        <label class="field field--full">
+          <span>{{ 'scoringPolicies.form.effectiveFrom' | t }}</span>
+          <input
+            type="date"
+            [ngModel]="effectiveDateInput(createModel)"
+            (ngModelChange)="setEffectiveDateFromInput(createModel, $event)"
+          />
+        </label>
+        <label class="field field--full">
+          <span>{{ 'scoringPolicies.form.notes' | t }}</span>
+          <textarea [(ngModel)]="createModel.notes" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="createOpen.set(false)">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveCreate()">{{ 'criticalPositions.save' | t }}</button>
+    </footer>
+  </section>
+}
+
+@if (detailsOpen() && selected()) {
+  <div class="modal-backdrop" (click)="detailsOpen.set(false)"></div>
+  <section class="modal sp-modal sp-modal--details" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'scoringPolicies.detailsModal.title' | t }}</h2>
+        <p>{{ 'scoringPolicies.detailsModal.subtitle' | t }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="detailsOpen.set(false)" [attr.aria-label]="'scoringPolicies.modal.close' | t">×</button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="details-grid">
+        <div class="detail-item"><span>{{ 'scoringPolicies.table.name' | t }}</span><strong>{{ selected()!.name }}</strong></div>
+        <div class="detail-item"><span>{{ 'scoringPolicies.table.version' | t }}</span><strong>{{ selected()!.version }}</strong></div>
+        <div class="detail-item">
+          <span>{{ 'scoringPolicies.table.weights' | t }}</span>
+          <strong>{{ selected()!.performanceWeight | number: '1.0-2' }} / {{ selected()!.potentialWeight | number: '1.0-2' }}</strong>
+        </div>
+        <div class="detail-item"><span>{{ 'scoringPolicies.table.effectiveFrom' | t }}</span><strong>{{ selected()!.effectiveFromUtc | date: 'yyyy-MM-dd' }}</strong></div>
+        <div class="detail-item"><span>{{ 'scoringPolicies.table.status' | t }}</span><strong>{{ recordStatusLabel(selected()!.recordStatus) }}</strong></div>
+        <div class="detail-item"><span>{{ 'scoringPolicies.form.notes' | t }}</span><strong>{{ selected()!.notes || '—' }}</strong></div>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="detailsOpen.set(false)">{{ 'scoringPolicies.modal.close' | t }}</button>
+    </footer>
+  </section>
+}
+
+@if (editOpen() && selected()) {
+  <div class="modal-backdrop" (click)="editOpen.set(false)"></div>
+  <section class="modal sp-modal" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'scoringPolicies.editModal.title' | t }}</h2>
+        <p>{{ 'scoringPolicies.editModal.subtitle' | t }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="editOpen.set(false)" [attr.aria-label]="'scoringPolicies.modal.close' | t">×</button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="form-grid">
+        <label class="field">
+          <span>{{ 'scoringPolicies.form.name' | t }}</span>
+          <input [(ngModel)]="editModel.name" />
+        </label>
+        <label class="field">
+          <span>{{ 'scoringPolicies.form.version' | t }}</span>
+          <input [(ngModel)]="editModel.version" />
+        </label>
+        <label class="field">
+          <span>{{ 'scoringPolicies.form.performanceWeight' | t }}</span>
+          <input type="number" step="0.01" [(ngModel)]="editModel.performanceWeight" />
+        </label>
+        <label class="field">
+          <span>{{ 'scoringPolicies.form.potentialWeight' | t }}</span>
+          <input type="number" step="0.01" [(ngModel)]="editModel.potentialWeight" />
+        </label>
+        <label class="field field--full">
+          <span>{{ 'scoringPolicies.form.effectiveFrom' | t }}</span>
+          <input
+            type="date"
+            [ngModel]="effectiveDateInput(editModel)"
+            (ngModelChange)="setEffectiveDateFromInput(editModel, $event)"
+          />
+        </label>
+        <label class="field field--full">
+          <span>{{ 'scoringPolicies.form.notes' | t }}</span>
+          <textarea [(ngModel)]="editModel.notes" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="editOpen.set(false)">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveEdit()">{{ 'criticalPositions.save' | t }}</button>
+    </footer>
+  </section>
+}
+

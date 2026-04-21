@@ -34,4 +34,19 @@ public interface IIdentityLookupService
         string? search = null,
         int? take = null,
         CancellationToken cancellationToken = default);
+
+    Task<Result<IReadOnlyList<LookupItemDto>>> GetJobGradesAsync(
+        string? search = null,
+        int? take = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<IReadOnlyList<LookupItemDto>>> GetCompetenciesAsync(
+        string? search = null,
+        int? take = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<IReadOnlyList<LookupItemDto>>> GetCompetencyLevelsAsync(
+        string? search = null,
+        int? take = null,
+        CancellationToken cancellationToken = default);
 }

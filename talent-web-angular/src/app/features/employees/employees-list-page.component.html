@@ -64,7 +64,14 @@
               <td>{{ row.email }}</td>
               <td class="cell-actions">
                 <div class="cell-actions__wrap">
-                  <a class="action-btn action-btn--info" [routerLink]="['/employees', row.id]">{{ 'common.view' | t }}</a>
+                  <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">
+                    {{ 'common.view' | t }}
+                  </button>
+                  @if (auth.hasPermission(PermissionCodes.EmployeeEdit)) {
+                    <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">
+                      {{ 'users.actions.edit' | t }}
+                    </button>
+                  }
                 </div>
               </td>
             </tr>
@@ -87,7 +94,14 @@
           </header>
           <p class="employee-card__line">{{ row.email }}</p>
           <div class="card-actions">
-            <a class="action-btn action-btn--info" [routerLink]="['/employees', row.id]">{{ 'common.view' | t }}</a>
+            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">
+              {{ 'common.view' | t }}
+            </button>
+            @if (auth.hasPermission(PermissionCodes.EmployeeEdit)) {
+              <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">
+                {{ 'users.actions.edit' | t }}
+              </button>
+            }
           </div>
         </article>
       }
@@ -163,6 +177,96 @@
     <div class="modal-actions">
       <button type="button" (click)="closeCreate()" [disabled]="createBusy()">{{ 'users.actions.cancel' | t }}</button>
       <button type="button" class="btn-primary" (click)="saveCreate()" [disabled]="createBusy()">{{ 'users.actions.save' | t }}</button>
+    </div>
+  </section>
+}
+
+@if (detailsOpen()) {
+  <div class="modal-backdrop" (click)="closeDetails()"></div>
+  <section class="modal card modal--wide modal--details" role="dialog" aria-modal="true">
+    @if (detailsBusy() && !detailsItem()) {
+      <div class="card--muted">{{ 'common.loading' | t }}</div>
+    } @else if (detailsItem()) {
+      <h2>تفاصيل الموظف</h2>
+      <div class="details-grid">
+        <div class="detail-item">
+          <span>رقم الموظف</span>
+          <strong>{{ detailsItem()!.employeeNumber }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>الاسم</span>
+          <strong>{{ displayName(detailsItem()!) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>البريد</span>
+          <strong>{{ detailsItem()!.email }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>الوحدة التنظيمية</span>
+          <strong>{{ organizationName(detailsItem()!) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>المنصب</span>
+          <strong>{{ positionName(detailsItem()!) }}</strong>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="action-btn action-btn--ghost" (click)="closeDetails()">
+          {{ 'users.actions.close' | t }}
+        </button>
+        @if (auth.hasPermission(PermissionCodes.EmployeeEdit)) {
+          <button type="button" class="action-btn action-btn--edit" (click)="openEditFromDetails()">
+            {{ 'users.actions.edit' | t }}
+          </button>
+        }
+      </div>
+    }
+  </section>
+}
+
+@if (editOpen()) {
+  <div class="modal-backdrop" (click)="closeEdit()"></div>
+  <section class="modal card" role="dialog" aria-modal="true">
+    <h2>تعديل موظف</h2>
+    <div class="form-grid">
+      <label>
+        <span>{{ 'employees.form.employeeNumber' | t }} <span class="required">*</span></span>
+        <input type="text" [(ngModel)]="editModel.employeeNumber" />
+      </label>
+      <label>
+        <span>{{ 'employees.form.fullNameAr' | t }} <span class="required">*</span></span>
+        <input type="text" [(ngModel)]="editModel.fullNameAr" />
+      </label>
+      <label>
+        <span>{{ 'employees.form.fullNameEn' | t }} <span class="required">*</span></span>
+        <input type="text" [(ngModel)]="editModel.fullNameEn" />
+      </label>
+      <label>
+        <span>{{ 'employees.form.email' | t }} <span class="required">*</span></span>
+        <input type="email" [(ngModel)]="editModel.email" />
+      </label>
+      <label>
+        <span>{{ 'employees.form.organizationUnitId' | t }} <span class="required">*</span></span>
+        <select [(ngModel)]="editModel.organizationUnitId">
+          <option value="">{{ 'employees.form.selectOrganizationUnit' | t }}</option>
+          @for (org of organizations(); track org.id) {
+            <option [value]="org.id">{{ org.name }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        <span>{{ 'employees.form.positionId' | t }} <span class="required">*</span></span>
+        <select [(ngModel)]="editModel.positionId">
+          <option value="">{{ 'employees.form.selectPosition' | t }}</option>
+          @for (position of positions(); track position.id) {
+            <option [value]="position.id">{{ position.name }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button type="button" (click)="closeEdit()" [disabled]="editBusy()">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveEdit()" [disabled]="editBusy()">{{ 'users.actions.saveEdit' | t }}</button>
     </div>
   </section>
 }

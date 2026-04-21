@@ -1,33 +1,361 @@
+<div class="page-head-row pot-head">
 <section class="page-head">
   <h1>تقييمات الإمكانات</h1>
+    <p class="page-head__sub">عرض وتصفية تقييمات الإمكانات، مع تفاصيل كاملة من الخادم لكل سجل.</p>
+  </section>
+  <div class="page-actions">
+    <button type="button" class="btn-head-primary" (click)="openCreate()">
+      <span class="btn-head-primary__ico" aria-hidden="true">+</span>
+      <span>تقييم جديد</span>
+    </button>
+  </div>
+</div>
+
+<section class="toolbar card pot-toolbar">
+  <div class="pot-toolbar__grid">
+    <label class="pot-field">
+      <span class="pot-field__label">الموظف</span>
+      <select class="pot-field__control" [(ngModel)]="filterEmployeeId">
+        <option value="">كل الموظفين</option>
+        @for (e of employees(); track e.id) {
+          <option [value]="e.id">{{ e.name }}</option>
+        }
+      </select>
+    </label>
+    <label class="pot-field">
+      <span class="pot-field__label">الدورة</span>
+      <select class="pot-field__control" [(ngModel)]="filterCycleId">
+        <option value="">كل الدورات</option>
+        @for (c of cycles(); track c.id) {
+          <option [value]="c.id">{{ c.name }}</option>
+        }
+      </select>
+    </label>
+    <label class="pot-field">
+      <span class="pot-field__label">مستوى الإمكانات</span>
+      <select class="pot-field__control" [(ngModel)]="filterPotentialLevel">
+        <option value="">الكل</option>
+        <option value="1">منخفض</option>
+        <option value="2">متوسط</option>
+        <option value="3">عالٍ</option>
+      </select>
+    </label>
+    <label class="pot-field">
+      <span class="pot-field__label">الحالة</span>
+      <select class="pot-field__control" [(ngModel)]="filterStatus">
+        <option value="">كل الحالات</option>
+        <option value="1">مسودة</option>
+        <option value="2">مُرسل</option>
+        <option value="3">قيد المراجعة</option>
+        <option value="4">معتمد</option>
+      </select>
+    </label>
+    <button type="button" class="pot-apply" (click)="applyFilters()">تطبيق الفلتر</button>
+    <div class="pot-view-mode" role="group" aria-label="طريقة العرض">
+      <button
+        type="button"
+        class="pot-mode-btn"
+        [class.pot-mode-btn--active]="viewMode === 'table'"
+        (click)="viewMode = 'table'"
+      >
+        جدول
+      </button>
+      <button
+        type="button"
+        class="pot-mode-btn"
+        [class.pot-mode-btn--active]="viewMode === 'cards'"
+        (click)="viewMode = 'cards'"
+      >
+        بطاقات
+      </button>
+    </div>
+  </div>
 </section>
-@if (failed()) {
-  <div class="card card--muted">تعذر التحميل.</div>
-} @else if (data()) {
-  <div class="card table-card">
-    <table class="data-table">
+
+@if (viewMode === 'table') {
+  <div class="table-shell card pot-table-shell">
+    @if (busy()) {
+      <div class="table-shell__loading">جاري التحميل…</div>
+    }
+    <div class="table-scroll">
+      <table class="data-table pot-table">
       <thead>
         <tr>
           <th>الموظف</th>
           <th>الدورة</th>
+            <th>المقيّم</th>
+            <th>الإجمالي</th>
           <th>المستوى</th>
-          <th>الإجمالي</th>
           <th>الحالة</th>
+            <th class="pot-actions-head">إجراءات</th>
         </tr>
       </thead>
       <tbody>
-        @for (row of data()!.items; track row.id) {
-          <tr>
-            <td><app-id-chip [id]="row.employeeId" /></td>
-            <td><app-id-chip label="دورة" [id]="row.performanceCycleId" /></td>
-            <td>{{ potentialLevel(row.potentialLevel) }}</td>
-            <td>{{ row.overallPotentialScore | number: '1.0-2' }}</td>
-            <td>{{ assessmentStatus(row.status) }}</td>
+          @for (row of data()?.items ?? []; track row.id) {
+            <tr>
+              <td><span class="cell-strong">{{ nameFrom(employees(), row.employeeId) }}</span></td>
+              <td class="muted">{{ nameFrom(cycleLabels(), row.performanceCycleId) }}</td>
+              <td class="muted">{{ nameFrom(employees(), row.assessedByEmployeeId) }}</td>
+              <td><span class="score-val">{{ row.overallPotentialScore | number: '1.0-2' }}</span></td>
+              <td><span class="level-tag">{{ potentialLevel(row.potentialLevel) }}</span></td>
+              <td><span class="chip" [attr.data-status]="row.status">{{ assessmentStatus(row.status) }}</span></td>
+              <td class="cell-actions">
+                <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">تفاصيل</button>
+                <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row)">تعديل</button>
+              </td>
           </tr>
         }
       </tbody>
     </table>
+    </div>
+    <div class="pager pot-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!data()?.hasPreviousPage">السابق</button>
+      <span class="pager__meta">{{ data()?.page ?? 1 }} / {{ data()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!data()?.hasNextPage">التالي</button>
+    </div>
   </div>
 } @else {
-  <div class="skeleton table-skel"></div>
+  <section class="pot-cards-wrap card" [attr.aria-busy]="busy() ? 'true' : 'false'">
+    @if (busy()) {
+      <div class="pot-cards-loading">جاري التحميل…</div>
+    }
+    <div class="pot-cards-grid">
+      @for (row of data()?.items ?? []; track row.id; let i = $index) {
+        <article class="pot-card" [attr.data-status]="row.status" [style.animation-delay.ms]="i * 35">
+          <header class="pot-card__head">
+            <div>
+              <strong class="pot-card__name">{{ nameFrom(employees(), row.employeeId) }}</strong>
+              <span class="pot-card__cycle muted">{{ nameFrom(cycleLabels(), row.performanceCycleId) }}</span>
+            </div>
+            <span class="chip" [attr.data-status]="row.status">{{ assessmentStatus(row.status) }}</span>
+          </header>
+          <div class="pot-card__scores">
+            <div class="pot-score-big">
+              <strong>{{ row.overallPotentialScore | number: '1.0-2' }}</strong>
+              <span>إجمالي</span>
+            </div>
+            <div class="pot-card__meta">
+              <span class="level-tag">{{ potentialLevel(row.potentialLevel) }}</span>
+              <span class="pot-assessor muted">المقيّم: {{ nameFrom(employees(), row.assessedByEmployeeId) }}</span>
+            </div>
+          </div>
+          <div class="pot-mini-bars" aria-hidden="true">
+            <div class="pot-mini-bar"><span [style.width.%]="meterPct(row.agilityScore)"></span></div>
+            <div class="pot-mini-bar"><span [style.width.%]="meterPct(row.leadershipScore)"></span></div>
+            <div class="pot-mini-bar"><span [style.width.%]="meterPct(row.growthScore)"></span></div>
+            <div class="pot-mini-bar"><span [style.width.%]="meterPct(row.mobilityScore)"></span></div>
+          </div>
+          <footer class="pot-card__foot">
+            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id); $event.stopPropagation()">تفاصيل</button>
+            <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row); $event.stopPropagation()">تعديل</button>
+          </footer>
+        </article>
+      }
+    </div>
+    <div class="pager pot-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!data()?.hasPreviousPage">السابق</button>
+      <span class="pager__meta">{{ data()?.page ?? 1 }} / {{ data()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!data()?.hasNextPage">التالي</button>
+    </div>
+  </section>
+}
+
+@if (detailsOpen()) {
+  <div class="modal-backdrop" (click)="closeDetails()"></div>
+  <section class="modal pot-details-modal" role="dialog" aria-modal="true" aria-labelledby="pot-details-title">
+    <header class="pot-details-modal__head">
+      <div>
+        <h2 id="pot-details-title">تفاصيل تقييم الإمكانات</h2>
+        <p class="muted">يتم جلب التفاصيل من الخادم لكل تقييم (المعرّف الفريد).</p>
+      </div>
+      <button type="button" class="pot-details-close" (click)="closeDetails()" aria-label="إغلاق">×</button>
+    </header>
+    <div class="pot-details-modal__body">
+      @if (detailsBusy()) {
+        <p class="pot-details-loading">جاري تحميل التفاصيل…</p>
+      } @else if (detailRecord()) {
+        @let d = detailRecord()!;
+        <div class="pot-detail-grid">
+          <div class="detail-block">
+            <span>الموظف</span>
+            <strong>{{ nameFrom(employees(), d.employeeId) }}</strong>
+          </div>
+          <div class="detail-block">
+            <span>الدورة</span>
+            <strong>{{ nameFrom(cycleLabels(), d.performanceCycleId) }}</strong>
+          </div>
+          <div class="detail-block">
+            <span>المقيّم</span>
+            <strong>{{ nameFrom(employees(), d.assessedByEmployeeId) }}</strong>
+          </div>
+          <div class="detail-block">
+            <span>تاريخ التقييم</span>
+            <strong>{{ d.assessedOnUtc ? (d.assessedOnUtc | date: 'medium') : '—' }}</strong>
+          </div>
+          <div class="detail-block">
+            <span>درجة الإجمالي</span>
+            <strong>{{ d.overallPotentialScore | number: '1.0-4' }}</strong>
+          </div>
+          <div class="detail-block">
+            <span>مستوى الإمكانات</span>
+            <strong>{{ potentialLevel(d.potentialLevel) }}</strong>
+          </div>
+          <div class="detail-block detail-block--full">
+            <span>الحالة</span>
+            <span class="chip" [attr.data-status]="d.status">{{ assessmentStatus(d.status) }}</span>
+          </div>
+        </div>
+
+        <h3 class="pot-subhead">الدرجات الفرعية</h3>
+        <div class="pot-score-grid">
+          <div class="pot-score-cell"><span>Agility</span><strong>{{ d.agilityScore | number: '1.0-2' }}</strong></div>
+          <div class="pot-score-cell"><span>Leadership</span><strong>{{ d.leadershipScore | number: '1.0-2' }}</strong></div>
+          <div class="pot-score-cell"><span>Growth</span><strong>{{ d.growthScore | number: '1.0-2' }}</strong></div>
+          <div class="pot-score-cell"><span>Mobility</span><strong>{{ d.mobilityScore | number: '1.0-2' }}</strong></div>
+        </div>
+
+        @if (d.comments && d.comments.trim()) {
+          <h3 class="pot-subhead">ملاحظات</h3>
+          <p class="pot-comments">{{ d.comments }}</p>
+        }
+
+        @if (d.factors.length > 0) {
+          <h3 class="pot-subhead">العوامل</h3>
+          <div class="table-scroll pot-factors-scroll">
+            <table class="data-table pot-factors-table">
+              <thead>
+                <tr>
+                  <th>العامل</th>
+                  <th>الدرجة</th>
+                  <th>الوزن</th>
+                  <th>ملاحظات</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (f of d.factors; track f.id) {
+                  <tr>
+                    <td>{{ f.factorName }}</td>
+                    <td>{{ f.score | number: '1.0-2' }}</td>
+                    <td>{{ f.weight | number: '1.0-2' }}</td>
+                    <td class="muted">{{ f.notes || '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    </div>
+    <footer class="pot-details-modal__foot">
+      @if (detailRecord()) {
+        <button type="button" class="btn-ghost" (click)="editFromDetails()">تعديل هذا التقييم</button>
+      }
+      <button type="button" class="btn-primary" (click)="closeDetails()">إغلاق</button>
+    </footer>
+  </section>
+}
+
+@if (createOpen()) {
+  <div class="modal-backdrop" (click)="createOpen.set(false)"></div>
+  <section class="modal pot-form-modal" role="dialog" aria-modal="true">
+    <header class="pot-form-modal__head">
+      <h3>إنشاء تقييم إمكانات</h3>
+      <button type="button" class="pot-details-close" (click)="createOpen.set(false)" aria-label="إغلاق">×</button>
+    </header>
+    <div class="pot-form-modal__body">
+      <div class="form-grid">
+        <label class="field">
+          <span>الموظف</span>
+          <select [(ngModel)]="createModel.employeeId">
+            <option value="">اختر الموظف</option>
+            @for (e of employees(); track e.id) {
+              <option [value]="e.id">{{ e.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>الدورة</span>
+          <select [(ngModel)]="createModel.performanceCycleId">
+            <option value="">اختر الدورة</option>
+            @for (c of cycles(); track c.id) {
+              <option [value]="c.id">{{ c.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>قيّم بواسطة</span>
+          <select [(ngModel)]="createModel.assessedByEmployeeId">
+            <option value="">اختر المقيّم</option>
+            @for (e of employees(); track e.id) {
+              <option [value]="e.id">{{ e.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>الحالة</span>
+          <select [(ngModel)]="createModel.status">
+            <option [ngValue]="1">مسودة</option>
+            <option [ngValue]="2">مُرسل</option>
+            <option [ngValue]="3">قيد المراجعة</option>
+            <option [ngValue]="4">معتمد</option>
+          </select>
+        </label>
+        <label class="field"><span>Agility</span><input type="number" min="0" max="100" step="0.1" [(ngModel)]="createModel.agilityScore" /></label>
+        <label class="field"><span>Leadership</span><input type="number" min="0" max="100" step="0.1" [(ngModel)]="createModel.leadershipScore" /></label>
+        <label class="field"><span>Growth</span><input type="number" min="0" max="100" step="0.1" [(ngModel)]="createModel.growthScore" /></label>
+        <label class="field"><span>Mobility</span><input type="number" min="0" max="100" step="0.1" [(ngModel)]="createModel.mobilityScore" /></label>
+        <label class="field field--full">
+          <span>ملاحظات</span>
+          <textarea rows="3" [(ngModel)]="createModel.comments"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="pot-form-modal__foot">
+      <button type="button" class="btn-ghost" (click)="createOpen.set(false)">إلغاء</button>
+      <button type="button" class="btn-primary" (click)="submitCreate()">حفظ</button>
+    </footer>
+  </section>
+}
+
+@if (editOpen() && selected()) {
+  <div class="modal-backdrop" (click)="editOpen.set(false)"></div>
+  <section class="modal pot-form-modal" role="dialog" aria-modal="true">
+    <header class="pot-form-modal__head">
+      <h3>تعديل تقييم الإمكانات</h3>
+      <button type="button" class="pot-details-close" (click)="editOpen.set(false)" aria-label="إغلاق">×</button>
+    </header>
+    <div class="pot-form-modal__body">
+      <div class="form-grid">
+        <label class="field">
+          <span>قيّم بواسطة</span>
+          <select [(ngModel)]="editModel.assessedByEmployeeId">
+            @for (e of employees(); track e.id) {
+              <option [value]="e.id">{{ e.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>الحالة</span>
+          <select [(ngModel)]="editModel.status">
+            <option [ngValue]="1">مسودة</option>
+            <option [ngValue]="2">مُرسل</option>
+            <option [ngValue]="3">قيد المراجعة</option>
+            <option [ngValue]="4">معتمد</option>
+          </select>
+        </label>
+        <label class="field"><span>Agility</span><input type="number" min="0" max="100" step="0.1" [(ngModel)]="editModel.agilityScore" /></label>
+        <label class="field"><span>Leadership</span><input type="number" min="0" max="100" step="0.1" [(ngModel)]="editModel.leadershipScore" /></label>
+        <label class="field"><span>Growth</span><input type="number" min="0" max="100" step="0.1" [(ngModel)]="editModel.growthScore" /></label>
+        <label class="field"><span>Mobility</span><input type="number" min="0" max="100" step="0.1" [(ngModel)]="editModel.mobilityScore" /></label>
+        <label class="field field--full">
+          <span>ملاحظات</span>
+          <textarea rows="3" [(ngModel)]="editModel.comments"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="pot-form-modal__foot">
+      <button type="button" class="btn-ghost" (click)="editOpen.set(false)">إلغاء</button>
+      <button type="button" class="btn-primary" (click)="submitEdit()">حفظ</button>
+    </footer>
+  </section>
 }

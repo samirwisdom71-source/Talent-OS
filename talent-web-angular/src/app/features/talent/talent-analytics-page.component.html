@@ -1,0 +1,135 @@
+<section class="hub-hero hub-hero--analytics">
+  <div class="hub-hero__text">
+    <span class="hub-hero__eyebrow">{{ 'talentAnalytics.hero.eyebrow' | t }}</span>
+    <h1>{{ 'talentAnalytics.title' | t }}</h1>
+    <p>{{ 'talentAnalytics.hero.lead' | t }}</p>
+  </div>
+</section>
+
+@if (canTalentAdmin()) {
+  <section class="quick-nav">
+    <a class="nav-card nav-card--indigo" routerLink="/talent/classifications">
+      <div class="nav-card__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 7h10M7 12h10M7 17h6" />
+          <path d="M5 4h14a2 2 0 012 2v14l-4-3-4 3-4-3-4 3V6a2 2 0 012-2z" />
+        </svg>
+      </div>
+      <div class="nav-card__body">
+        <strong>{{ 'nav.talentClassifications' | t }}</strong>
+        <span>{{ 'talentAnalytics.hero.cardClassifications' | t }}</span>
+      </div>
+      <span class="nav-card__chevron" aria-hidden="true">‹</span>
+    </a>
+    <a class="nav-card nav-card--teal" routerLink="/talent/scores">
+      <div class="nav-card__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19V9M12 19V5M20 19v-7" />
+        </svg>
+      </div>
+      <div class="nav-card__body">
+        <strong>{{ 'nav.talentScores' | t }}</strong>
+        <span>{{ 'talentAnalytics.hero.cardScores' | t }}</span>
+      </div>
+      <span class="nav-card__chevron" aria-hidden="true">‹</span>
+    </a>
+  </section>
+}
+
+<section class="toolbar card sp-toolbar ta-toolbar">
+  <div class="toolbar__inner">
+    <label class="toolbar__field">
+      <span class="toolbar__label">{{ 'talentAnalytics.filter.cycle' | t }}</span>
+      <select class="toolbar__select" [(ngModel)]="filterPerformanceCycleId">
+        <option value="">{{ 'successionPlansList.filter.all' | t }}</option>
+        @for (c of cycles(); track c.id) {
+          <option [value]="c.id">{{ c.name }}</option>
+        }
+      </select>
+    </label>
+    <label class="toolbar__field">
+      <span class="toolbar__label">{{ 'talentAnalytics.filter.orgUnit' | t }}</span>
+      <select class="toolbar__select" [(ngModel)]="filterOrganizationUnitId">
+        <option value="">{{ 'successionPlansList.filter.all' | t }}</option>
+        @for (u of orgUnits(); track u.id) {
+          <option [value]="u.id">{{ u.name }}</option>
+        }
+      </select>
+    </label>
+    <button type="button" class="btn-toolbar-apply" (click)="refresh()">{{ 'talentAnalytics.apply' | t }}</button>
+  </div>
+</section>
+
+@if (busy()) {
+  <div class="card card--muted">{{ 'common.loading' | t }}</div>
+} @else if (failed()) {
+  <div class="card card--muted">{{ 'talentAnalytics.error.load' | t }}</div>
+} @else if (distribution()) {
+  <div class="ta-dashboard-grid">
+    <div class="card card--interactive ta-block ta-block--accent">
+      <h2 class="ta-section-title">{{ 'talentAnalytics.section.nineBox' | t }}</h2>
+      <ul class="ta-pill-list">
+        @for (row of distribution()!.byNineBox; track row.nineBoxCode) {
+          <li>
+            <span>{{ nineBoxLabel(row.nineBoxCode) }}</span>
+            <span class="level-pill">{{ row.count }}</span>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div class="card card--interactive ta-block">
+      <h2 class="ta-section-title">{{ 'talentAnalytics.section.performanceBand' | t }}</h2>
+      <ul class="ta-pill-list">
+        @for (row of distribution()!.byPerformanceBand; track row.value) {
+          <li>
+            <span>{{ bandLabel('perf', row.value) }}</span>
+            <span class="level-pill">{{ row.count }}</span>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div class="card card--interactive ta-block">
+      <h2 class="ta-section-title">{{ 'talentAnalytics.section.potentialBand' | t }}</h2>
+      <ul class="ta-pill-list">
+        @for (row of distribution()!.byPotentialBand; track row.value) {
+          <li>
+            <span>{{ bandLabel('pot', row.value) }}</span>
+            <span class="level-pill">{{ row.count }}</span>
+          </li>
+        }
+      </ul>
+    </div>
+
+    @if (distribution()!.byCategoryName.length) {
+      <div class="card card--interactive ta-block">
+        <h2 class="ta-section-title">{{ 'talentAnalytics.section.categories' | t }}</h2>
+        <ul class="ta-pill-list">
+          @for (row of distribution()!.byCategoryName; track row.name) {
+            <li>
+              <span>{{ row.name }}</span>
+              <span class="level-pill">{{ row.count }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    <div class="card card--interactive ta-block ta-block--wide">
+      <h2 class="ta-section-title">{{ 'talentAnalytics.section.byCycle' | t }}</h2>
+      @if (!byCycle().length) {
+        <p class="muted">{{ 'common.empty' | t }}</p>
+      } @else {
+        <ul class="ta-cycle-list">
+          @for (row of byCycle(); track row.performanceCycleId) {
+            <li>
+              <span>{{ cycleDisplayName(row) }}</span>
+              <span class="level-pill">{{ row.classificationCount }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+}

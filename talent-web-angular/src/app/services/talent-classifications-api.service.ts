@@ -3,7 +3,12 @@ import { Injectable, inject } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { apiUrl } from '../core/config/api-url';
 import { ApiResponse, PagedResult } from '../shared/models/api.types';
-import { TalentClassificationDto, TalentClassificationFilterRequest } from '../shared/models/classification.models';
+import {
+  ClassifyTalentClassificationRequest,
+  ReclassifyTalentClassificationRequest,
+  TalentClassificationDto,
+  TalentClassificationFilterRequest,
+} from '../shared/models/classification.models';
 import { toHttpParams, unwrapApiResponse } from '../shared/utils/api-helpers';
 
 @Injectable({ providedIn: 'root' })
@@ -31,6 +36,25 @@ export class TalentClassificationsApiService {
   getById(id: string) {
     return this.http
       .get<ApiResponse<TalentClassificationDto>>(`${this.base}/${id}`)
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  getByEmployeeCycle(employeeId: string, performanceCycleId: string) {
+    const params = toHttpParams({ employeeId, performanceCycleId });
+    return this.http
+      .get<ApiResponse<TalentClassificationDto>>(`${this.base}/by-employee-cycle`, { params })
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  classify(body: ClassifyTalentClassificationRequest) {
+    return this.http
+      .post<ApiResponse<TalentClassificationDto>>(`${this.base}/classify`, body)
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  reclassify(body: ReclassifyTalentClassificationRequest) {
+    return this.http
+      .post<ApiResponse<TalentClassificationDto>>(`${this.base}/reclassify`, body)
       .pipe(map((r) => unwrapApiResponse(r)));
   }
 }

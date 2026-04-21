@@ -26,6 +26,27 @@ export const routes: Routes = [
           import('./features/employees/employees-list-page.component').then((m) => m.EmployeesListPageComponent),
       },
       {
+        path: 'organization-units',
+        canActivate: [permissionGuard],
+        data: { permissions: ['EMPLOYEE_EDIT'] },
+        loadComponent: () =>
+          import('./features/organization-units/organization-units-page.component').then(
+            (m) => m.OrganizationUnitsPageComponent,
+          ),
+      },
+      {
+        path: 'positions',
+        canActivate: [permissionGuard],
+        data: { permissions: ['EMPLOYEE_EDIT'] },
+        loadComponent: () => import('./features/positions/positions-page.component').then((m) => m.PositionsPageComponent),
+      },
+      {
+        path: 'job-grades',
+        canActivate: [permissionGuard],
+        data: { permissions: ['EMPLOYEE_EDIT'] },
+        loadComponent: () => import('./features/job-grades/job-grades-page.component').then((m) => m.JobGradesPageComponent),
+      },
+      {
         path: 'employees/create',
         canActivate: [permissionGuard],
         data: { permissions: ['EMPLOYEE_EDIT'] },
@@ -75,6 +96,15 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'job-competency-requirements',
+        canActivate: [permissionGuard],
+        data: { permissions: ['COMPETENCY_EDIT'] },
+        loadComponent: () =>
+          import('./features/job-competency-requirements/job-competency-requirements-page.component').then(
+            (m) => m.JobCompetencyRequirementsPageComponent,
+          ),
+      },
+      {
         path: 'profile',
         loadComponent: () => import('./features/profile/profile-page.component').then((m) => m.ProfilePageComponent),
       },
@@ -82,6 +112,23 @@ export const routes: Routes = [
         path: 'talent/performance',
         loadComponent: () =>
           import('./features/talent/performance-page.component').then((m) => m.PerformancePageComponent),
+      },
+      {
+        path: 'talent/performance/cycles',
+        loadComponent: () =>
+          import('./features/talent/performance-cycles-page.component').then((m) => m.PerformanceCyclesPageComponent),
+      },
+      {
+        path: 'talent/performance/evaluations',
+        loadComponent: () =>
+          import('./features/talent/performance-evaluations-page.component').then(
+            (m) => m.PerformanceEvaluationsPageComponent,
+          ),
+      },
+      {
+        path: 'talent/performance/goals',
+        loadComponent: () =>
+          import('./features/talent/performance-goals-page.component').then((m) => m.PerformanceGoalsPageComponent),
       },
       {
         path: 'talent/potential',
@@ -94,10 +141,74 @@ export const routes: Routes = [
           import('./features/talent/nine-box-page.component').then((m) => m.NineBoxPageComponent),
       },
       {
+        path: 'talent/analytics',
+        loadComponent: () =>
+          import('./features/talent/talent-analytics-page.component').then((m) => m.TalentAnalyticsPageComponent),
+      },
+      {
+        path: 'talent/classifications',
+        canActivate: [permissionGuard],
+        data: { permissions: ['CLASSIFICATION_VIEW', 'CLASSIFICATION_MANAGE'] },
+        loadComponent: () =>
+          import('./features/talent/talent-classifications-admin-page.component').then(
+            (m) => m.TalentClassificationsAdminPageComponent,
+          ),
+      },
+      {
+        path: 'talent/scores',
+        canActivate: [permissionGuard],
+        data: { permissions: ['CLASSIFICATION_VIEW', 'CLASSIFICATION_MANAGE'] },
+        loadComponent: () =>
+          import('./features/talent/talent-scores-page.component').then((m) => m.TalentScoresPageComponent),
+      },
+      {
+        path: 'scoring-policies',
+        canActivate: [permissionGuard],
+        data: { permissions: ['SCORING_VIEW', 'SCORING_MANAGE'] },
+        loadComponent: () =>
+          import('./features/scoring-policies/scoring-policies-page.component').then((m) => m.ScoringPoliciesPageComponent),
+      },
+      {
         path: 'succession',
         loadComponent: () =>
           import('./features/succession/succession-overview-page.component').then(
             (m) => m.SuccessionOverviewPageComponent,
+          ),
+      },
+      {
+        path: 'succession/critical-positions',
+        canActivate: [permissionGuard],
+        data: { permissions: ['SUCCESSION_VIEW', 'SUCCESSION_MANAGE'] },
+        loadComponent: () =>
+          import('./features/critical-positions/critical-positions-page.component').then(
+            (m) => m.CriticalPositionsPageComponent,
+          ),
+      },
+      {
+        path: 'succession/plans',
+        canActivate: [permissionGuard],
+        data: { permissions: ['SUCCESSION_VIEW', 'SUCCESSION_MANAGE'] },
+        loadComponent: () =>
+          import('./features/succession/succession-plans-list-page.component').then(
+            (m) => m.SuccessionPlansListPageComponent,
+          ),
+      },
+      {
+        path: 'succession/analytics',
+        canActivate: [permissionGuard],
+        data: { permissions: ['SUCCESSION_VIEW', 'SUCCESSION_MANAGE'] },
+        loadComponent: () =>
+          import('./features/succession/succession-analytics-page.component').then(
+            (m) => m.SuccessionAnalyticsPageComponent,
+          ),
+      },
+      {
+        path: 'succession/successor-candidates',
+        canActivate: [permissionGuard],
+        data: { permissions: ['SUCCESSION_VIEW', 'SUCCESSION_MANAGE'] },
+        loadComponent: () =>
+          import('./features/succession/successor-candidates-page.component').then(
+            (m) => m.SuccessorCandidatesPageComponent,
           ),
       },
       {

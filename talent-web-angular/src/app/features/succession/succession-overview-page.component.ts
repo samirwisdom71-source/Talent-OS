@@ -4,24 +4,25 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { forkJoin } from 'rxjs';
 import { DomainAnalyticsApiService } from '../../services/domain-analytics-api.service';
+import { IdentityLookupsApiService } from '../../services/identity-lookups-api.service';
 import { SuccessionApiService } from '../../services/succession-api.service';
 import { SuccessionAnalyticsSummaryDto } from '../../shared/models/domain-analytics.models';
 import { CriticalPositionDto, SuccessionPlanDto } from '../../shared/models/succession.models';
 import { PermissionCodes as PermissionCodesConst } from '../../shared/models/permission-codes';
 import { I18nService } from '../../shared/services/i18n.service';
-import { IdChipComponent } from '../../shared/ui/id-chip.component';
 import { EnumLabels, UiLang } from '../../shared/utils/enum-labels';
 
 @Component({
   selector: 'app-succession-overview-page',
   standalone: true,
-  imports: [RouterLink, IdChipComponent, DecimalPipe],
+  imports: [RouterLink, DecimalPipe],
   templateUrl: './succession-overview-page.component.html',
   styleUrl: './succession-overview-page.component.scss',
 })
 export class SuccessionOverviewPageComponent implements OnInit {
   private readonly api = inject(SuccessionApiService);
   private readonly analytics = inject(DomainAnalyticsApiService);
+  private readonly identityLookups = inject(IdentityLookupsApiService);
   readonly auth = inject(AuthService);
   readonly i18n = inject(I18nService);
   readonly PermissionCodes = PermissionCodesConst;
@@ -32,16 +33,20 @@ export class SuccessionOverviewPageComponent implements OnInit {
   readonly failed = signal(false);
   readonly summaryFailed = signal(false);
 
+  private readonly positionLookup = signal(new Map<string, string>());
+
   ngOnInit(): void {
     forkJoin({
       plans: this.api.getPlansPaged({ page: 1, pageSize: 25 }),
       positions: this.api.getCriticalPositionsPaged({ page: 1, pageSize: 25, activeOnly: true }),
       sum: this.analytics.getSuccessionSummary(),
+      posLookup: this.identityLookups.getPositions(undefined, 400),
     }).subscribe({
-      next: ({ plans, positions, sum }) => {
+      next: ({ plans, positions, sum, posLookup }) => {
         this.plans.set(plans.items);
         this.positions.set(positions.items);
         this.summary.set(sum);
+        this.positionLookup.set(new Map(posLookup.map((x) => [x.id, x.name])));
         this.failed.set(false);
         this.summaryFailed.set(false);
       },
@@ -49,10 +54,19 @@ export class SuccessionOverviewPageComponent implements OnInit {
         this.plans.set([]);
         this.positions.set([]);
         this.summary.set(null);
+        this.positionLookup.set(new Map());
         this.failed.set(true);
         this.summaryFailed.set(true);
       },
     });
+  }
+
+  positionLabel(positionId: string): string {
+    return this.positionLookup().get(positionId) ?? '';
+  }
+
+  canSuccessionSection(): boolean {
+    return this.auth.hasAnyPermission([PermissionCodesConst.SuccessionView, PermissionCodesConst.SuccessionManage]);
   }
 
   lang(): UiLang {

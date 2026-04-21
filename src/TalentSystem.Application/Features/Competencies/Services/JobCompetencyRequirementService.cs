@@ -16,18 +16,15 @@ public sealed class JobCompetencyRequirementService : IJobCompetencyRequirementS
     private readonly TalentDbContext _db;
     private readonly IValidator<CreateJobCompetencyRequirementRequest> _createValidator;
     private readonly IValidator<UpdateJobCompetencyRequirementRequest> _updateValidator;
-    private readonly IValidator<JobCompetencyRequirementFilterRequest> _filterValidator;
 
     public JobCompetencyRequirementService(
         TalentDbContext db,
         IValidator<CreateJobCompetencyRequirementRequest> createValidator,
-        IValidator<UpdateJobCompetencyRequirementRequest> updateValidator,
-        IValidator<JobCompetencyRequirementFilterRequest> filterValidator)
+        IValidator<UpdateJobCompetencyRequirementRequest> updateValidator)
     {
         _db = db;
         _createValidator = createValidator;
         _updateValidator = updateValidator;
-        _filterValidator = filterValidator;
     }
 
     public async Task<Result<JobCompetencyRequirementDto>> CreateAsync(
@@ -176,13 +173,7 @@ public sealed class JobCompetencyRequirementService : IJobCompetencyRequirementS
         JobCompetencyRequirementFilterRequest request,
         CancellationToken cancellationToken = default)
     {
-        var validation = await _filterValidator.ValidateAsync(request, cancellationToken);
-        if (!validation.IsValid)
-        {
-            return Result<PagedResult<JobCompetencyRequirementDto>>.Fail(
-                validation.Errors.Select(e => e.ErrorMessage).ToList());
-        }
-
+        // Listing is allowed with no filters; positionId and competencyId are optional query filters only.
         var page = request.Page <= 0 ? PaginationConstants.DefaultPage : request.Page;
         var pageSize = request.PageSize <= 0 ? PaginationConstants.DefaultPageSize : request.PageSize;
         if (pageSize > PaginationConstants.MaxPageSize)

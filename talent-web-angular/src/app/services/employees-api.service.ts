@@ -8,6 +8,7 @@ import {
   EmployeeDto,
   EmployeeFilterRequest,
   EmployeeListItemDto,
+  UpdateEmployeeRequest,
 } from '../shared/models/employee.models';
 import { toHttpParams, unwrapApiResponse } from '../shared/utils/api-helpers';
 
@@ -36,6 +37,12 @@ export class EmployeesApiService {
   create(body: CreateEmployeeRequest) {
     return this.http
       .post<ApiResponse<EmployeeDto>>(this.base, body)
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  update(id: string, body: UpdateEmployeeRequest) {
+    return this.http
+      .put<ApiResponse<EmployeeDto>>(`${this.base}/${id}`, body)
       .pipe(map((r) => unwrapApiResponse(r)));
   }
 }

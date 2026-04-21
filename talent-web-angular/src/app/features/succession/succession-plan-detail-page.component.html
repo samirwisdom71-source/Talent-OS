@@ -1,4 +1,11 @@
-<a routerLink="/succession" class="back-link">← نظرة التعاقب</a>
+<a routerLink="/succession" class="back-link back-link--hero">
+  <span class="back-link__ico" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  </span>
+  <span class="back-link__label">نظرة التعاقب</span>
+</a>
 @if (failed()) {
   <div class="card card--muted">تعذر التحميل.</div>
 } @else if (plan()) {
@@ -9,11 +16,11 @@
   <div class="card grid">
     <div>
       <div class="label">منصب حرج</div>
-      <div class="value"><app-id-chip [id]="plan()!.criticalPositionId" /></div>
+      <div class="value">{{ criticalLabel(plan()!.criticalPositionId) || '—' }}</div>
     </div>
     <div>
       <div class="label">دورة الأداء</div>
-      <div class="value"><app-id-chip [id]="plan()!.performanceCycleId" /></div>
+      <div class="value">{{ cycleLabel(plan()!.performanceCycleId) || '—' }}</div>
     </div>
     @if (plan()!.coverageSnapshot; as c) {
       <div>
@@ -45,7 +52,7 @@
             <th>الجاهزية</th>
             <th>أساسي</th>
             @if (auth.hasPermission(PermissionCodes.SuccessionManage)) {
-              <th></th>
+              <th class="actions-col-head">إجراءات</th>
             }
           </tr>
         </thead>
@@ -53,7 +60,7 @@
           @for (c of sortedCandidates(); track c.id) {
             <tr>
               <td>{{ c.rankOrder }}</td>
-              <td><app-id-chip [id]="c.employeeId" /></td>
+              <td>{{ employeeName(c.employeeId) || '—' }}</td>
               <td>{{ readiness(c.readinessLevel) }}</td>
               <td>
                 @if (c.isPrimarySuccessor) {
@@ -63,11 +70,11 @@
                 }
               </td>
               @if (auth.hasPermission(PermissionCodes.SuccessionManage)) {
-                <td class="cell-actions">
+                <td class="cell-actions cell-actions--row">
                   @if (!c.isPrimarySuccessor) {
                     <button
                       type="button"
-                      class="linkish"
+                      class="candidates__btn candidates__btn--primary"
                       [disabled]="busyRowId() === c.id"
                       (click)="markPrimary(c)"
                     >
@@ -76,7 +83,7 @@
                   }
                   <button
                     type="button"
-                    class="linkish danger"
+                    class="candidates__btn candidates__btn--danger"
                     [disabled]="busyRowId() === c.id"
                     (click)="removeCandidate(c)"
                   >
@@ -98,7 +105,14 @@
   <div class="modal-backdrop" (click)="closeAdd()"></div>
   <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
     <h3>مرشح جديد</h3>
-    <label>معرّف الموظف (GUID)<input type="text" [(ngModel)]="addForm.employeeId" name="eid" /></label>
+    <div class="modal-field modal-field--full">
+      <app-lookup-search-combo
+        kind="employee"
+        [(value)]="addForm.employeeId"
+        label="الموظف"
+        placeholder="اكتب للبحث واختر من القائمة…"
+      />
+    </div>
     <label
       >الجاهزية
       <select class="select" [(ngModel)]="addForm.readinessLevel" name="rl">

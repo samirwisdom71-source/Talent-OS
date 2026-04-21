@@ -97,7 +97,10 @@ public sealed class SuccessorCandidateService : ISuccessorCandidateService
 
         if (request.IsPrimarySuccessor)
         {
+            // Two-phase: unique index on SuccessionPlanId (where IsPrimarySuccessor) — one save per step
+            // so SQL never has two "primary" rows for the same plan in a single command batch.
             await ClearPrimaryFlagsForPlanAsync(request.SuccessionPlanId, null, cancellationToken);
+            await _db.SaveChangesAsync(cancellationToken);
         }
 
         var entity = new SuccessorCandidate
@@ -161,7 +164,8 @@ public sealed class SuccessorCandidateService : ISuccessorCandidateService
 
         if (request.IsPrimarySuccessor)
         {
-            await ClearPrimaryFlagsForPlanAsync(entity.SuccessionPlanId, entity.Id, cancellationToken);
+            await ClearPrimaryFlagsForPlanAsync(entity.SuccessionPlanId, null, cancellationToken);
+            await _db.SaveChangesAsync(cancellationToken);
         }
 
         entity.ReadinessLevel = request.ReadinessLevel;
@@ -294,7 +298,9 @@ public sealed class SuccessorCandidateService : ISuccessorCandidateService
             return Result<SuccessorCandidateDto>.Ok(MapToDto(entity));
         }
 
-        await ClearPrimaryFlagsForPlanAsync(entity.SuccessionPlanId, entity.Id, cancellationToken);
+        await ClearPrimaryFlagsForPlanAsync(entity.SuccessionPlanId, null, cancellationToken);
+        await _db.SaveChangesAsync(cancellationToken);
+
         entity.IsPrimarySuccessor = true;
         await _db.SaveChangesAsync(cancellationToken);
 

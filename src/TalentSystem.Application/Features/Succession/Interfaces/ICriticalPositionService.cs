@@ -1,3 +1,4 @@
+using TalentSystem.Application.Features.Identity.DTOs;
 using TalentSystem.Application.Features.Succession.DTOs;
 using TalentSystem.Shared.Api;
 using TalentSystem.Shared.Results;
@@ -19,6 +20,10 @@ public interface ICriticalPositionService
 
     Task<Result<PagedResult<CriticalPositionDto>>> GetPagedAsync(
         CriticalPositionFilterRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<IReadOnlyList<LookupItemDto>>> GetLookupAsync(
+        CriticalPositionLookupRequest request,
         CancellationToken cancellationToken = default);
 
     Task<Result<CriticalPositionDto>> DeactivateAsync(Guid id, CancellationToken cancellationToken = default);

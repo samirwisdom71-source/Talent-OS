@@ -203,16 +203,29 @@ public sealed class ScoringPolicyService : IScoringPolicyService
         }
 
         var currentlyActive = await _db.ScoringPolicies
-            .Where(x => x.RecordStatus == RecordStatus.Active)
+            .Where(x => x.RecordStatus == RecordStatus.Active && x.Id != policy.Id)
             .ToListAsync(cancellationToken);
 
-        foreach (var active in currentlyActive)
+        var strategy = _db.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async () =>
         {
-            active.RecordStatus = RecordStatus.Archived;
-        }
+            await using var transaction = await _db.Database.BeginTransactionAsync(cancellationToken);
 
-        policy.RecordStatus = RecordStatus.Active;
-        await _db.SaveChangesAsync(cancellationToken);
+            if (currentlyActive.Count > 0)
+            {
+                foreach (var active in currentlyActive)
+                {
+                    active.RecordStatus = RecordStatus.Archived;
+                }
+
+                await _db.SaveChangesAsync(cancellationToken);
+            }
+
+            policy.RecordStatus = RecordStatus.Active;
+            await _db.SaveChangesAsync(cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
+        });
 
         return Result<ScoringPolicyDto>.Ok(MapToDto(policy));
     }

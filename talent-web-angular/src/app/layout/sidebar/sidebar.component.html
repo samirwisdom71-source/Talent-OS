@@ -60,14 +60,13 @@
       @for (item of visibleFlatItems(); track item.path) {
         <a
           class="sidebar__link"
+          [class.sidebar__link--active]="linkIsActive(item.path)"
           [attr.data-tooltip]="item.labelKey | t"
           (mouseenter)="showTooltip($event, tooltipLabel(item.labelKey))"
           (mouseleave)="hideTooltip()"
           (blur)="hideTooltip()"
           (click)="closeMobileSidebar()"
           [routerLink]="item.path"
-          routerLinkActive="sidebar__link--active"
-          [routerLinkActiveOptions]="{ exact: linkExact(item.path) }"
         >
           <span class="sidebar__icon" aria-hidden="true">
             <i [class]="iconFor(item.path)"></i>
@@ -103,14 +102,13 @@
               @for (item of group.items; track item.path) {
                 <a
                   class="sidebar__link sidebar__link--nested"
+                  [class.sidebar__link--active]="linkIsActive(item.path)"
                   [attr.data-tooltip]="item.labelKey | t"
                   (mouseenter)="showTooltip($event, tooltipLabel(item.labelKey))"
                   (mouseleave)="hideTooltip()"
                   (blur)="hideTooltip()"
                   (click)="closeMobileSidebar()"
                   [routerLink]="item.path"
-                  routerLinkActive="sidebar__link--active"
-                  [routerLinkActiveOptions]="{ exact: linkExact(item.path) }"
                 >
                   <span class="sidebar__icon" aria-hidden="true">
                     <i [class]="iconFor(item.path)"></i>

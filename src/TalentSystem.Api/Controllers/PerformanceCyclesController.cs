@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using TalentSystem.Api.Extensions;
+using TalentSystem.Application.Features.Identity.DTOs;
 using TalentSystem.Application.Features.Performance.DTOs;
 using TalentSystem.Application.Features.Performance.Interfaces;
 using TalentSystem.Shared.Api;
@@ -65,6 +66,23 @@ public sealed class PerformanceCyclesController : ControllerBase
         if (result.IsSuccess)
         {
             return Ok(ApiResponse<PagedResult<PerformanceCycleDto>>.FromSuccess(result.Value!, traceId));
+        }
+
+        return result.ToFailureActionResult(this, traceId);
+    }
+
+    /// <summary>قائمة مختصرة (معرّف + اسم) للقوائم المنسدلة.</summary>
+    [HttpGet("lookup")]
+    public async Task<IActionResult> GetLookup(
+        [FromQuery] PerformanceCycleLookupRequest request,
+        CancellationToken cancellationToken)
+    {
+        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var result = await _service.GetLookupAsync(request, cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return Ok(ApiResponse<IReadOnlyList<LookupItemDto>>.FromSuccess(result.Value!, traceId));
         }
 
         return result.ToFailureActionResult(this, traceId);

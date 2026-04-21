@@ -9,6 +9,7 @@ import {
   CreateCompetencyLevelRequest,
   UpdateCompetencyLevelRequest,
 } from '../shared/models/competency-level.models';
+import { LookupItemDto } from '../shared/models/lookup.models';
 import { toHttpParams, unwrapApiResponse } from '../shared/utils/api-helpers';
 
 @Injectable({ providedIn: 'root' })
@@ -24,6 +25,17 @@ export class CompetencyLevelsApiService {
     });
     return this.http
       .get<ApiResponse<PagedResult<CompetencyLevelDto>>>(this.base, { params })
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  /** GET /api/competency-levels/lookup */
+  getLookup(filter: { search?: string | null; take?: number }) {
+    const params = toHttpParams({
+      search: filter.search ?? undefined,
+      take: filter.take ?? 200,
+    });
+    return this.http
+      .get<ApiResponse<LookupItemDto[]>>(`${this.base}/lookup`, { params })
       .pipe(map((r) => unwrapApiResponse(r)));
   }
 

@@ -24,3 +24,15 @@ export interface TalentClassificationFilterRequest {
   performanceBand?: number | null;
   potentialBand?: number | null;
 }
+
+export interface ClassifyTalentClassificationRequest {
+  employeeId: string;
+  performanceCycleId: string;
+  notes?: string | null;
+}
+
+export interface ReclassifyTalentClassificationRequest {
+  employeeId: string;
+  performanceCycleId: string;
+  notes?: string | null;
+}

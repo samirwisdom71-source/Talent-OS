@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { PermissionCodes } from '../../shared/models/permission-codes';
 import { I18nService } from '../../shared/services/i18n.service';
@@ -21,13 +21,14 @@ interface NavGroup {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, TranslatePipe],
+  imports: [RouterLink, TranslatePipe],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
   private readonly auth = inject(AuthService);
   private readonly i18n = inject(I18nService);
+  private readonly router = inject(Router);
   readonly layout = inject(LayoutStateService);
   readonly collapsed = signal(false);
   readonly tooltipOpen = signal(false);
@@ -48,7 +49,17 @@ export class SidebarComponent {
     {
       id: 'people',
       titleKey: 'nav.group.people',
-      items: [{ path: '/employees', labelKey: 'nav.employees', permissions: [] }],
+      items: [
+        { path: '/employees', labelKey: 'nav.employees', permissions: [] },
+        { path: '/organization-units', labelKey: 'nav.organizationUnits', permissions: [PermissionCodes.EmployeeEdit] },
+        { path: '/positions', labelKey: 'nav.positions', permissions: [PermissionCodes.EmployeeEdit] },
+        {
+          path: '/succession/critical-positions',
+          labelKey: 'nav.criticalPositions',
+          permissions: [PermissionCodes.SuccessionView, PermissionCodes.SuccessionManage],
+        },
+        { path: '/job-grades', labelKey: 'nav.jobGrades', permissions: [PermissionCodes.EmployeeEdit] },
+      ],
     },
     {
       id: 'identity',
@@ -69,6 +80,11 @@ export class SidebarComponent {
         },
         { path: '/competencies', labelKey: 'nav.competencies', permissions: [PermissionCodes.CompetencyEdit] },
         { path: '/competency-levels', labelKey: 'nav.competencyLevels', permissions: [PermissionCodes.CompetencyEdit] },
+        {
+          path: '/job-competency-requirements',
+          labelKey: 'nav.jobCompetencyRequirements',
+          permissions: [PermissionCodes.CompetencyEdit],
+        },
       ],
     },
     {
@@ -78,6 +94,8 @@ export class SidebarComponent {
         { path: '/talent/performance', labelKey: 'nav.performance', permissions: [] },
         { path: '/talent/potential', labelKey: 'nav.potential', permissions: [] },
         { path: '/talent/nine-box', labelKey: 'nav.nineBox', permissions: [] },
+        { path: '/scoring-policies', labelKey: 'nav.scoringPolicies', permissions: [PermissionCodes.ScoringView, PermissionCodes.ScoringManage] },
+        { path: '/talent/analytics', labelKey: 'nav.talentAnalytics', permissions: [] },
         { path: '/succession', labelKey: 'nav.succession', permissions: [] },
         { path: '/development', labelKey: 'nav.development', permissions: [] },
         { path: '/marketplace', labelKey: 'nav.marketplace', permissions: [] },
@@ -213,15 +231,27 @@ export class SidebarComponent {
     const icons: Record<string, string> = {
       '/dashboard': 'fa-solid fa-gauge-high',
       '/employees': 'fa-solid fa-users',
+      '/organization-units': 'fa-solid fa-building',
+      '/positions': 'fa-solid fa-briefcase',
+      '/job-grades': 'fa-solid fa-layer-group',
       '/users': 'fa-solid fa-user-shield',
       '/roles': 'fa-solid fa-user-gear',
       '/competency-categories': 'fa-solid fa-layer-group',
       '/competencies': 'fa-solid fa-list-check',
       '/competency-levels': 'fa-solid fa-stairs',
+      '/job-competency-requirements': 'fa-solid fa-link',
       '/talent/performance': 'fa-solid fa-chart-line',
       '/talent/potential': 'fa-solid fa-seedling',
       '/talent/nine-box': 'fa-solid fa-table-cells-large',
+      '/scoring-policies': 'fa-solid fa-scale-balanced',
+      '/talent/analytics': 'fa-solid fa-chart-pie',
+      '/talent/classifications': 'fa-solid fa-tags',
+      '/talent/scores': 'fa-solid fa-calculator',
       '/succession': 'fa-solid fa-sitemap',
+      '/succession/plans': 'fa-solid fa-list-check',
+      '/succession/analytics': 'fa-solid fa-chart-simple',
+      '/succession/successor-candidates': 'fa-solid fa-user-group',
+      '/succession/critical-positions': 'fa-solid fa-bullseye',
       '/development': 'fa-solid fa-graduation-cap',
       '/marketplace': 'fa-solid fa-store',
       '/analytics/executive': 'fa-solid fa-chart-column',
@@ -236,7 +266,50 @@ export class SidebarComponent {
     return icons[path] ?? 'fa-solid fa-circle-dot';
   }
 
-  linkExact(path: string): boolean {
-    return path === '/dashboard';
+  /**
+   * «التعاقب» يبقى مُضاءً لـ /succession و /succession/plans/… فقط،
+   * ولا يُفعَّل عند /succession/critical-positions.
+   */
+  linkIsActive(path: string): boolean {
+    const current = this.normalizePath(this.router.url);
+    if (path === '/dashboard') {
+      return current === '/dashboard' || current === '';
+    }
+    if (path === '/talent/performance') {
+      return current === '/talent/performance' || current.startsWith('/talent/performance/');
+    }
+    if (path === '/talent/analytics') {
+      return (
+        current === '/talent/analytics' ||
+        current === '/talent/classifications' ||
+        current === '/talent/scores'
+      );
+    }
+    if (path === '/succession') {
+      if (current === '/succession/critical-positions') return false;
+      return (
+        current === '/succession' ||
+        current.startsWith('/succession/plans') ||
+        current === '/succession/analytics' ||
+        current === '/succession/successor-candidates'
+      );
+    }
+    if (path === '/succession/critical-positions') {
+      return current === '/succession/critical-positions';
+    }
+    return this.router.isActive(path, {
+      paths: 'subset',
+      queryParams: 'ignored',
+      fragment: 'ignored',
+      matrixParams: 'ignored',
+    });
+  }
+
+  private normalizePath(url: string): string {
+    const p = (url.split('?')[0] ?? url).trim();
+    if (p.length > 1 && p.endsWith('/')) {
+      return p.slice(0, -1);
+    }
+    return p;
   }
 }

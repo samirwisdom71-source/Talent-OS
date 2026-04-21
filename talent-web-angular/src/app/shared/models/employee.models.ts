@@ -35,3 +35,12 @@ export interface CreateEmployeeRequest {
   organizationUnitId: string;
   positionId: string;
 }
+
+export interface UpdateEmployeeRequest {
+  employeeNumber: string;
+  fullNameAr: string;
+  fullNameEn: string;
+  email: string;
+  organizationUnitId: string;
+  positionId: string;
+}

@@ -1,0 +1,307 @@
+<div class="page-head-row sp-head">
+  <section class="page-head">
+    <h1>{{ 'talentClassificationsAdmin.title' | t }}</h1>
+    <p class="page-head__sub">{{ 'talentClassificationsAdmin.subtitle' | t }}</p>
+  </section>
+  @if (canManage()) {
+    <div class="page-actions">
+      <button type="button" class="btn-head-primary" (click)="openClassify()">
+        <span class="btn-head-primary__ico" aria-hidden="true">+</span>
+        <span>{{ 'talentClassificationsAdmin.classify' | t }}</span>
+      </button>
+      <button type="button" class="btn-ghost" (click)="openReclassify()">{{ 'talentClassificationsAdmin.reclassify' | t }}</button>
+    </div>
+  }
+</div>
+
+<section class="toolbar card sp-toolbar">
+  <div class="toolbar__inner">
+    <div class="toolbar__field toolbar__field--combo">
+      <span class="toolbar__label">{{ 'talentClassificationsAdmin.filter.employee' | t }}</span>
+      <app-lookup-search-combo
+        kind="employee"
+        [(value)]="filterEmployeeId"
+        [placeholder]="('talentClassificationsAdmin.combo.searchEmployee' | t)"
+      />
+    </div>
+    <div class="toolbar__field toolbar__field--combo">
+      <span class="toolbar__label">{{ 'talentClassificationsAdmin.filter.cycle' | t }}</span>
+      <app-lookup-search-combo
+        kind="performanceCycle"
+        [(value)]="filterPerformanceCycleId"
+        [placeholder]="('talentClassificationsAdmin.combo.searchCycle' | t)"
+      />
+    </div>
+    <label class="toolbar__field">
+      <span class="toolbar__label">{{ 'talentClassificationsAdmin.filter.nineBox' | t }}</span>
+      <select class="toolbar__select" [(ngModel)]="filterNineBoxCode">
+        <option [ngValue]="''">{{ 'successionPlansList.filter.all' | t }}</option>
+        @for (code of [1, 2, 3, 4, 5, 6, 7, 8, 9]; track code) {
+          <option [ngValue]="code">{{ nineBoxLabel(code) }}</option>
+        }
+      </select>
+    </label>
+    <button type="button" class="btn-toolbar-apply" (click)="applyFilters()">{{ 'talentAnalytics.apply' | t }}</button>
+    <div class="sp-view-mode" role="group" [attr.aria-label]="'common.view' | t">
+      <button type="button" class="sp-mode-btn" [class.sp-mode-btn--active]="viewMode() === 'table'" (click)="viewMode.set('table')">
+        {{ 'successionPlansList.view.table' | t }}
+      </button>
+      <button type="button" class="sp-mode-btn" [class.sp-mode-btn--active]="viewMode() === 'cards'" (click)="viewMode.set('cards')">
+        {{ 'successionPlansList.view.cards' | t }}
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="card ta-lookup">
+  <h2 class="ta-section-title">{{ 'talentClassificationsAdmin.lookup.title' | t }}</h2>
+  <p class="muted">{{ 'talentClassificationsAdmin.lookup.subtitle' | t }}</p>
+  <div class="toolbar__inner lookup-row lookup-row--combo">
+    <div class="toolbar__field toolbar__field--combo">
+      <span class="toolbar__label">{{ 'talentClassificationsAdmin.filter.employee' | t }}</span>
+      <app-lookup-search-combo kind="employee" [(value)]="lookupEmployeeId" [placeholder]="('talentClassificationsAdmin.combo.searchEmployee' | t)" />
+    </div>
+    <div class="toolbar__field toolbar__field--combo">
+      <span class="toolbar__label">{{ 'talentClassificationsAdmin.filter.cycle' | t }}</span>
+      <app-lookup-search-combo kind="performanceCycle" [(value)]="lookupCycleId" [placeholder]="('talentClassificationsAdmin.combo.searchCycle' | t)" />
+    </div>
+    <button type="button" class="btn-toolbar-apply" (click)="runLookup()" [disabled]="lookupBusy()">
+      {{ 'talentClassificationsAdmin.lookup.run' | t }}
+    </button>
+  </div>
+  @if (lookupBusy()) {
+    <p class="muted">{{ 'common.loading' | t }}</p>
+  } @else if (lookupResult()) {
+    <div class="details-grid lookup-result">
+      <div class="detail-item">
+        <span>{{ 'talentClassificationsAdmin.table.nineBox' | t }}</span><strong>{{ nineBoxLabel(lookupResult()!.nineBoxCode) }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>{{ 'talentClassificationsAdmin.table.category' | t }}</span><strong>{{ lookupResult()!.categoryName }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>{{ 'talentClassificationsAdmin.table.bands' | t }}</span><strong>{{ perfPotLabels(lookupResult()!) }}</strong>
+      </div>
+      <div class="detail-item">
+        <span>{{ 'talentClassificationsAdmin.table.classifiedOn' | t }}</span>
+        <strong>{{ lookupResult()!.classifiedOnUtc | date: 'yyyy-MM-dd HH:mm' }}</strong>
+      </div>
+    </div>
+  }
+</section>
+
+@if (failed()) {
+  <div class="card card--muted">{{ 'talentClassificationsAdmin.error.loadList' | t }}</div>
+} @else if (viewMode() === 'table') {
+  <div class="table-shell card">
+    @if (busy()) {
+      <div class="table-shell__loading">{{ 'common.loading' | t }}</div>
+    }
+    <div class="table-scroll">
+      <table class="data-table sp-table">
+        <thead>
+          <tr>
+            <th>{{ 'talentClassificationsAdmin.table.employee' | t }}</th>
+            <th>{{ 'talentClassificationsAdmin.table.cycle' | t }}</th>
+            <th>{{ 'talentClassificationsAdmin.table.nineBox' | t }}</th>
+            <th>{{ 'talentClassificationsAdmin.table.flags' | t }}</th>
+            <th>{{ 'talentClassificationsAdmin.table.classifiedOn' | t }}</th>
+            <th class="actions-col-head">{{ 'common.actions' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of result()?.items ?? []; track row.id) {
+            <tr>
+              <td>
+                <span class="cell-strong">{{ employeeName(row.employeeId) }}</span>
+              </td>
+              <td class="muted">{{ cycleName(row.performanceCycleId) }}</td>
+              <td>{{ nineBoxLabel(row.nineBoxCode) }}</td>
+              <td>
+                @if (row.isHighPotential) {
+                  <span class="level-pill">{{ 'talentClassificationsAdmin.badges.hipo' | t }}</span>
+                }
+                @if (row.isHighPerformer) {
+                  <span class="level-pill">{{ 'talentClassificationsAdmin.badges.hiperf' | t }}</span>
+                }
+                @if (!row.isHighPotential && !row.isHighPerformer) {
+                  —
+                }
+              </td>
+              <td class="muted">{{ row.classifiedOnUtc | date: 'yyyy-MM-dd' }}</td>
+              <td class="cell-actions">
+                <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">
+                  {{ 'successionPlansList.actions.details' | t }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pager sp-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!result()?.hasPreviousPage">{{ 'common.previous' | t }}</button>
+      <span class="pager__meta">{{ result()?.page ?? 1 }} / {{ result()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!result()?.hasNextPage">{{ 'common.next' | t }}</button>
+    </div>
+  </div>
+} @else {
+  <section class="sp-cards-wrap card" [attr.aria-busy]="busy() ? 'true' : 'false'">
+    @if (busy()) {
+      <div class="sp-cards-loading">{{ 'common.loading' | t }}</div>
+    }
+    <div class="sp-cards-grid">
+      @for (row of result()?.items ?? []; track row.id; let i = $index) {
+        <article class="sp-card" [style.animation-delay.ms]="i * 35">
+          <header class="sp-card__head">
+            <strong class="sp-card__title">{{ employeeName(row.employeeId) }}</strong>
+            <span class="level-pill">{{ nineBoxLabel(row.nineBoxCode) }}</span>
+          </header>
+          <p class="sp-card__sub muted">{{ cycleName(row.performanceCycleId) }}</p>
+          <p class="sp-card__sub">{{ perfPotLabels(row) }}</p>
+          <footer class="sp-card__actions">
+            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">
+              {{ 'successionPlansList.actions.details' | t }}
+            </button>
+          </footer>
+        </article>
+      }
+    </div>
+    <div class="pager sp-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!result()?.hasPreviousPage">{{ 'common.previous' | t }}</button>
+      <span class="pager__meta">{{ result()?.page ?? 1 }} / {{ result()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!result()?.hasNextPage">{{ 'common.next' | t }}</button>
+    </div>
+  </section>
+}
+
+@if (detailsOpen() && selected()) {
+  <div class="modal-backdrop" (click)="detailsOpen.set(false)"></div>
+  <section class="modal sp-modal sp-modal--details" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'talentClassificationsAdmin.detailsModal.title' | t }}</h2>
+        <p>{{ employeeName(selected()!.employeeId) }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="detailsOpen.set(false)" [attr.aria-label]="'successorCandidates.modal.close' | t">×</button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="details-grid">
+        <div class="detail-item">
+          <span>{{ 'talentClassificationsAdmin.table.cycle' | t }}</span><strong>{{ cycleName(selected()!.performanceCycleId) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'talentClassificationsAdmin.table.nineBox' | t }}</span><strong>{{ nineBoxLabel(selected()!.nineBoxCode) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'talentClassificationsAdmin.table.category' | t }}</span><strong>{{ selected()!.categoryName }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'talentClassificationsAdmin.table.bands' | t }}</span><strong>{{ perfPotLabels(selected()!) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'talentClassificationsAdmin.table.flags' | t }}</span>
+          <strong>
+            @if (selected()!.isHighPotential) {
+              {{ 'talentClassificationsAdmin.badges.hipo' | t }}
+            }
+            @if (selected()!.isHighPerformer) {
+              {{ 'talentClassificationsAdmin.badges.hiperf' | t }}
+            }
+            @if (!selected()!.isHighPotential && !selected()!.isHighPerformer) {
+              —
+            }
+          </strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'successionPlansList.form.notes' | t }}</span><strong>{{ selected()!.notes || '—' }}</strong>
+        </div>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="detailsOpen.set(false)">{{ 'successorCandidates.modal.close' | t }}</button>
+    </footer>
+  </section>
+}
+
+@if (classifyOpen()) {
+  <div class="modal-backdrop" (click)="classifyOpen.set(false)"></div>
+  <section class="modal sp-modal" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'talentClassificationsAdmin.classifyModal.title' | t }}</h2>
+        <p>{{ 'talentClassificationsAdmin.classifyModal.subtitle' | t }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="classifyOpen.set(false)" [attr.aria-label]="'successorCandidates.modal.close' | t">×</button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="form-grid">
+        <div class="field field--full">
+          <span class="field-label">{{ 'talentClassificationsAdmin.form.employee' | t }}</span>
+          <app-lookup-search-combo
+            kind="employee"
+            [(value)]="classifyModel.employeeId"
+            [placeholder]="('talentClassificationsAdmin.combo.searchEmployee' | t)"
+          />
+        </div>
+        <div class="field field--full">
+          <span class="field-label">{{ 'talentClassificationsAdmin.filter.cycle' | t }}</span>
+          <app-lookup-search-combo
+            kind="performanceCycle"
+            [(value)]="classifyModel.performanceCycleId"
+            [placeholder]="('talentClassificationsAdmin.combo.searchCycle' | t)"
+          />
+        </div>
+        <label class="field field--full">
+          <span>{{ 'successionPlansList.form.notes' | t }}</span>
+          <textarea [(ngModel)]="classifyModel.notes" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="classifyOpen.set(false)">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveClassify()">{{ 'criticalPositions.save' | t }}</button>
+    </footer>
+  </section>
+}
+
+@if (reclassifyOpen()) {
+  <div class="modal-backdrop" (click)="reclassifyOpen.set(false)"></div>
+  <section class="modal sp-modal" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'talentClassificationsAdmin.reclassifyModal.title' | t }}</h2>
+        <p>{{ 'talentClassificationsAdmin.reclassifyModal.subtitle' | t }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="reclassifyOpen.set(false)" [attr.aria-label]="'successorCandidates.modal.close' | t">×</button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="form-grid">
+        <div class="field field--full">
+          <span class="field-label">{{ 'talentClassificationsAdmin.form.employee' | t }}</span>
+          <app-lookup-search-combo
+            kind="employee"
+            [(value)]="reclassifyModel.employeeId"
+            [placeholder]="('talentClassificationsAdmin.combo.searchEmployee' | t)"
+          />
+        </div>
+        <div class="field field--full">
+          <span class="field-label">{{ 'talentClassificationsAdmin.filter.cycle' | t }}</span>
+          <app-lookup-search-combo
+            kind="performanceCycle"
+            [(value)]="reclassifyModel.performanceCycleId"
+            [placeholder]="('talentClassificationsAdmin.combo.searchCycle' | t)"
+          />
+        </div>
+        <label class="field field--full">
+          <span>{{ 'successionPlansList.form.notes' | t }}</span>
+          <textarea [(ngModel)]="reclassifyModel.notes" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="reclassifyOpen.set(false)">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveReclassify()">{{ 'criticalPositions.save' | t }}</button>
+    </footer>
+  </section>
+}

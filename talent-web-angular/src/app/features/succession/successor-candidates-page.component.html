@@ -1,0 +1,303 @@
+<div class="page-head-row sp-head">
+  <section class="page-head">
+    <h1>{{ 'successorCandidates.title' | t }}</h1>
+    <p class="page-head__sub">{{ 'successorCandidates.subtitle' | t }}</p>
+  </section>
+  @if (canManage()) {
+    <div class="page-actions">
+      <button type="button" class="btn-head-primary" (click)="openCreate()">
+        <span class="btn-head-primary__ico" aria-hidden="true">+</span>
+        <span>{{ 'successorCandidates.create' | t }}</span>
+      </button>
+    </div>
+  }
+</div>
+
+<section class="toolbar card sp-toolbar">
+  <div class="toolbar__inner">
+    <div class="toolbar__field toolbar__field--combo">
+      <span class="toolbar__label">{{ 'successorCandidates.filter.plan' | t }}</span>
+      <app-lookup-search-combo
+        kind="successionPlan"
+        [value]="filterSuccessionPlanId"
+        (valueChange)="onPlanFilterChange($event)"
+        [placeholder]="('talentClassificationsAdmin.combo.searchPlan' | t)"
+      />
+    </div>
+    <div class="sp-view-mode" role="group" [attr.aria-label]="'common.view' | t">
+      <button
+        type="button"
+        class="sp-mode-btn"
+        [class.sp-mode-btn--active]="viewMode() === 'table'"
+        (click)="viewMode.set('table')"
+      >
+        {{ 'successorCandidates.view.table' | t }}
+      </button>
+      <button
+        type="button"
+        class="sp-mode-btn"
+        [class.sp-mode-btn--active]="viewMode() === 'cards'"
+        (click)="viewMode.set('cards')"
+      >
+        {{ 'successorCandidates.view.cards' | t }}
+      </button>
+    </div>
+  </div>
+</section>
+
+@if (!filterSuccessionPlanId) {
+  <div class="card card--muted">{{ 'successorCandidates.empty.pickPlan' | t }}</div>
+} @else if (failed()) {
+  <div class="card card--muted">{{ 'successorCandidates.error.loadList' | t }}</div>
+} @else if (viewMode() === 'table') {
+  <div class="table-shell card">
+    @if (busy()) {
+      <div class="table-shell__loading">{{ 'common.loading' | t }}</div>
+    }
+    <div class="table-scroll">
+      <table class="data-table sp-table">
+        <thead>
+          <tr>
+            <th>{{ 'successorCandidates.table.employee' | t }}</th>
+            <th>{{ 'successorCandidates.table.readiness' | t }}</th>
+            <th>{{ 'successorCandidates.table.rank' | t }}</th>
+            <th>{{ 'successorCandidates.table.primary' | t }}</th>
+            <th class="actions-col-head">{{ 'common.actions' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of result()?.items ?? []; track row.id) {
+            <tr>
+              <td>
+                <span class="cell-strong">{{ employeeName(row.employeeId) }}</span>
+              </td>
+              <td>{{ readiness(row.readinessLevel) }}</td>
+              <td class="muted">{{ row.rankOrder }}</td>
+              <td>
+                @if (row.isPrimarySuccessor) {
+                  <span class="level-pill">{{ 'successorCandidates.badges.primary' | t }}</span>
+                } @else {
+                  —
+                }
+              </td>
+              <td class="cell-actions">
+                <div class="cell-actions__wrap">
+                  <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">
+                    {{ 'successorCandidates.actions.details' | t }}
+                  </button>
+                  <a class="action-btn action-btn--info" [routerLink]="['/succession/plans', row.successionPlanId]">{{
+                    'successorCandidates.actions.openPlan' | t
+                  }}</a>
+                  @if (canManage()) {
+                    <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">
+                      {{ 'successorCandidates.actions.edit' | t }}
+                    </button>
+                    @if (!row.isPrimarySuccessor) {
+                      <button type="button" class="action-btn action-btn--danger" (click)="markPrimary(row)">
+                        {{ 'successorCandidates.actions.markPrimary' | t }}
+                      </button>
+                    }
+                    <button type="button" class="action-btn action-btn--danger" (click)="remove(row)">
+                      {{ 'successorCandidates.actions.delete' | t }}
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pager sp-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!result()?.hasPreviousPage">
+        {{ 'common.previous' | t }}
+      </button>
+      <span class="pager__meta">{{ result()?.page ?? 1 }} / {{ result()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!result()?.hasNextPage">
+        {{ 'common.next' | t }}
+      </button>
+    </div>
+  </div>
+} @else {
+  <section class="sp-cards-wrap card" [attr.aria-busy]="busy() ? 'true' : 'false'">
+    @if (busy()) {
+      <div class="sp-cards-loading">{{ 'common.loading' | t }}</div>
+    }
+    <div class="sp-cards-grid">
+      @for (row of result()?.items ?? []; track row.id; let i = $index) {
+        <article class="sp-card" [style.animation-delay.ms]="i * 35">
+          <header class="sp-card__head">
+            <strong class="sp-card__title">{{ employeeName(row.employeeId) }}</strong>
+            @if (row.isPrimarySuccessor) {
+              <span class="level-pill">{{ 'successorCandidates.badges.primary' | t }}</span>
+            }
+          </header>
+          <p class="sp-card__sub muted">{{ readiness(row.readinessLevel) }} · #{{ row.rankOrder }}</p>
+          <footer class="sp-card__actions">
+            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">
+              {{ 'successorCandidates.actions.details' | t }}
+            </button>
+            <a class="action-btn action-btn--info" [routerLink]="['/succession/plans', row.successionPlanId]">{{
+              'successorCandidates.actions.openPlan' | t
+            }}</a>
+            @if (canManage()) {
+              <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">
+                {{ 'successorCandidates.actions.edit' | t }}
+              </button>
+              @if (!row.isPrimarySuccessor) {
+                <button type="button" class="action-btn action-btn--danger" (click)="markPrimary(row)">
+                  {{ 'successorCandidates.actions.markPrimary' | t }}
+                </button>
+              }
+              <button type="button" class="action-btn action-btn--danger" (click)="remove(row)">
+                {{ 'successorCandidates.actions.delete' | t }}
+              </button>
+            }
+          </footer>
+        </article>
+      }
+    </div>
+    <div class="pager sp-pager">
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!result()?.hasPreviousPage">
+        {{ 'common.previous' | t }}
+      </button>
+      <span class="pager__meta">{{ result()?.page ?? 1 }} / {{ result()?.totalPages ?? 1 }}</span>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!result()?.hasNextPage">
+        {{ 'common.next' | t }}
+      </button>
+    </div>
+  </section>
+}
+
+@if (createOpen()) {
+  <div class="modal-backdrop" (click)="createOpen.set(false)"></div>
+  <section class="modal sp-modal" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'successorCandidates.createModal.title' | t }}</h2>
+        <p>{{ planName(createModel.successionPlanId) }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="createOpen.set(false)" [attr.aria-label]="'successorCandidates.modal.close' | t">
+        ×
+      </button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="form-grid">
+        <div class="field field--full">
+          <span class="field-label">{{ 'successorCandidates.form.employee' | t }}</span>
+          <app-lookup-search-combo
+            kind="employee"
+            [(value)]="createModel.employeeId"
+            [placeholder]="('talentClassificationsAdmin.combo.searchEmployee' | t)"
+          />
+        </div>
+        <label class="field">
+          <span>{{ 'successorCandidates.form.readiness' | t }}</span>
+          <select [(ngModel)]="createModel.readinessLevel">
+            <option [ngValue]="1">{{ readiness(1) }}</option>
+            <option [ngValue]="2">{{ readiness(2) }}</option>
+            <option [ngValue]="3">{{ readiness(3) }}</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>{{ 'successorCandidates.form.rank' | t }}</span>
+          <input type="number" min="1" [(ngModel)]="createModel.rankOrder" />
+        </label>
+        <label class="field field--full sc-check">
+          <input type="checkbox" [(ngModel)]="createModel.isPrimarySuccessor" />
+          <span>{{ 'successorCandidates.form.primary' | t }}</span>
+        </label>
+        <label class="field field--full">
+          <span>{{ 'successionPlansList.form.notes' | t }}</span>
+          <textarea [(ngModel)]="createModel.notes" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="createOpen.set(false)">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveCreate()">{{ 'criticalPositions.save' | t }}</button>
+    </footer>
+  </section>
+}
+
+@if (detailsOpen() && selected()) {
+  <div class="modal-backdrop" (click)="detailsOpen.set(false)"></div>
+  <section class="modal sp-modal sp-modal--details" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'successorCandidates.detailsModal.title' | t }}</h2>
+        <p>{{ planName(selected()!.successionPlanId) }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="detailsOpen.set(false)" [attr.aria-label]="'successorCandidates.modal.close' | t">
+        ×
+      </button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="details-grid">
+        <div class="detail-item">
+          <span>{{ 'successorCandidates.table.employee' | t }}</span>
+          <strong>{{ employeeName(selected()!.employeeId) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'successorCandidates.table.readiness' | t }}</span><strong>{{ readiness(selected()!.readinessLevel) }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'successorCandidates.table.rank' | t }}</span><strong>{{ selected()!.rankOrder }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'successorCandidates.table.primary' | t }}</span><strong>{{ selected()!.isPrimarySuccessor ? ('successorCandidates.badges.primary' | t) : '—' }}</strong>
+        </div>
+        <div class="detail-item">
+          <span>{{ 'successionPlansList.form.notes' | t }}</span><strong>{{ selected()!.notes || '—' }}</strong>
+        </div>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <a class="btn-primary" [routerLink]="['/succession/plans', selected()!.successionPlanId]">{{ 'successorCandidates.actions.openPlan' | t }}</a>
+      <button type="button" class="btn-ghost" (click)="detailsOpen.set(false)">{{ 'successorCandidates.modal.close' | t }}</button>
+    </footer>
+  </section>
+}
+
+@if (editOpen() && selected()) {
+  <div class="modal-backdrop" (click)="editOpen.set(false)"></div>
+  <section class="modal sp-modal" role="dialog" aria-modal="true">
+    <header class="sp-modal__head">
+      <div>
+        <h2>{{ 'successorCandidates.editModal.title' | t }}</h2>
+        <p>{{ employeeName(selected()!.employeeId) }}</p>
+      </div>
+      <button type="button" class="sp-modal__close" (click)="editOpen.set(false)" [attr.aria-label]="'successorCandidates.modal.close' | t">
+        ×
+      </button>
+    </header>
+    <div class="sp-modal__body">
+      <div class="form-grid">
+        <label class="field">
+          <span>{{ 'successorCandidates.form.readiness' | t }}</span>
+          <select [(ngModel)]="editModel.readinessLevel">
+            <option [ngValue]="1">{{ readiness(1) }}</option>
+            <option [ngValue]="2">{{ readiness(2) }}</option>
+            <option [ngValue]="3">{{ readiness(3) }}</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>{{ 'successorCandidates.form.rank' | t }}</span>
+          <input type="number" min="1" [(ngModel)]="editModel.rankOrder" />
+        </label>
+        <label class="field field--full sc-check">
+          <input type="checkbox" [(ngModel)]="editModel.isPrimarySuccessor" />
+          <span>{{ 'successorCandidates.form.primary' | t }}</span>
+        </label>
+        <label class="field field--full">
+          <span>{{ 'successionPlansList.form.notes' | t }}</span>
+          <textarea [(ngModel)]="editModel.notes" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn-ghost" (click)="editOpen.set(false)">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveEdit()">{{ 'criticalPositions.save' | t }}</button>
+    </footer>
+  </section>
+}

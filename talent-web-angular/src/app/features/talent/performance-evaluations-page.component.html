@@ -1,0 +1,218 @@
+<div class="page-head-row">
+  <section class="page-head">
+    <h1>التقييمات</h1>
+    <p class="page-head__sub">تقييم الأداء وربط الدرجة بالموظف والدورة.</p>
+  </section>
+  <div class="head-actions">
+    <button class="btn-primary btn-primary--icon" type="button" (click)="openCreate.set(true)">
+      <span class="btn-ico">+</span>
+      <span>تقييم جديد</span>
+    </button>
+    <a class="btn-secondary" routerLink="/talent/performance">رجوع لمركز الأداء</a>
+  </div>
+</div>
+
+<section class="toolbar card">
+  <div class="toolbar__group">
+    <app-searchable-select
+      [items]="employees()"
+      [ngModel]="filterEmployeeId"
+      (ngModelChange)="onFilterEmployeeChange($event)"
+      (searchChange)="onFilterEmployeeSearch($event)"
+      placeholder="كل الموظفين"
+      searchPlaceholder="ابحث عن موظف..."
+      allLabel="كل الموظفين"
+    />
+    <app-searchable-select
+      [items]="cycles()"
+      [ngModel]="filterCycleId"
+      (ngModelChange)="onFilterCycleChange($event)"
+      (searchChange)="onCycleSearch($event)"
+      placeholder="دورات نشطة فقط"
+      searchPlaceholder="ابحث عن دورة..."
+      allLabel="كل الدورات النشطة"
+    />
+  </div>
+  <div class="view-mode">
+    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='table'" (click)="viewMode='table'">جدول</button>
+    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='cards'" (click)="viewMode='cards'">كارد</button>
+  </div>
+</section>
+
+@if (viewMode === 'table') {
+  <div class="card table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>الموظف</th>
+          <th>الدورة</th>
+          <th>الدرجة</th>
+          <th>الحالة</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows(); track row.id) {
+          <tr>
+            <td><strong>{{ labelFrom(employees(), row.employeeId) }}</strong></td>
+            <td class="muted">{{ cycleDisplayName(row.performanceCycleId) }}</td>
+            <td><span class="score">{{ row.overallScore | number:'1.0-2' }}</span></td>
+            <td><span class="chip" [attr.data-status]="row.status">{{ statusLabel(row.status) }}</span></td>
+            <td><button class="action-btn action-btn--info" type="button" (click)="openRow(row)">تفاصيل</button></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <section class="cards-grid">
+    @for (row of rows(); track row.id; let i = $index) {
+      <article class="score-card" [attr.data-status]="row.status" [style.animation-delay.ms]="i*40" (click)="openRow(row)" (keydown.enter)="openRow(row)" tabindex="0" role="button">
+        <header class="score-card__head">
+          <div>
+            <strong class="score-card__name">{{ labelFrom(employees(), row.employeeId) }}</strong>
+            <span class="score-card__cycle">{{ cycleDisplayName(row.performanceCycleId) }}</span>
+          </div>
+          <span class="chip" [attr.data-status]="row.status">{{ statusLabel(row.status) }}</span>
+        </header>
+
+        <div class="score-card__display">
+          <div class="score-big">
+            <strong>{{ row.overallScore | number:'1.0-2' }}</strong>
+            <span>/ 10</span>
+          </div>
+          <div class="score-card__meter">
+            <div class="meter">
+              <span [style.width.%]="(row.overallScore * 10)"></span>
+            </div>
+            <div class="meter-ticks" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <footer class="score-card__foot">
+          <span>اضغط لعرض التفاصيل والتعديل</span>
+          <span class="arrow" aria-hidden="true">←</span>
+        </footer>
+      </article>
+    }
+  </section>
+}
+
+@if (openCreate()) {
+  <div class="modal-backdrop" (click)="openCreate.set(false)"></div>
+  <section class="modal modal--form" role="dialog" aria-modal="true">
+    <header class="modal__head">
+      <div>
+        <h3>إنشاء تقييم جديد</h3>
+        <p>حدّد الموظف والدورة ثم سجّل الدرجة والتعليقات.</p>
+      </div>
+      <button class="modal__close" type="button" (click)="openCreate.set(false)" aria-label="إغلاق">×</button>
+    </header>
+    <div class="modal__body">
+      <div class="form-grid">
+        <label class="field">
+          <span>الموظف</span>
+          <app-searchable-select
+            [items]="createEmployees()"
+            [(ngModel)]="createModel.employeeId"
+            (searchChange)="onCreateEmployeeSearch($event)"
+            placeholder="اختر موظف"
+            searchPlaceholder="ابحث عن موظف..."
+            [showAllOption]="false"
+          />
+        </label>
+        <label class="field">
+          <span>دورة الأداء</span>
+          <app-searchable-select
+            [items]="cycles()"
+            [(ngModel)]="createModel.performanceCycleId"
+            (searchChange)="onCycleSearch($event)"
+            placeholder="اختر دورة نشطة"
+            searchPlaceholder="ابحث عن دورة..."
+            [showAllOption]="false"
+          />
+        </label>
+        <label class="field">
+          <span>الدرجة الكلية (من 10)</span>
+          <input type="number" min="0" max="10" step="0.1" [(ngModel)]="createModel.overallScore" />
+        </label>
+        <label class="field">
+          <span>الحالة</span>
+          <select [(ngModel)]="createModel.status">
+            <option [ngValue]="1">مسودة</option>
+            <option [ngValue]="2">مُرسل</option>
+            <option [ngValue]="3">قيد المراجعة</option>
+            <option [ngValue]="4">معتمد</option>
+          </select>
+        </label>
+        <label class="field field--full">
+          <span>تعليق المدير</span>
+          <textarea rows="3" [(ngModel)]="createModel.managerComments" placeholder="اكتب ملاحظات المدير..."></textarea>
+        </label>
+        <label class="field field--full">
+          <span>تعليق الموظف</span>
+          <textarea rows="3" [(ngModel)]="createModel.employeeComments" placeholder="اكتب ملاحظات الموظف..."></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <button type="button" class="btn-ghost" (click)="openCreate.set(false)">إلغاء</button>
+      <button type="button" class="btn-primary" (click)="submitCreate()">حفظ التقييم</button>
+    </footer>
+  </section>
+}
+
+@if (openDetails() && selected()) {
+  <div class="modal-backdrop" (click)="openDetails.set(false)"></div>
+  <section class="modal modal--form" role="dialog" aria-modal="true">
+    <header class="modal__head">
+      <div>
+        <h3>تعديل التقييم</h3>
+        <p>{{ labelFrom(employees(), selected()!.employeeId) }} • {{ cycleDisplayName(selected()!.performanceCycleId) }}</p>
+      </div>
+      <button class="modal__close" type="button" (click)="openDetails.set(false)" aria-label="إغلاق">×</button>
+    </header>
+    <div class="modal__body">
+      <div class="summary-row">
+        <div class="summary-block">
+          <span>الدرجة الحالية</span>
+          <strong>{{ selected()!.overallScore | number:'1.0-2' }}<small> / 10</small></strong>
+        </div>
+        <div class="summary-block">
+          <span>الحالة</span>
+          <strong><span class="chip" [attr.data-status]="selected()!.status">{{ statusLabel(selected()!.status) }}</span></strong>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <label class="field">
+          <span>الدرجة (من 10)</span>
+          <input type="number" min="0" max="10" step="0.1" [(ngModel)]="editModel.overallScore" />
+        </label>
+        <label class="field">
+          <span>الحالة</span>
+          <select [(ngModel)]="editModel.status">
+            <option [ngValue]="1">مسودة</option>
+            <option [ngValue]="2">مُرسل</option>
+            <option [ngValue]="3">قيد المراجعة</option>
+            <option [ngValue]="4">معتمد</option>
+          </select>
+        </label>
+        <label class="field field--full">
+          <span>تعليق المدير</span>
+          <textarea rows="3" [(ngModel)]="editModel.managerComments"></textarea>
+        </label>
+        <label class="field field--full">
+          <span>تعليق الموظف</span>
+          <textarea rows="3" [(ngModel)]="editModel.employeeComments"></textarea>
+        </label>
+      </div>
+    </div>
+    <footer class="modal__foot">
+      <button type="button" class="btn-ghost" (click)="openDetails.set(false)">إغلاق</button>
+      <button type="button" class="btn-primary" (click)="saveEdit()">حفظ التعديل</button>
+    </footer>
+  </section>
+}

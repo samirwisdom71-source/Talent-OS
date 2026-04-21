@@ -21,3 +21,6 @@ D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSyste
 D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\obj\Debug\net9.0\refint\TalentSystem.Shared.dll
 D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\obj\Debug\net9.0\TalentSystem.Shared.pdb
 D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Shared\obj\Debug\net9.0\ref\TalentSystem.Shared.dll
+C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Shared.deps.json
+C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Shared.dll
+C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Shared.pdb

@@ -5,6 +5,10 @@ using TalentSystem.Application.Features.Competencies.Services;
 using TalentSystem.Application.Features.Employees.Interfaces;
 using TalentSystem.Application.Features.Employees.Services;
 using TalentSystem.Application.Features.Employees.Validators;
+using TalentSystem.Application.Features.JobArchitecture.Interfaces;
+using TalentSystem.Application.Features.JobArchitecture.Services;
+using TalentSystem.Application.Features.Organizations.Interfaces;
+using TalentSystem.Application.Features.Organizations.Services;
 using TalentSystem.Application.Features.Performance.Interfaces;
 using TalentSystem.Application.Features.Performance.Services;
 using TalentSystem.Application.Features.Potential.Interfaces;
@@ -39,6 +43,9 @@ public static class ApplicationServiceCollectionExtensions
         services.AddValidatorsFromAssemblyContaining<CreateEmployeeRequestValidator>();
 
         services.AddScoped<IEmployeeService, EmployeeService>();
+        services.AddScoped<IOrganizationUnitService, OrganizationUnitService>();
+        services.AddScoped<IPositionService, PositionService>();
+        services.AddScoped<IJobGradeService, JobGradeService>();
 
         services.AddScoped<ICompetencyCategoryService, CompetencyCategoryService>();
         services.AddScoped<ICompetencyService, CompetencyService>();

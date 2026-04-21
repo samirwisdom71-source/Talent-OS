@@ -1,3 +1,4 @@
+using TalentSystem.Application.Features.Identity.DTOs;
 using TalentSystem.Application.Features.Performance.DTOs;
 using TalentSystem.Shared.Api;
 using TalentSystem.Shared.Results;
@@ -19,6 +20,11 @@ public interface IPerformanceCycleService
 
     Task<Result<PagedResult<PerformanceCycleDto>>> GetPagedAsync(
         PerformanceCycleFilterRequest request,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>قائمة { Id, Name } للقوائم المنسدلة — استعلام خفيف دون تواريخ أو وصف كامل.</summary>
+    Task<Result<IReadOnlyList<LookupItemDto>>> GetLookupAsync(
+        PerformanceCycleLookupRequest request,
         CancellationToken cancellationToken = default);
 
     Task<Result<PerformanceCycleDto>> ActivateAsync(Guid id, CancellationToken cancellationToken = default);

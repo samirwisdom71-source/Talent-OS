@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using TalentSystem.Application.Common;
+using TalentSystem.Application.Features.Identity.DTOs;
 using TalentSystem.Application.Features.Succession.DTOs;
 using TalentSystem.Application.Features.Succession.Interfaces;
 using TalentSystem.Domain.Enums;
@@ -176,6 +177,72 @@ public sealed class CriticalPositionService : ICriticalPositionService
             PageSize = pageSize,
             TotalCount = totalCount
         });
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetLookupAsync(
+        CriticalPositionLookupRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var take = request.Take <= 0 ? PaginationConstants.MaxPageSize : request.Take;
+        if (take > PaginationConstants.MaxPageSize)
+        {
+            take = PaginationConstants.MaxPageSize;
+        }
+
+        var preferEn = string.Equals(request.Lang, "en", StringComparison.OrdinalIgnoreCase);
+
+        var query =
+            from cp in _db.CriticalPositions.AsNoTracking()
+            join p in _db.Positions.AsNoTracking() on cp.PositionId equals p.Id
+            select new { cp.Id, cp.RecordStatus, p.TitleAr, p.TitleEn, cp.Notes };
+
+        if (request.ActiveOnly)
+        {
+            query = query.Where(x => x.RecordStatus == RecordStatus.Active);
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            var term = request.Search.Trim();
+            query = query.Where(x =>
+                x.TitleAr.Contains(term) ||
+                x.TitleEn.Contains(term) ||
+                (x.Notes != null && x.Notes.Contains(term)));
+        }
+
+        var rows = await query
+            .OrderBy(x => x.TitleAr)
+            .ThenBy(x => x.Id)
+            .Take(take)
+            .ToListAsync(cancellationToken);
+
+        var list = rows
+            .Select(x => new LookupItemDto
+            {
+                Id = x.Id,
+                Name = preferEn
+                    ? PickBilingualTitle(x.TitleEn, x.TitleAr, x.Id)
+                    : PickBilingualTitle(x.TitleAr, x.TitleEn, x.Id),
+                Email = null
+            })
+            .ToList();
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(list);
+    }
+
+    private static string PickBilingualTitle(string? primary, string? secondary, Guid id)
+    {
+        if (!string.IsNullOrWhiteSpace(primary))
+        {
+            return primary.Trim();
+        }
+
+        if (!string.IsNullOrWhiteSpace(secondary))
+        {
+            return secondary.Trim();
+        }
+
+        return id.ToString();
     }
 
     public async Task<Result<CriticalPositionDto>> DeactivateAsync(Guid id, CancellationToken cancellationToken = default)
