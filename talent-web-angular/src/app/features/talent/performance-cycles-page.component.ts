@@ -10,6 +10,7 @@ import {
   PerformanceCycleDto,
   UpdatePerformanceCycleRequest,
 } from '../../shared/models/performance.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { EnumLabels, UiLang } from '../../shared/utils/enum-labels';
 import { I18nService } from '../../shared/services/i18n.service';
 type ViewMode = 'table' | 'cards';
@@ -17,7 +18,7 @@ type ViewMode = 'table' | 'cards';
 @Component({
   selector: 'app-performance-cycles-page',
   standalone: true,
-  imports: [FormsModule, DatePipe, RouterLink],
+  imports: [FormsModule, DatePipe, RouterLink, TranslatePipe],
   templateUrl: './performance-cycles-page.component.html',
   styleUrl: './performance-cycles-page.component.scss',
 })
@@ -92,14 +93,14 @@ export class PerformanceCyclesPageComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.toast.show('تم إنشاء دورة الأداء', 'success');
+          this.toast.show(this.i18n.t('تم إنشاء دورة الأداء'), 'success');
           this.openCreate.set(false);
           this.actionBusy.set(false);
           this.page = 1;
           this.load();
         },
         error: () => {
-          this.toast.show('تعذر إنشاء الدورة', 'error');
+          this.toast.show(this.i18n.t('تعذر إنشاء الدورة'), 'error');
           this.actionBusy.set(false);
         },
       });
@@ -130,13 +131,13 @@ export class PerformanceCyclesPageComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.toast.show('تم تحديث الدورة', 'success');
+          this.toast.show(this.i18n.t('تم تحديث الدورة'), 'success');
           this.openEdit.set(false);
           this.actionBusy.set(false);
           this.load();
         },
         error: () => {
-          this.toast.show('تعذر تحديث الدورة', 'error');
+          this.toast.show(this.i18n.t('تعذر تحديث الدورة'), 'error');
           this.actionBusy.set(false);
         },
       });
@@ -146,12 +147,12 @@ export class PerformanceCyclesPageComponent implements OnInit {
     this.actionBusy.set(true);
     this.api.activate(row.id).subscribe({
       next: () => {
-        this.toast.show('تم تفعيل الدورة', 'success');
+        this.toast.show(this.i18n.t('تم تفعيل الدورة'), 'success');
         this.actionBusy.set(false);
         this.load();
       },
       error: () => {
-        this.toast.show('تعذر تفعيل الدورة', 'error');
+        this.toast.show(this.i18n.t('تعذر تفعيل الدورة'), 'error');
         this.actionBusy.set(false);
       },
     });
@@ -161,12 +162,12 @@ export class PerformanceCyclesPageComponent implements OnInit {
     this.actionBusy.set(true);
     this.api.close(row.id).subscribe({
       next: () => {
-        this.toast.show('تم إغلاق الدورة', 'success');
+        this.toast.show(this.i18n.t('تم إغلاق الدورة'), 'success');
         this.actionBusy.set(false);
         this.load();
       },
       error: () => {
-        this.toast.show('تعذر إغلاق الدورة', 'error');
+        this.toast.show(this.i18n.t('تعذر إغلاق الدورة'), 'error');
         this.actionBusy.set(false);
       },
     });
@@ -181,7 +182,7 @@ export class PerformanceCyclesPageComponent implements OnInit {
         this.actionBusy.set(false);
       },
       error: () => {
-        this.toast.show('تعذر تحميل التفاصيل', 'error');
+        this.toast.show(this.i18n.t('تعذر تحميل التفاصيل'), 'error');
         this.actionBusy.set(false);
       },
     });

@@ -447,25 +447,46 @@ html[dir='ltr'] .sidebar__link::before {
     top: 0;
     bottom: 0;
     inset-inline-start: 0;
+    inset-inline-end: auto;
     z-index: 70;
     height: auto;
     pointer-events: none;
   }
 
   .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    inset-inline-start: 0;
+    inset-inline-end: auto;
     width: min(288px, 86vw);
     height: 100vh;
-    transform: translateX(104%);
-    transition: transform 0.22s ease;
-    pointer-events: auto;
+    transform: translateX(calc(-100% - 16px));
+    opacity: 0;
+    transition:
+      transform 0.22s ease,
+      opacity 0.22s ease;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  html[dir='rtl'] .sidebar {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+    transform: translateX(calc(100% + 16px));
   }
 
   html[dir='ltr'] .sidebar {
-    transform: translateX(-104%);
+    inset-inline-start: 0;
+    inset-inline-end: auto;
+    transform: translateX(calc(-100% - 16px));
   }
 
   .sidebar.sidebar--mobile-open {
-    transform: translateX(0);
+    transform: translateX(0) !important;
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
   }
 
   .sidebar__collapse {

@@ -3,27 +3,34 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ToastService } from '../../core/services/toast.service';
 import { DevelopmentPlansApiService } from '../../services/development-plans-api.service';
+import { IdentityLookupsApiService } from '../../services/identity-lookups-api.service';
 import { PerformanceCyclesApiService } from '../../services/performance-cycles-api.service';
 import { CreateDevelopmentPlanRequest } from '../../shared/models/development.models';
-import { PerformanceCycleDto } from '../../shared/models/performance.models';
+import { LookupItemDto } from '../../shared/models/lookup.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { I18nService } from '../../shared/services/i18n.service';
+import { EnumLabels } from '../../shared/utils/enum-labels';
 
 @Component({
   selector: 'app-development-create-page',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, TranslatePipe],
   templateUrl: './development-create-page.component.html',
   styleUrl: './development-create-page.component.scss',
 })
 export class DevelopmentCreatePageComponent implements OnInit {
   private readonly api = inject(DevelopmentPlansApiService);
+  private readonly lookups = inject(IdentityLookupsApiService);
   private readonly cyclesApi = inject(PerformanceCyclesApiService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   readonly i18n = inject(I18nService);
 
   readonly busy = signal(false);
-  readonly cycles = signal<readonly PerformanceCycleDto[]>([]);
+  readonly cycles = signal<readonly LookupItemDto[]>([]);
+  readonly employees = signal<readonly LookupItemDto[]>([]);
+
+  readonly sourceOptions: readonly number[] = [1, 2, 3, 4, 5];
 
   model: CreateDevelopmentPlanRequest = {
     employeeId: '',
@@ -35,17 +42,25 @@ export class DevelopmentCreatePageComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.cyclesApi.getPaged({ page: 1, pageSize: 100 }).subscribe({
-      next: (p) => this.cycles.set(p.items),
+    this.lookups.getEmployees('', 200).subscribe({
+      next: (items) => this.employees.set(items),
+      error: () => this.employees.set([]),
+    });
+    this.cyclesApi.getLookup({ lang: this.i18n.lang(), take: 200 }).subscribe({
+      next: (items) => this.cycles.set(items),
       error: () => this.cycles.set([]),
     });
   }
 
-  cycleLabel(c: PerformanceCycleDto): string {
-    return this.i18n.lang() === 'ar' ? c.nameAr || c.nameEn : c.nameEn || c.nameAr;
+  sourceType(v: number): string {
+    return EnumLabels.developmentSourceType(this.i18n.lang(), v);
   }
 
   save(): void {
+    if (!this.model.employeeId || !this.model.performanceCycleId || !this.model.planTitle.trim()) {
+      this.toast.show(this.i18n.t('املأ كل الحقول المطلوبة'), 'error');
+      return;
+    }
     this.busy.set(true);
     const body = {
       ...this.model,
@@ -55,12 +70,12 @@ export class DevelopmentCreatePageComponent implements OnInit {
     this.api.create(body).subscribe({
       next: (plan) => {
         this.busy.set(false);
-        this.toast.show('تم إنشاء الخطة', 'success');
+        this.toast.show(this.i18n.t('تم إنشاء الخطة'), 'success');
         void this.router.navigate(['/development', plan.id]);
       },
       error: () => {
         this.busy.set(false);
-        this.toast.show('تعذر الإنشاء', 'error');
+        this.toast.show(this.i18n.t('تعذر الإنشاء'), 'error');
       },
     });
   }

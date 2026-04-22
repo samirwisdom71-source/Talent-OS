@@ -8,6 +8,7 @@ import { PagedResult } from '../../shared/models/api.types';
 import { TalentDistributionSummaryDto } from '../../shared/models/domain-analytics.models';
 import { TalentClassificationDto } from '../../shared/models/classification.models';
 import { PerformanceCycleDto } from '../../shared/models/performance.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { I18nService } from '../../shared/services/i18n.service';
 import { IdChipComponent } from '../../shared/ui/id-chip.component';
 import { EnumLabels, UiLang } from '../../shared/utils/enum-labels';
@@ -15,7 +16,7 @@ import { EnumLabels, UiLang } from '../../shared/utils/enum-labels';
 @Component({
   selector: 'app-nine-box-page',
   standalone: true,
-  imports: [FormsModule, IdChipComponent],
+  imports: [FormsModule, IdChipComponent, TranslatePipe],
   templateUrl: './nine-box-page.component.html',
   styleUrls: ['./nine-box-page.component.scss', './talent-pages.component.scss'],
 })

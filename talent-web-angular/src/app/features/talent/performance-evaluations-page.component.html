@@ -1,14 +1,14 @@
 <div class="page-head-row">
   <section class="page-head">
-    <h1>التقييمات</h1>
-    <p class="page-head__sub">تقييم الأداء وربط الدرجة بالموظف والدورة.</p>
+    <h1>{{ 'التقييمات' | t }}</h1>
+    <p class="page-head__sub">{{ 'تقييم الأداء وربط الدرجة بالموظف والدورة.' | t }}</p>
   </section>
   <div class="head-actions">
     <button class="btn-primary btn-primary--icon" type="button" (click)="openCreate.set(true)">
       <span class="btn-ico">+</span>
-      <span>تقييم جديد</span>
+      <span>{{ 'تقييم جديد' | t }}</span>
     </button>
-    <a class="btn-secondary" routerLink="/talent/performance">رجوع لمركز الأداء</a>
+    <a class="btn-secondary" routerLink="/talent/performance">{{ 'رجوع لمركز الأداء' | t }}</a>
   </div>
 </div>
 
@@ -19,23 +19,23 @@
       [ngModel]="filterEmployeeId"
       (ngModelChange)="onFilterEmployeeChange($event)"
       (searchChange)="onFilterEmployeeSearch($event)"
-      placeholder="كل الموظفين"
-      searchPlaceholder="ابحث عن موظف..."
-      allLabel="كل الموظفين"
+      [placeholder]="'كل الموظفين' | t"
+      [searchPlaceholder]="'ابحث عن موظف...' | t"
+      [allLabel]="'كل الموظفين' | t"
     />
     <app-searchable-select
       [items]="cycles()"
       [ngModel]="filterCycleId"
       (ngModelChange)="onFilterCycleChange($event)"
       (searchChange)="onCycleSearch($event)"
-      placeholder="دورات نشطة فقط"
-      searchPlaceholder="ابحث عن دورة..."
-      allLabel="كل الدورات النشطة"
+      [placeholder]="'دورات نشطة فقط' | t"
+      [searchPlaceholder]="'ابحث عن دورة...' | t"
+      [allLabel]="'كل الدورات النشطة' | t"
     />
   </div>
   <div class="view-mode">
-    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='table'" (click)="viewMode='table'">جدول</button>
-    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='cards'" (click)="viewMode='cards'">كارد</button>
+    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='table'" (click)="viewMode='table'">{{ 'جدول' | t }}</button>
+    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='cards'" (click)="viewMode='cards'">{{ 'كارد' | t }}</button>
   </div>
 </section>
 
@@ -44,11 +44,11 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>الموظف</th>
-          <th>الدورة</th>
-          <th>الدرجة</th>
-          <th>الحالة</th>
-          <th>إجراءات</th>
+          <th>{{ 'الموظف' | t }}</th>
+          <th>{{ 'الدورة' | t }}</th>
+          <th>{{ 'الدرجة' | t }}</th>
+          <th>{{ 'الحالة' | t }}</th>
+          <th>{{ 'إجراءات' | t }}</th>
         </tr>
       </thead>
       <tbody>
@@ -58,7 +58,7 @@
             <td class="muted">{{ cycleDisplayName(row.performanceCycleId) }}</td>
             <td><span class="score">{{ row.overallScore | number:'1.0-2' }}</span></td>
             <td><span class="chip" [attr.data-status]="row.status">{{ statusLabel(row.status) }}</span></td>
-            <td><button class="action-btn action-btn--info" type="button" (click)="openRow(row)">تفاصيل</button></td>
+            <td><button class="action-btn action-btn--info" type="button" (click)="openRow(row)">{{ 'تفاصيل' | t }}</button></td>
           </tr>
         }
       </tbody>
@@ -92,7 +92,7 @@
         </div>
 
         <footer class="score-card__foot">
-          <span>اضغط لعرض التفاصيل والتعديل</span>
+          <span>{{ 'اضغط لعرض التفاصيل والتعديل' | t }}</span>
           <span class="arrow" aria-hidden="true">←</span>
         </footer>
       </article>
@@ -105,61 +105,61 @@
   <section class="modal modal--form" role="dialog" aria-modal="true">
     <header class="modal__head">
       <div>
-        <h3>إنشاء تقييم جديد</h3>
-        <p>حدّد الموظف والدورة ثم سجّل الدرجة والتعليقات.</p>
+        <h3>{{ 'إنشاء تقييم جديد' | t }}</h3>
+        <p>{{ 'حدّد الموظف والدورة ثم سجّل الدرجة والتعليقات.' | t }}</p>
       </div>
       <button class="modal__close" type="button" (click)="openCreate.set(false)" aria-label="إغلاق">×</button>
     </header>
     <div class="modal__body">
       <div class="form-grid">
         <label class="field">
-          <span>الموظف</span>
+          <span>{{ 'الموظف' | t }}</span>
           <app-searchable-select
             [items]="createEmployees()"
             [(ngModel)]="createModel.employeeId"
             (searchChange)="onCreateEmployeeSearch($event)"
-            placeholder="اختر موظف"
-            searchPlaceholder="ابحث عن موظف..."
+            [placeholder]="'اختر موظف' | t"
+            [searchPlaceholder]="'ابحث عن موظف...' | t"
             [showAllOption]="false"
           />
         </label>
         <label class="field">
-          <span>دورة الأداء</span>
+          <span>{{ 'دورة الأداء' | t }}</span>
           <app-searchable-select
             [items]="cycles()"
             [(ngModel)]="createModel.performanceCycleId"
             (searchChange)="onCycleSearch($event)"
-            placeholder="اختر دورة نشطة"
-            searchPlaceholder="ابحث عن دورة..."
+            [placeholder]="'اختر دورة نشطة' | t"
+            [searchPlaceholder]="'ابحث عن دورة...' | t"
             [showAllOption]="false"
           />
         </label>
         <label class="field">
-          <span>الدرجة الكلية (من 10)</span>
+          <span>{{ 'الدرجة الكلية (من 10)' | t }}</span>
           <input type="number" min="0" max="10" step="0.1" [(ngModel)]="createModel.overallScore" />
         </label>
         <label class="field">
-          <span>الحالة</span>
+          <span>{{ 'الحالة' | t }}</span>
           <select [(ngModel)]="createModel.status">
-            <option [ngValue]="1">مسودة</option>
-            <option [ngValue]="2">مُرسل</option>
-            <option [ngValue]="3">قيد المراجعة</option>
-            <option [ngValue]="4">معتمد</option>
+            <option [ngValue]="1">{{ 'مسودة' | t }}</option>
+            <option [ngValue]="2">{{ 'مُرسل' | t }}</option>
+            <option [ngValue]="3">{{ 'قيد المراجعة' | t }}</option>
+            <option [ngValue]="4">{{ 'معتمد' | t }}</option>
           </select>
         </label>
         <label class="field field--full">
-          <span>تعليق المدير</span>
-          <textarea rows="3" [(ngModel)]="createModel.managerComments" placeholder="اكتب ملاحظات المدير..."></textarea>
+          <span>{{ 'تعليق المدير' | t }}</span>
+          <textarea rows="3" [(ngModel)]="createModel.managerComments" [placeholder]="'اكتب ملاحظات المدير...' | t"></textarea>
         </label>
         <label class="field field--full">
-          <span>تعليق الموظف</span>
-          <textarea rows="3" [(ngModel)]="createModel.employeeComments" placeholder="اكتب ملاحظات الموظف..."></textarea>
+          <span>{{ 'تعليق الموظف' | t }}</span>
+          <textarea rows="3" [(ngModel)]="createModel.employeeComments" [placeholder]="'اكتب ملاحظات الموظف...' | t"></textarea>
         </label>
       </div>
     </div>
     <footer class="modal__foot">
-      <button type="button" class="btn-ghost" (click)="openCreate.set(false)">إلغاء</button>
-      <button type="button" class="btn-primary" (click)="submitCreate()">حفظ التقييم</button>
+      <button type="button" class="btn-ghost" (click)="openCreate.set(false)">{{ 'إلغاء' | t }}</button>
+      <button type="button" class="btn-primary" (click)="submitCreate()">{{ 'حفظ التقييم' | t }}</button>
     </footer>
   </section>
 }
@@ -169,7 +169,7 @@
   <section class="modal modal--form" role="dialog" aria-modal="true">
     <header class="modal__head">
       <div>
-        <h3>تعديل التقييم</h3>
+        <h3>{{ 'تعديل التقييم' | t }}</h3>
         <p>{{ labelFrom(employees(), selected()!.employeeId) }} • {{ cycleDisplayName(selected()!.performanceCycleId) }}</p>
       </div>
       <button class="modal__close" type="button" (click)="openDetails.set(false)" aria-label="إغلاق">×</button>
@@ -177,42 +177,42 @@
     <div class="modal__body">
       <div class="summary-row">
         <div class="summary-block">
-          <span>الدرجة الحالية</span>
+          <span>{{ 'الدرجة الحالية' | t }}</span>
           <strong>{{ selected()!.overallScore | number:'1.0-2' }}<small> / 10</small></strong>
         </div>
         <div class="summary-block">
-          <span>الحالة</span>
+          <span>{{ 'الحالة' | t }}</span>
           <strong><span class="chip" [attr.data-status]="selected()!.status">{{ statusLabel(selected()!.status) }}</span></strong>
         </div>
       </div>
 
       <div class="form-grid">
         <label class="field">
-          <span>الدرجة (من 10)</span>
+          <span>{{ 'الدرجة (من 10)' | t }}</span>
           <input type="number" min="0" max="10" step="0.1" [(ngModel)]="editModel.overallScore" />
         </label>
         <label class="field">
-          <span>الحالة</span>
+          <span>{{ 'الحالة' | t }}</span>
           <select [(ngModel)]="editModel.status">
-            <option [ngValue]="1">مسودة</option>
-            <option [ngValue]="2">مُرسل</option>
-            <option [ngValue]="3">قيد المراجعة</option>
-            <option [ngValue]="4">معتمد</option>
+            <option [ngValue]="1">{{ 'مسودة' | t }}</option>
+            <option [ngValue]="2">{{ 'مُرسل' | t }}</option>
+            <option [ngValue]="3">{{ 'قيد المراجعة' | t }}</option>
+            <option [ngValue]="4">{{ 'معتمد' | t }}</option>
           </select>
         </label>
         <label class="field field--full">
-          <span>تعليق المدير</span>
+          <span>{{ 'تعليق المدير' | t }}</span>
           <textarea rows="3" [(ngModel)]="editModel.managerComments"></textarea>
         </label>
         <label class="field field--full">
-          <span>تعليق الموظف</span>
+          <span>{{ 'تعليق الموظف' | t }}</span>
           <textarea rows="3" [(ngModel)]="editModel.employeeComments"></textarea>
         </label>
       </div>
     </div>
     <footer class="modal__foot">
-      <button type="button" class="btn-ghost" (click)="openDetails.set(false)">إغلاق</button>
-      <button type="button" class="btn-primary" (click)="saveEdit()">حفظ التعديل</button>
+      <button type="button" class="btn-ghost" (click)="openDetails.set(false)">{{ 'إغلاق' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveEdit()">{{ 'حفظ التعديل' | t }}</button>
     </footer>
   </section>
 }

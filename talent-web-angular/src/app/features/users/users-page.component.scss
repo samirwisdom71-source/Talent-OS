@@ -406,12 +406,14 @@
   }
 
   .modal {
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    transform: none;
     width: auto;
-    inset-inline-start: 0.75rem;
-    inset-inline-end: 0.75rem;
+    max-height: unset;
+    margin: 0;
   }
 
   .data-table {

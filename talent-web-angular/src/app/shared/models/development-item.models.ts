@@ -20,3 +20,22 @@ export interface DevelopmentPlanItemFilterRequest {
 export interface UpdateDevelopmentPlanItemProgressRequest {
   progressPercentage: number;
 }
+
+export interface CreateDevelopmentPlanItemRequest {
+  developmentPlanId: string;
+  title: string;
+  description?: string | null;
+  itemType: number;
+  relatedCompetencyId?: string | null;
+  targetDate?: string | null;
+  notes?: string | null;
+}
+
+export interface UpdateDevelopmentPlanItemRequest {
+  title: string;
+  description?: string | null;
+  itemType: number;
+  relatedCompetencyId?: string | null;
+  targetDate?: string | null;
+  notes?: string | null;
+}

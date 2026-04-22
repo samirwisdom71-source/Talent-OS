@@ -127,6 +127,14 @@ const DEV_ITEM_TYPE: Record<number, { ar: string; en: string }> = {
   8: { ar: 'أخرى', en: 'Other' },
 };
 
+const DEV_SOURCE_TYPE: Record<number, { ar: string; en: string }> = {
+  1: { ar: 'يدوي', en: 'Manual' },
+  2: { ar: 'فجوة كفاءات', en: 'Competency gap' },
+  3: { ar: 'تعاقب', en: 'Succession' },
+  4: { ar: 'أداء', en: 'Performance' },
+  5: { ar: 'إمكانات', en: 'Potential' },
+};
+
 const OPPORTUNITY_TYPE: Record<number, { ar: string; en: string }> = {
   1: { ar: 'مشروع', en: 'Project' },
   2: { ar: 'فريق مهام', en: 'Task force' },
@@ -185,6 +193,7 @@ export const EnumLabels = {
   potentialLevel: (lang: UiLang, v: number | null | undefined) => mapNum(lang, POTENTIAL_LEVEL, v),
   approvalActionType: (lang: UiLang, v: number | null | undefined) => mapNum(lang, APPROVAL_ACTION_TYPE, v),
   developmentItemType: (lang: UiLang, v: number | null | undefined) => mapNum(lang, DEV_ITEM_TYPE, v),
+  developmentSourceType: (lang: UiLang, v: number | null | undefined) => mapNum(lang, DEV_SOURCE_TYPE, v),
   opportunityType: (lang: UiLang, v: number | null | undefined) => mapNum(lang, OPPORTUNITY_TYPE, v),
   criticalityLevel: (lang: UiLang, v: number | null | undefined) => mapNum(lang, LOW_MED_HIGH, v),
   successionRiskLevel: (lang: UiLang, v: number | null | undefined) => mapNum(lang, LOW_MED_HIGH, v),

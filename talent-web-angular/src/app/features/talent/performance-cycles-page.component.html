@@ -1,48 +1,48 @@
 <div class="page-head-row">
   <section class="page-head">
-    <h1>دورات الأداء</h1>
-    <p class="page-head__sub">إدارة كاملة لدورات الأداء مع التفعيل والإغلاق.</p>
+    <h1>{{ 'دورات الأداء' | t }}</h1>
+    <p class="page-head__sub">{{ 'إدارة كاملة لدورات الأداء مع التفعيل والإغلاق.' | t }}</p>
   </section>
   <div class="head-actions">
     <button class="btn-primary btn-primary--icon" type="button" (click)="openCreate.set(true)">
       <span class="btn-ico">+</span>
-      <span>دورة جديدة</span>
+      <span>{{ 'دورة جديدة' | t }}</span>
     </button>
-    <a class="btn-secondary" routerLink="/talent/performance">رجوع لمركز الأداء</a>
+    <a class="btn-secondary" routerLink="/talent/performance">{{ 'رجوع لمركز الأداء' | t }}</a>
   </div>
 </div>
 
 <section class="toolbar card">
   <div class="toolbar__group">
-    <input class="toolbar__search" type="search" [(ngModel)]="search" placeholder="بحث بالاسم..." />
+    <input class="toolbar__search" type="search" [(ngModel)]="search" [placeholder]="'بحث بالاسم...' | t" />
     <select class="toolbar__select" [(ngModel)]="status">
-      <option [ngValue]="''">كل الحالات</option>
-      <option [ngValue]="1">مسودة</option>
-      <option [ngValue]="2">نشط</option>
-      <option [ngValue]="3">مغلق</option>
-      <option [ngValue]="4">مؤرشف</option>
+      <option [ngValue]="''">{{ 'كل الحالات' | t }}</option>
+      <option [ngValue]="1">{{ 'مسودة' | t }}</option>
+      <option [ngValue]="2">{{ 'نشط' | t }}</option>
+      <option [ngValue]="3">{{ 'مغلق' | t }}</option>
+      <option [ngValue]="4">{{ 'مؤرشف' | t }}</option>
     </select>
-    <button type="button" class="btn-primary" (click)="page = 1; load()">تطبيق</button>
+    <button type="button" class="btn-primary" (click)="page = 1; load()">{{ 'تطبيق' | t }}</button>
   </div>
   <div class="view-mode">
-    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='table'" (click)="viewMode='table'">جدول</button>
-    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='cards'" (click)="viewMode='cards'">كارد</button>
+    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='table'" (click)="viewMode='table'">{{ 'جدول' | t }}</button>
+    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='cards'" (click)="viewMode='cards'">{{ 'كارد' | t }}</button>
   </div>
 </section>
 
 @if (failed()) {
-  <div class="card card--muted">تعذر تحميل البيانات.</div>
+  <div class="card card--muted">{{ 'تعذر تحميل البيانات.' | t }}</div>
 } @else if (result()) {
   @if (viewMode === 'table') {
     <div class="card table-card">
       <table class="data-table">
         <thead>
           <tr>
-            <th>الاسم</th>
-            <th>الفترة</th>
-            <th>الحالة</th>
-            <th>الوصف</th>
-            <th class="actions-col-head">إجراءات</th>
+            <th>{{ 'الاسم' | t }}</th>
+            <th>{{ 'الفترة' | t }}</th>
+            <th>{{ 'الحالة' | t }}</th>
+            <th>{{ 'الوصف' | t }}</th>
+            <th class="actions-col-head">{{ 'إجراءات' | t }}</th>
           </tr>
         </thead>
         <tbody>
@@ -60,10 +60,10 @@
               <td class="muted">{{ row.description || '—' }}</td>
               <td class="cell-actions">
                 <div class="cell-actions__wrap">
-                  <button class="action-btn action-btn--info" type="button" (click)="showDetails(row)">تفاصيل</button>
-                  <button class="action-btn action-btn--edit" type="button" (click)="openEditModal(row)">تعديل</button>
-                  <button class="action-btn action-btn--go" type="button" (click)="activate(row)" [disabled]="actionBusy() || row.status !== 1">تفعيل</button>
-                  <button class="action-btn action-btn--stop" type="button" (click)="closeCycle(row)" [disabled]="actionBusy() || row.status !== 2">إغلاق</button>
+                  <button class="action-btn action-btn--info" type="button" (click)="showDetails(row)">{{ 'تفاصيل' | t }}</button>
+                  <button class="action-btn action-btn--edit" type="button" (click)="openEditModal(row)">{{ 'تعديل' | t }}</button>
+                  <button class="action-btn action-btn--go" type="button" (click)="activate(row)" [disabled]="actionBusy() || row.status !== 1">{{ 'تفعيل' | t }}</button>
+                  <button class="action-btn action-btn--stop" type="button" (click)="closeCycle(row)" [disabled]="actionBusy() || row.status !== 2">{{ 'إغلاق' | t }}</button>
                 </div>
               </td>
             </tr>
@@ -84,21 +84,21 @@
           </header>
           <div class="cycle-card__period">
             <div class="period-item">
-              <span>بداية</span>
+              <span>{{ 'بداية' | t }}</span>
               <strong>{{ row.startDate | date:'mediumDate' }}</strong>
             </div>
             <div class="period-divider" aria-hidden="true"></div>
             <div class="period-item">
-              <span>نهاية</span>
+              <span>{{ 'نهاية' | t }}</span>
               <strong>{{ row.endDate | date:'mediumDate' }}</strong>
             </div>
           </div>
-          <p class="cycle-card__desc">{{ row.description || 'لا يوجد وصف' }}</p>
+          <p class="cycle-card__desc">{{ row.description || ('لا يوجد وصف' | t) }}</p>
           <div class="cycle-card__actions">
-            <button class="action-btn action-btn--info" type="button" (click)="showDetails(row)">تفاصيل</button>
-            <button class="action-btn action-btn--edit" type="button" (click)="openEditModal(row)">تعديل</button>
-            <button class="action-btn action-btn--go" type="button" (click)="activate(row)" [disabled]="actionBusy() || row.status !== 1">تفعيل</button>
-            <button class="action-btn action-btn--stop" type="button" (click)="closeCycle(row)" [disabled]="actionBusy() || row.status !== 2">إغلاق</button>
+            <button class="action-btn action-btn--info" type="button" (click)="showDetails(row)">{{ 'تفاصيل' | t }}</button>
+            <button class="action-btn action-btn--edit" type="button" (click)="openEditModal(row)">{{ 'تعديل' | t }}</button>
+            <button class="action-btn action-btn--go" type="button" (click)="activate(row)" [disabled]="actionBusy() || row.status !== 1">{{ 'تفعيل' | t }}</button>
+            <button class="action-btn action-btn--stop" type="button" (click)="closeCycle(row)" [disabled]="actionBusy() || row.status !== 2">{{ 'إغلاق' | t }}</button>
           </div>
         </article>
       }
@@ -113,38 +113,38 @@
   <section class="modal modal--form" role="dialog" aria-modal="true">
     <header class="modal__head">
       <div>
-        <h3>إنشاء دورة جديدة</h3>
-        <p>أضف بيانات الدورة الأساسية ثم احفظ.</p>
+        <h3>{{ 'إنشاء دورة جديدة' | t }}</h3>
+        <p>{{ 'أضف بيانات الدورة الأساسية ثم احفظ.' | t }}</p>
       </div>
-      <button class="modal__close" type="button" (click)="openCreate.set(false)" aria-label="إغلاق">×</button>
+      <button class="modal__close" type="button" (click)="openCreate.set(false)" [attr.aria-label]="'إغلاق' | t">×</button>
     </header>
     <div class="modal__body">
       <div class="form-grid">
         <label class="field">
-          <span>الاسم بالعربية</span>
-          <input [(ngModel)]="createModel.nameAr" placeholder="مثال: دورة 2026 الربع الأول" />
+          <span>{{ 'الاسم بالعربية' | t }}</span>
+          <input [(ngModel)]="createModel.nameAr" [placeholder]="'مثال: دورة 2026 الربع الأول' | t" />
         </label>
         <label class="field">
-          <span>الاسم بالإنجليزية</span>
+          <span>{{ 'الاسم بالإنجليزية' | t }}</span>
           <input [(ngModel)]="createModel.nameEn" placeholder="e.g. 2026 Q1 Cycle" />
         </label>
         <label class="field">
-          <span>تاريخ البداية</span>
+          <span>{{ 'تاريخ البداية' | t }}</span>
           <input type="date" [(ngModel)]="createModel.startDate" />
         </label>
         <label class="field">
-          <span>تاريخ النهاية</span>
+          <span>{{ 'تاريخ النهاية' | t }}</span>
           <input type="date" [(ngModel)]="createModel.endDate" />
         </label>
         <label class="field field--full">
-          <span>الوصف</span>
-          <textarea rows="3" [(ngModel)]="createModel.description" placeholder="اكتب وصفاً مختصراً للدورة..."></textarea>
+          <span>{{ 'الوصف' | t }}</span>
+          <textarea rows="3" [(ngModel)]="createModel.description" [placeholder]="'اكتب وصفاً مختصراً للدورة...' | t"></textarea>
         </label>
       </div>
     </div>
     <footer class="modal__foot">
-      <button type="button" class="btn-ghost" (click)="openCreate.set(false)">إلغاء</button>
-      <button type="button" class="btn-primary" (click)="submitCreate()" [disabled]="actionBusy()">حفظ الدورة</button>
+      <button type="button" class="btn-ghost" (click)="openCreate.set(false)">{{ 'إلغاء' | t }}</button>
+      <button type="button" class="btn-primary" (click)="submitCreate()" [disabled]="actionBusy()">{{ 'حفظ الدورة' | t }}</button>
     </footer>
   </section>
 }
@@ -154,38 +154,38 @@
   <section class="modal modal--form" role="dialog" aria-modal="true">
     <header class="modal__head">
       <div>
-        <h3>تعديل دورة</h3>
-        <p>حدّث بيانات الدورة ثم احفظ التغييرات.</p>
+        <h3>{{ 'تعديل دورة' | t }}</h3>
+        <p>{{ 'حدّث بيانات الدورة ثم احفظ التغييرات.' | t }}</p>
       </div>
-      <button class="modal__close" type="button" (click)="openEdit.set(false)" aria-label="إغلاق">×</button>
+      <button class="modal__close" type="button" (click)="openEdit.set(false)" [attr.aria-label]="'إغلاق' | t">×</button>
     </header>
     <div class="modal__body">
       <div class="form-grid">
         <label class="field">
-          <span>الاسم بالعربية</span>
+          <span>{{ 'الاسم بالعربية' | t }}</span>
           <input [(ngModel)]="editModel.nameAr" />
         </label>
         <label class="field">
-          <span>الاسم بالإنجليزية</span>
+          <span>{{ 'الاسم بالإنجليزية' | t }}</span>
           <input [(ngModel)]="editModel.nameEn" />
         </label>
         <label class="field">
-          <span>تاريخ البداية</span>
+          <span>{{ 'تاريخ البداية' | t }}</span>
           <input type="date" [(ngModel)]="editModel.startDate" />
         </label>
         <label class="field">
-          <span>تاريخ النهاية</span>
+          <span>{{ 'تاريخ النهاية' | t }}</span>
           <input type="date" [(ngModel)]="editModel.endDate" />
         </label>
         <label class="field field--full">
-          <span>الوصف</span>
+          <span>{{ 'الوصف' | t }}</span>
           <textarea rows="3" [(ngModel)]="editModel.description"></textarea>
         </label>
       </div>
     </div>
     <footer class="modal__foot">
-      <button type="button" class="btn-ghost" (click)="openEdit.set(false)">إلغاء</button>
-      <button type="button" class="btn-primary" (click)="submitEdit()" [disabled]="actionBusy()">حفظ التعديل</button>
+      <button type="button" class="btn-ghost" (click)="openEdit.set(false)">{{ 'إلغاء' | t }}</button>
+      <button type="button" class="btn-primary" (click)="submitEdit()" [disabled]="actionBusy()">{{ 'حفظ التعديل' | t }}</button>
     </footer>
   </section>
 }
@@ -196,35 +196,35 @@
     <header class="modal__head">
       <div>
         <h3>{{ name(selected()!) }}</h3>
-        <p>تفاصيل الدورة كاملة.</p>
+        <p>{{ 'تفاصيل الدورة كاملة.' | t }}</p>
       </div>
-      <button class="modal__close" type="button" (click)="openDetails.set(false)" aria-label="إغلاق">×</button>
+      <button class="modal__close" type="button" (click)="openDetails.set(false)" [attr.aria-label]="'إغلاق' | t">×</button>
     </header>
     <div class="modal__body">
       <div class="details-grid">
         <div class="detail-item">
-          <span class="detail-item__label">الحالة</span>
+          <span class="detail-item__label">{{ 'الحالة' | t }}</span>
           <strong class="detail-item__value">
             <span class="chip" [attr.data-status]="selected()!.status">{{ statusLabel(selected()!.status) }}</span>
           </strong>
         </div>
         <div class="detail-item">
-          <span class="detail-item__label">تاريخ البداية</span>
+          <span class="detail-item__label">{{ 'تاريخ البداية' | t }}</span>
           <strong class="detail-item__value">{{ selected()!.startDate | date:'mediumDate' }}</strong>
         </div>
         <div class="detail-item">
-          <span class="detail-item__label">تاريخ النهاية</span>
+          <span class="detail-item__label">{{ 'تاريخ النهاية' | t }}</span>
           <strong class="detail-item__value">{{ selected()!.endDate | date:'mediumDate' }}</strong>
         </div>
         <div class="detail-item detail-item--full">
-          <span class="detail-item__label">الوصف</span>
+          <span class="detail-item__label">{{ 'الوصف' | t }}</span>
           <strong class="detail-item__value">{{ selected()!.description || '—' }}</strong>
         </div>
       </div>
     </div>
     <footer class="modal__foot">
-      <button type="button" class="btn-ghost" (click)="openDetails.set(false)">إغلاق</button>
-      <button type="button" class="btn-primary" (click)="openDetails.set(false); openEditModal(selected()!)">تعديل الدورة</button>
+      <button type="button" class="btn-ghost" (click)="openDetails.set(false)">{{ 'إغلاق' | t }}</button>
+      <button type="button" class="btn-primary" (click)="openDetails.set(false); openEditModal(selected()!)">{{ 'تعديل الدورة' | t }}</button>
     </footer>
   </section>
 }

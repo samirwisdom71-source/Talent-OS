@@ -1,13 +1,13 @@
 <div class="nb">
   <header class="nb__hero">
-    <h1 class="nb__title">مصفوفة الصناديق التسعة</h1>
-    <p class="nb__lead">عرض التصنيفات مع توزيع الخانات من تحليلات المواهب — اختر الدورة والصندوق لتضييق النتائج.</p>
+    <h1 class="nb__title">{{ 'مصفوفة الصناديق التسعة' | t }}</h1>
+    <p class="nb__lead">{{ 'عرض التصنيفات مع توزيع الخانات من تحليلات المواهب — اختر الدورة والصندوق لتضييق النتائج.' | t }}</p>
   </header>
 
   @if (talentSummary() && !summaryFailed()) {
     <div class="card card--interactive nb-distribution">
       <div class="nb__panel-head">
-        <h2 class="nb__panel-title">توزيع الخانات</h2>
+        <h2 class="nb__panel-title">{{ 'توزيع الخانات' | t }}</h2>
         <span class="nb__tag">Talent distribution</span>
       </div>
       <div class="stat-grid">
@@ -20,23 +20,23 @@
       </div>
     </div>
   } @else if (summaryFailed()) {
-    <div class="card card--muted">تعذر تحميل ملخص التوزيع.</div>
+    <div class="card card--muted">{{ 'تعذر تحميل ملخص التوزيع.' | t }}</div>
   }
 
   <div class="toolbar card nb-toolbar card--interactive">
     <label>
-      الدورة
+      {{ 'الدورة' | t }}
       <select class="select" [(ngModel)]="cycleFilterId" (change)="onFiltersChange()">
-        <option value="">كل الدورات</option>
+        <option value="">{{ 'كل الدورات' | t }}</option>
         @for (c of cycles(); track c.id) {
           <option [value]="c.id">{{ cycleLabel(c) }}</option>
         }
       </select>
     </label>
     <label>
-      الصندوق
+      {{ 'الصندوق' | t }}
       <select class="select" [(ngModel)]="filterBox" (change)="onFiltersChange()">
-        <option value="">الكل</option>
+        <option value="">{{ 'الكل' | t }}</option>
         @for (b of [1, 2, 3, 4, 5, 6, 7, 8, 9]; track b) {
           <option [value]="'' + b">{{ nineBoxLabel(b) }}</option>
         }
@@ -45,20 +45,20 @@
   </div>
 
   @if (failed()) {
-    <div class="card card--muted">تعذر التحميل.</div>
+    <div class="card card--muted">{{ 'تعذر التحميل.' | t }}</div>
   } @else if (data()) {
     <div class="card table-card card--interactive">
       <div class="nb__panel-head">
-        <h2 class="nb__panel-title">سجل التصنيفات</h2>
+        <h2 class="nb__panel-title">{{ 'سجل التصنيفات' | t }}</h2>
       </div>
       <div class="nb-table-wrap">
         <table class="data-table">
           <thead>
             <tr>
-              <th>الموظف</th>
-              <th>الدورة</th>
-              <th>الصندوق</th>
-              <th>التصنيف</th>
+              <th>{{ 'الموظف' | t }}</th>
+              <th>{{ 'الدورة' | t }}</th>
+              <th>{{ 'الصندوق' | t }}</th>
+              <th>{{ 'التصنيف' | t }}</th>
               <th>HP</th>
               <th>HiPerf</th>
             </tr>
@@ -67,20 +67,20 @@
             @for (row of data()!.items; track row.id) {
               <tr>
                 <td><app-id-chip [id]="row.employeeId" /></td>
-                <td><app-id-chip label="دورة" [id]="row.performanceCycleId" /></td>
+                <td><app-id-chip [label]="'دورة' | t" [id]="row.performanceCycleId" /></td>
                 <td>{{ nineBoxLabel(row.nineBoxCode) }}</td>
                 <td>{{ row.categoryName }}</td>
-                <td>{{ row.isHighPotential ? 'نعم' : 'لا' }}</td>
-                <td>{{ row.isHighPerformer ? 'نعم' : 'لا' }}</td>
+                <td>{{ row.isHighPotential ? ('نعم' | t) : ('لا' | t) }}</td>
+                <td>{{ row.isHighPerformer ? ('نعم' | t) : ('لا' | t) }}</td>
               </tr>
             }
           </tbody>
         </table>
       </div>
       <div class="pager">
-        <button type="button" (click)="prev()" [disabled]="!data()!.hasPreviousPage">السابق</button>
+        <button type="button" (click)="prev()" [disabled]="!data()!.hasPreviousPage">{{ 'السابق' | t }}</button>
         <span>{{ data()!.page }} / {{ data()!.totalPages || 1 }}</span>
-        <button type="button" (click)="next()" [disabled]="!data()!.hasNextPage">التالي</button>
+        <button type="button" (click)="next()" [disabled]="!data()!.hasNextPage">{{ 'التالي' | t }}</button>
       </div>
     </div>
   } @else {

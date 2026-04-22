@@ -1,37 +1,37 @@
 <div class="page-head-row">
   <section class="page-head">
-    <h1>الدرجات الوظيفية</h1>
-    <p class="page-head__sub">إدارة الدرجات الوظيفية ومستوى كل درجة.</p>
+    <h1>{{ 'الدرجات الوظيفية' | t }}</h1>
+    <p class="page-head__sub">{{ 'إدارة الدرجات الوظيفية ومستوى كل درجة.' | t }}</p>
   </section>
   <div class="page-actions">
     <button type="button" class="btn-primary btn-primary--icon" (click)="openCreate()">
       <span class="btn-ico" aria-hidden="true">＋</span>
-      درجة جديدة
+      {{ 'درجة جديدة' | t }}
     </button>
   </div>
 </div>
 
 <div class="toolbar card card--interactive">
-  <input class="toolbar__search" type="search" [(ngModel)]="search" (keyup.enter)="page = 1; load()" placeholder="بحث بالاسم..." />
-  <input class="toolbar__level" type="number" min="1" [(ngModel)]="level" placeholder="المستوى" />
-  <button type="button" class="btn-primary" (click)="page = 1; load()">تطبيق</button>
+  <input class="toolbar__search" type="search" [(ngModel)]="search" (keyup.enter)="page = 1; load()" [placeholder]="'بحث بالاسم...' | t" />
+  <input class="toolbar__level" type="number" min="1" [(ngModel)]="level" [placeholder]="'المستوى' | t" />
+  <button type="button" class="btn-primary" (click)="page = 1; load()">{{ 'تطبيق' | t }}</button>
   <div class="view-mode">
-    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='table'" (click)="viewMode='table'">جدول</button>
-    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='cards'" (click)="viewMode='cards'">كارد</button>
+    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='table'" (click)="viewMode='table'">{{ 'جدول' | t }}</button>
+    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='cards'" (click)="viewMode='cards'">{{ 'كارد' | t }}</button>
   </div>
 </div>
 
 @if (failed()) {
-  <div class="card card--muted">تعذر تحميل الدرجات الوظيفية.</div>
+  <div class="card card--muted">{{ 'تعذر تحميل الدرجات الوظيفية.' | t }}</div>
 } @else if (result()) {
   @if (viewMode === 'table') {
     <div class="card table-card">
       <table class="data-table">
         <thead>
           <tr>
-            <th>الاسم</th>
-            <th>المستوى</th>
-            <th class="actions-col-head">إجراءات</th>
+            <th>{{ 'الاسم' | t }}</th>
+            <th>{{ 'المستوى' | t }}</th>
+            <th class="actions-col-head">{{ 'إجراءات' | t }}</th>
           </tr>
         </thead>
         <tbody>
@@ -41,8 +41,8 @@
               <td>L{{ row.level }}</td>
               <td class="cell-actions">
                 <div class="cell-actions__wrap">
-                  <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">تفاصيل</button>
-                  <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">تعديل</button>
+                  <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">{{ 'تفاصيل' | t }}</button>
+                  <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">{{ 'تعديل' | t }}</button>
                 </div>
               </td>
             </tr>
@@ -50,9 +50,9 @@
         </tbody>
       </table>
       <div class="pager">
-        <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">السابق</button>
+        <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">{{ 'السابق' | t }}</button>
         <span>{{ result()!.page }} / {{ result()!.totalPages || 1 }}</span>
-        <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">التالي</button>
+        <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">{{ 'التالي' | t }}</button>
       </div>
     </div>
   } @else {
@@ -70,7 +70,7 @@
             </div>
             <div class="entity-card__titles">
               <h3>{{ row.name }}</h3>
-              <span class="sub">درجة وظيفية</span>
+              <span class="sub">{{ 'درجة وظيفية' | t }}</span>
             </div>
             <span class="entity-card__badge">L{{ row.level }}</span>
           </header>
@@ -81,20 +81,20 @@
               }
             </div>
             <span class="chip chip--soft">
-              المستوى: L{{ row.level }}
+              {{ 'المستوى:' | t }} L{{ row.level }}
             </span>
           </div>
           <footer class="entity-card__footer">
-            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">تفاصيل</button>
-            <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">تعديل</button>
+            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">{{ 'تفاصيل' | t }}</button>
+            <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">{{ 'تعديل' | t }}</button>
           </footer>
         </article>
       }
     </div>
     <div class="pager card">
-      <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">السابق</button>
+      <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">{{ 'السابق' | t }}</button>
       <span>{{ result()!.page }} / {{ result()!.totalPages || 1 }}</span>
-      <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">التالي</button>
+      <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">{{ 'التالي' | t }}</button>
     </div>
   }
 } @else if (busy()) {
@@ -104,20 +104,20 @@
 @if (createOpen()) {
   <div class="modal-backdrop" (click)="createOpen.set(false)"></div>
   <section class="modal card" role="dialog" aria-modal="true">
-    <h2>إنشاء درجة وظيفية</h2>
+    <h2>{{ 'إنشاء درجة وظيفية' | t }}</h2>
     <div class="form-grid">
       <label>
-        <span>الاسم</span>
+        <span>{{ 'الاسم' | t }}</span>
         <input type="text" [(ngModel)]="createModel.name" />
       </label>
       <label>
-        <span>المستوى</span>
+        <span>{{ 'المستوى' | t }}</span>
         <input type="number" min="1" [(ngModel)]="createModel.level" />
       </label>
     </div>
     <div class="modal-actions">
-      <button type="button" (click)="createOpen.set(false)" [disabled]="actionBusy()">إلغاء</button>
-      <button type="button" class="btn-primary" (click)="saveCreate()" [disabled]="actionBusy()">حفظ</button>
+      <button type="button" (click)="createOpen.set(false)" [disabled]="actionBusy()">{{ 'إلغاء' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveCreate()" [disabled]="actionBusy()">{{ 'حفظ' | t }}</button>
     </div>
   </section>
 }
@@ -125,20 +125,20 @@
 @if (detailsOpen() && selected()) {
   <div class="modal-backdrop" (click)="detailsOpen.set(false)"></div>
   <section class="modal card modal--wide modal--details" role="dialog" aria-modal="true">
-    <h2>تفاصيل الدرجة الوظيفية</h2>
+    <h2>{{ 'تفاصيل الدرجة الوظيفية' | t }}</h2>
     <div class="details-grid">
       <div class="detail-item">
-        <span>الاسم</span>
+        <span>{{ 'الاسم' | t }}</span>
         <strong>{{ selected()!.name }}</strong>
       </div>
       <div class="detail-item">
-        <span>المستوى</span>
+        <span>{{ 'المستوى' | t }}</span>
         <strong>L{{ selected()!.level }}</strong>
       </div>
     </div>
     <div class="modal-actions">
-      <button type="button" class="action-btn action-btn--ghost" (click)="detailsOpen.set(false)">إغلاق</button>
-      <button type="button" class="action-btn action-btn--edit" (click)="openEdit(selected()!.id)">تعديل</button>
+      <button type="button" class="action-btn action-btn--ghost" (click)="detailsOpen.set(false)">{{ 'إغلاق' | t }}</button>
+      <button type="button" class="action-btn action-btn--edit" (click)="openEdit(selected()!.id)">{{ 'تعديل' | t }}</button>
     </div>
   </section>
 }
@@ -146,20 +146,20 @@
 @if (editOpen() && selected()) {
   <div class="modal-backdrop" (click)="editOpen.set(false)"></div>
   <section class="modal card" role="dialog" aria-modal="true">
-    <h2>تعديل الدرجة الوظيفية</h2>
+    <h2>{{ 'تعديل الدرجة الوظيفية' | t }}</h2>
     <div class="form-grid">
       <label>
-        <span>الاسم</span>
+        <span>{{ 'الاسم' | t }}</span>
         <input type="text" [(ngModel)]="editModel.name" />
       </label>
       <label>
-        <span>المستوى</span>
+        <span>{{ 'المستوى' | t }}</span>
         <input type="number" min="1" [(ngModel)]="editModel.level" />
       </label>
     </div>
     <div class="modal-actions">
-      <button type="button" (click)="editOpen.set(false)" [disabled]="actionBusy()">إلغاء</button>
-      <button type="button" class="btn-primary" (click)="saveEdit()" [disabled]="actionBusy()">حفظ التعديل</button>
+      <button type="button" (click)="editOpen.set(false)" [disabled]="actionBusy()">{{ 'إلغاء' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveEdit()" [disabled]="actionBusy()">{{ 'حفظ التعديل' | t }}</button>
     </div>
   </section>
 }

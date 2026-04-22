@@ -35,3 +35,10 @@ export interface CreateDevelopmentPlanRequest {
   targetCompletionDate?: string | null;
   notes?: string | null;
 }
+
+export interface UpdateDevelopmentPlanRequest {
+  planTitle: string;
+  sourceType: number;
+  targetCompletionDate?: string | null;
+  notes?: string | null;
+}

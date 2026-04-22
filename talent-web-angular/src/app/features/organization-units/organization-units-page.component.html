@@ -1,37 +1,37 @@
 <div class="page-head-row">
   <section class="page-head">
-    <h1>الوحدات التنظيمية</h1>
-    <p class="page-head__sub">إدارة هيكل الوحدات التنظيمية وربط الوحدات الفرعية بالأب.</p>
+    <h1>{{ 'الوحدات التنظيمية' | t }}</h1>
+    <p class="page-head__sub">{{ 'إدارة هيكل الوحدات التنظيمية وربط الوحدات الفرعية بالأب.' | t }}</p>
   </section>
   <div class="page-actions">
     <button type="button" class="btn-primary btn-primary--icon" (click)="openCreate()">
       <span class="btn-ico" aria-hidden="true">＋</span>
-      وحدة تنظيمية جديدة
+      {{ 'وحدة تنظيمية جديدة' | t }}
     </button>
   </div>
 </div>
 
 <div class="toolbar card card--interactive">
-  <input class="toolbar__search" type="search" [(ngModel)]="search" (keyup.enter)="page = 1; load()" placeholder="بحث بالاسم..." />
-  <button type="button" class="btn-primary" (click)="page = 1; load()">بحث</button>
+  <input class="toolbar__search" type="search" [(ngModel)]="search" (keyup.enter)="page = 1; load()" [placeholder]="'بحث بالاسم...' | t" />
+  <button type="button" class="btn-primary" (click)="page = 1; load()">{{ 'بحث' | t }}</button>
   <div class="view-mode">
-    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='table'" (click)="viewMode='table'">جدول</button>
-    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='cards'" (click)="viewMode='cards'">كارد</button>
+    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='table'" (click)="viewMode='table'">{{ 'جدول' | t }}</button>
+    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='cards'" (click)="viewMode='cards'">{{ 'كارد' | t }}</button>
   </div>
 </div>
 
 @if (failed()) {
-  <div class="card card--muted">تعذر تحميل الوحدات التنظيمية.</div>
+  <div class="card card--muted">{{ 'تعذر تحميل الوحدات التنظيمية.' | t }}</div>
 } @else if (result()) {
   @if (viewMode === 'table') {
     <div class="card table-card">
       <table class="data-table">
         <thead>
           <tr>
-            <th>الاسم العربي</th>
-            <th>الاسم الإنجليزي</th>
-            <th>الوحدة الأب</th>
-            <th class="actions-col-head">إجراءات</th>
+            <th>{{ 'الاسم العربي' | t }}</th>
+            <th>{{ 'الاسم الإنجليزي' | t }}</th>
+            <th>{{ 'الوحدة الأب' | t }}</th>
+            <th class="actions-col-head">{{ 'إجراءات' | t }}</th>
           </tr>
         </thead>
         <tbody>
@@ -42,8 +42,8 @@
               <td>{{ row.parentNameAr || row.parentNameEn || '—' }}</td>
               <td class="cell-actions">
                 <div class="cell-actions__wrap">
-                  <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">تفاصيل</button>
-                  <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">تعديل</button>
+                  <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">{{ 'تفاصيل' | t }}</button>
+                  <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">{{ 'تعديل' | t }}</button>
                 </div>
               </td>
             </tr>
@@ -51,9 +51,9 @@
         </tbody>
       </table>
       <div class="pager">
-        <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">السابق</button>
+        <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">{{ 'السابق' | t }}</button>
         <span>{{ result()!.page }} / {{ result()!.totalPages || 1 }}</span>
-        <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">التالي</button>
+        <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">{{ 'التالي' | t }}</button>
       </div>
     </div>
   } @else {
@@ -74,9 +74,9 @@
               <span class="sub">{{ row.nameEn }}</span>
             </div>
             @if (row.parentId) {
-              <span class="entity-card__badge entity-card__badge--soft">فرعية</span>
+              <span class="entity-card__badge entity-card__badge--soft">{{ 'فرعية' | t }}</span>
             } @else {
-              <span class="entity-card__badge">رئيسية</span>
+              <span class="entity-card__badge">{{ 'رئيسية' | t }}</span>
             }
           </header>
           <div class="entity-card__body">
@@ -84,20 +84,20 @@
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 6h16M4 12h10M4 18h16"></path>
               </svg>
-              الأب: {{ row.parentNameAr || row.parentNameEn || '—' }}
+              {{ 'الأب:' | t }} {{ row.parentNameAr || row.parentNameEn || '—' }}
             </span>
           </div>
           <footer class="entity-card__footer">
-            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">تفاصيل</button>
-            <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">تعديل</button>
+            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">{{ 'تفاصيل' | t }}</button>
+            <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">{{ 'تعديل' | t }}</button>
           </footer>
         </article>
       }
     </div>
     <div class="pager card">
-      <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">السابق</button>
+      <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">{{ 'السابق' | t }}</button>
       <span>{{ result()!.page }} / {{ result()!.totalPages || 1 }}</span>
-      <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">التالي</button>
+      <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">{{ 'التالي' | t }}</button>
     </div>
   }
 } @else if (busy()) {
@@ -107,20 +107,20 @@
 @if (createOpen()) {
   <div class="modal-backdrop" (click)="createOpen.set(false)"></div>
   <section class="modal card" role="dialog" aria-modal="true">
-    <h2>إنشاء وحدة تنظيمية</h2>
+    <h2>{{ 'إنشاء وحدة تنظيمية' | t }}</h2>
     <div class="form-grid">
       <label>
-        <span>الاسم العربي</span>
+        <span>{{ 'الاسم العربي' | t }}</span>
         <input type="text" [(ngModel)]="createModel.nameAr" />
       </label>
       <label>
-        <span>الاسم الإنجليزي</span>
+        <span>{{ 'الاسم الإنجليزي' | t }}</span>
         <input type="text" [(ngModel)]="createModel.nameEn" />
       </label>
       <label class="full">
-        <span>الوحدة الأب (اختياري)</span>
+        <span>{{ 'الوحدة الأب (اختياري)' | t }}</span>
         <select [(ngModel)]="createModel.parentId">
-          <option [ngValue]="null">بدون</option>
+          <option [ngValue]="null">{{ 'بدون' | t }}</option>
           @for (item of unitsLookup(); track item.id) {
             <option [ngValue]="item.id">{{ item.name }}</option>
           }
@@ -128,8 +128,8 @@
       </label>
     </div>
     <div class="modal-actions">
-      <button type="button" (click)="createOpen.set(false)" [disabled]="actionBusy()">إلغاء</button>
-      <button type="button" class="btn-primary" (click)="saveCreate()" [disabled]="actionBusy()">حفظ</button>
+      <button type="button" (click)="createOpen.set(false)" [disabled]="actionBusy()">{{ 'إلغاء' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveCreate()" [disabled]="actionBusy()">{{ 'حفظ' | t }}</button>
     </div>
   </section>
 }
@@ -137,24 +137,24 @@
 @if (detailsOpen() && selected()) {
   <div class="modal-backdrop" (click)="detailsOpen.set(false)"></div>
   <section class="modal card modal--wide modal--details" role="dialog" aria-modal="true">
-    <h2>تفاصيل الوحدة التنظيمية</h2>
+    <h2>{{ 'تفاصيل الوحدة التنظيمية' | t }}</h2>
     <div class="details-grid">
       <div class="detail-item">
-        <span>الاسم العربي</span>
+        <span>{{ 'الاسم العربي' | t }}</span>
         <strong>{{ selected()!.nameAr }}</strong>
       </div>
       <div class="detail-item">
-        <span>الاسم الإنجليزي</span>
+        <span>{{ 'الاسم الإنجليزي' | t }}</span>
         <strong>{{ selected()!.nameEn }}</strong>
       </div>
       <div class="detail-item full">
-        <span>الوحدة الأب</span>
+        <span>{{ 'الوحدة الأب' | t }}</span>
         <strong>{{ selected()!.parentNameAr || selected()!.parentNameEn || '—' }}</strong>
       </div>
     </div>
     <div class="modal-actions">
-      <button type="button" class="action-btn action-btn--ghost" (click)="detailsOpen.set(false)">إغلاق</button>
-      <button type="button" class="action-btn action-btn--edit" (click)="openEdit(selected()!.id)">تعديل</button>
+      <button type="button" class="action-btn action-btn--ghost" (click)="detailsOpen.set(false)">{{ 'إغلاق' | t }}</button>
+      <button type="button" class="action-btn action-btn--edit" (click)="openEdit(selected()!.id)">{{ 'تعديل' | t }}</button>
     </div>
   </section>
 }
@@ -162,20 +162,20 @@
 @if (editOpen() && selected()) {
   <div class="modal-backdrop" (click)="editOpen.set(false)"></div>
   <section class="modal card" role="dialog" aria-modal="true">
-    <h2>تعديل الوحدة التنظيمية</h2>
+    <h2>{{ 'تعديل الوحدة التنظيمية' | t }}</h2>
     <div class="form-grid">
       <label>
-        <span>الاسم العربي</span>
+        <span>{{ 'الاسم العربي' | t }}</span>
         <input type="text" [(ngModel)]="editModel.nameAr" />
       </label>
       <label>
-        <span>الاسم الإنجليزي</span>
+        <span>{{ 'الاسم الإنجليزي' | t }}</span>
         <input type="text" [(ngModel)]="editModel.nameEn" />
       </label>
       <label class="full">
-        <span>الوحدة الأب (اختياري)</span>
+        <span>{{ 'الوحدة الأب (اختياري)' | t }}</span>
         <select [(ngModel)]="editModel.parentId">
-          <option [ngValue]="null">بدون</option>
+          <option [ngValue]="null">{{ 'بدون' | t }}</option>
           @for (item of unitsLookup(); track item.id) {
             @if (item.id !== selected()!.id) {
               <option [ngValue]="item.id">{{ item.name }}</option>
@@ -185,8 +185,8 @@
       </label>
     </div>
     <div class="modal-actions">
-      <button type="button" (click)="editOpen.set(false)" [disabled]="actionBusy()">إلغاء</button>
-      <button type="button" class="btn-primary" (click)="saveEdit()" [disabled]="actionBusy()">حفظ التعديل</button>
+      <button type="button" (click)="editOpen.set(false)" [disabled]="actionBusy()">{{ 'إلغاء' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveEdit()" [disabled]="actionBusy()">{{ 'حفظ التعديل' | t }}</button>
     </div>
   </section>
 }

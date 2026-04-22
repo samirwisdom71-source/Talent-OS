@@ -7,13 +7,14 @@ import { PerformanceCyclesApiService } from '../../services/performance-cycles-a
 import { PagedResult } from '../../shared/models/api.types';
 import { PerformanceAnalyticsSummaryDto } from '../../shared/models/domain-analytics.models';
 import { PerformanceCycleDto } from '../../shared/models/performance.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { I18nService } from '../../shared/services/i18n.service';
 import { EnumLabels, UiLang } from '../../shared/utils/enum-labels';
 
 @Component({
   selector: 'app-performance-page',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, RouterLink],
+  imports: [DatePipe, DecimalPipe, RouterLink, TranslatePipe],
   templateUrl: './performance-page.component.html',
   styleUrl: './performance-page.component.scss',
 })

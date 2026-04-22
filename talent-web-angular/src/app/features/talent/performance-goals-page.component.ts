@@ -16,6 +16,7 @@ import {
   PerformanceGoalDto,
   UpdatePerformanceGoalRequest,
 } from '../../shared/models/performance.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { I18nService } from '../../shared/services/i18n.service';
 import { SearchableSelectComponent } from '../../shared/ui/searchable-select.component';
 
@@ -24,7 +25,7 @@ type ViewMode = 'table' | 'cards';
 @Component({
   selector: 'app-performance-goals-page',
   standalone: true,
-  imports: [FormsModule, DecimalPipe, RouterLink, SearchableSelectComponent],
+  imports: [FormsModule, DecimalPipe, RouterLink, SearchableSelectComponent, TranslatePipe],
   templateUrl: './performance-goals-page.component.html',
   styleUrl: './performance-goals-page.component.scss',
 })
@@ -162,7 +163,7 @@ export class PerformanceGoalsPageComponent implements OnInit {
   }
 
   title(row: PerformanceGoalDto): string {
-    return row.titleAr || row.titleEn;
+    return this.i18n.lang() === 'en' ? row.titleEn || row.titleAr : row.titleAr || row.titleEn;
   }
   empName(id: string): string {
     return this.employees().find((x) => x.id === id)?.name ?? id;
@@ -172,6 +173,13 @@ export class PerformanceGoalsPageComponent implements OnInit {
   }
 
   statusLabel(v: number): string {
+    if (this.i18n.lang() === 'en') {
+      if (v === 1) return 'Draft';
+      if (v === 2) return 'Active';
+      if (v === 3) return 'Completed';
+      if (v === 4) return 'Canceled';
+      return `#${v}`;
+    }
     if (v === 1) return 'مسودة';
     if (v === 2) return 'نشط';
     if (v === 3) return 'مكتمل';

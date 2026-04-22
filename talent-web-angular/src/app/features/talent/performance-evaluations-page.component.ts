@@ -16,6 +16,7 @@ import {
   PerformanceEvaluationDto,
   UpdatePerformanceEvaluationRequest,
 } from '../../shared/models/performance.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SearchableSelectComponent } from '../../shared/ui/searchable-select.component';
 import { I18nService } from '../../shared/services/i18n.service';
 type ViewMode = 'table' | 'cards';
@@ -23,7 +24,7 @@ type ViewMode = 'table' | 'cards';
 @Component({
   selector: 'app-performance-evaluations-page',
   standalone: true,
-  imports: [FormsModule, DecimalPipe, RouterLink, SearchableSelectComponent],
+  imports: [FormsModule, DecimalPipe, RouterLink, SearchableSelectComponent, TranslatePipe],
   templateUrl: './performance-evaluations-page.component.html',
   styleUrl: './performance-evaluations-page.component.scss',
 })
@@ -175,6 +176,13 @@ export class PerformanceEvaluationsPageComponent implements OnInit {
   }
 
   statusLabel(v: number): string {
+    if (this.i18n.lang() === 'en') {
+      if (v === 1) return 'Draft';
+      if (v === 2) return 'Submitted';
+      if (v === 3) return 'In review';
+      if (v === 4) return 'Approved';
+      return `#${v}`;
+    }
     if (v === 1) return 'مسودة';
     if (v === 2) return 'مُرسل';
     if (v === 3) return 'قيد المراجعة';

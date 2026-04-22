@@ -1,14 +1,14 @@
 <section class="hub-hero">
   <div class="hub-hero__text">
-    <span class="hub-hero__eyebrow">إدارة الأداء</span>
-    <h1>مركز الأداء</h1>
-    <p>لوحة موحّدة لدورات الأداء والتقييمات والأهداف مع مؤشرات لحظية على الإنجاز.</p>
+    <span class="hub-hero__eyebrow">{{ 'إدارة الأداء' | t }}</span>
+    <h1>{{ 'مركز الأداء' | t }}</h1>
+    <p>{{ 'لوحة موحّدة لدورات الأداء والتقييمات والأهداف مع مؤشرات لحظية على الإنجاز.' | t }}</p>
   </div>
   <div class="hub-hero__ring" aria-hidden="true">
     <div class="ring" [style.--pct]="completionRate()">
       <div class="ring__inner">
         <strong>{{ completionRate() }}%</strong>
-        <span>إنجاز الأهداف</span>
+        <span>{{ 'إنجاز الأهداف' | t }}</span>
       </div>
     </div>
   </div>
@@ -23,8 +23,8 @@
       </svg>
     </div>
     <div class="nav-card__body">
-      <strong>دورات الأداء</strong>
-      <span>إنشاء، تعديل، تفعيل، وإغلاق الدورات</span>
+      <strong>{{ 'دورات الأداء' | t }}</strong>
+      <span>{{ 'إنشاء، تعديل، تفعيل، وإغلاق الدورات' | t }}</span>
     </div>
     <span class="nav-card__chevron" aria-hidden="true">‹</span>
   </a>
@@ -37,8 +37,8 @@
       </svg>
     </div>
     <div class="nav-card__body">
-      <strong>التقييمات</strong>
-      <span>تقييم الموظفين وربطهم بالدورات</span>
+      <strong>{{ 'التقييمات' | t }}</strong>
+      <span>{{ 'تقييم الموظفين وربطهم بالدورات' | t }}</span>
     </div>
     <span class="nav-card__chevron" aria-hidden="true">‹</span>
   </a>
@@ -52,8 +52,8 @@
       </svg>
     </div>
     <div class="nav-card__body">
-      <strong>الأهداف</strong>
-      <span>متابعة الأهداف والأوزان والإنجاز</span>
+      <strong>{{ 'الأهداف' | t }}</strong>
+      <span>{{ 'متابعة الأهداف والأوزان والإنجاز' | t }}</span>
     </div>
     <span class="nav-card__chevron" aria-hidden="true">‹</span>
   </a>
@@ -69,7 +69,7 @@
         </svg>
       </div>
       <div>
-        <div class="kpi-tile__label">إجمالي الدورات</div>
+        <div class="kpi-tile__label">{{ 'إجمالي الدورات' | t }}</div>
         <div class="kpi-tile__value">{{ summary()!.totalPerformanceCycles }}</div>
       </div>
     </article>
@@ -80,7 +80,7 @@
         </svg>
       </div>
       <div>
-        <div class="kpi-tile__label">دورات نشطة</div>
+        <div class="kpi-tile__label">{{ 'دورات نشطة' | t }}</div>
         <div class="kpi-tile__value">{{ summary()!.activePerformanceCycles }}</div>
       </div>
     </article>
@@ -93,7 +93,7 @@
         </svg>
       </div>
       <div>
-        <div class="kpi-tile__label">الأهداف</div>
+        <div class="kpi-tile__label">{{ 'الأهداف' | t }}</div>
         <div class="kpi-tile__value">
           {{ summary()!.completedGoals }}<span class="kpi-tile__suffix">/{{ summary()!.totalGoals }}</span>
         </div>
@@ -107,7 +107,7 @@
         </svg>
       </div>
       <div>
-        <div class="kpi-tile__label">التقييمات المُعتمدة</div>
+        <div class="kpi-tile__label">{{ 'التقييمات المُعتمدة' | t }}</div>
         <div class="kpi-tile__value">
           {{ summary()!.finalizedEvaluations }}<span class="kpi-tile__suffix">/{{ summary()!.totalEvaluations }}</span>
         </div>
@@ -121,7 +121,7 @@
           </svg>
         </div>
         <div>
-          <div class="kpi-tile__label">متوسط الدرجة</div>
+          <div class="kpi-tile__label">{{ 'متوسط الدرجة' | t }}</div>
           <div class="kpi-tile__value">{{ summary()!.averageOverallEvaluationScoreFinalized | number: '1.0-1' }}</div>
         </div>
       </article>
@@ -131,8 +131,8 @@
   <section class="progress-panel">
     <div class="progress-panel__head">
       <div>
-        <strong>معدل إنجاز الأهداف</strong>
-        <span>نسبة الأهداف المكتملة من الإجمالي</span>
+        <strong>{{ 'معدل إنجاز الأهداف' | t }}</strong>
+        <span>{{ 'نسبة الأهداف المكتملة من الإجمالي' | t }}</span>
       </div>
       <div class="progress-panel__value">{{ completionRate() }}%</div>
     </div>
@@ -140,30 +140,30 @@
       <span [style.width.%]="completionRate()"></span>
     </div>
     <div class="progress-panel__meta">
-      <span>المكتمل: {{ summary()!.completedGoals }}</span>
-      <span>الإجمالي: {{ summary()!.totalGoals }}</span>
+      <span>{{ 'المكتمل:' | t }} {{ summary()!.completedGoals }}</span>
+      <span>{{ 'الإجمالي:' | t }} {{ summary()!.totalGoals }}</span>
     </div>
   </section>
 } @else if (summaryFailed()) {
-  <div class="card card--muted">تعذر تحميل ملخص الأداء.</div>
+  <div class="card card--muted">{{ 'تعذر تحميل ملخص الأداء.' | t }}</div>
 }
 
 @if (failed()) {
-  <div class="card card--muted">تعذر التحميل.</div>
+  <div class="card card--muted">{{ 'تعذر التحميل.' | t }}</div>
 } @else if (data()) {
   <section class="recent-panel">
     <header class="recent-panel__head">
-      <h2>أحدث دورات الأداء</h2>
-      <a class="link" routerLink="/talent/performance/cycles">عرض الكل</a>
+      <h2>{{ 'أحدث دورات الأداء' | t }}</h2>
+      <a class="link" routerLink="/talent/performance/cycles">{{ 'عرض الكل' | t }}</a>
     </header>
     <div class="recent-panel__body">
       <table class="data-table">
         <thead>
           <tr>
-            <th>الاسم</th>
-            <th>البداية</th>
-            <th>النهاية</th>
-            <th>الحالة</th>
+            <th>{{ 'الاسم' | t }}</th>
+            <th>{{ 'البداية' | t }}</th>
+            <th>{{ 'النهاية' | t }}</th>
+            <th>{{ 'الحالة' | t }}</th>
           </tr>
         </thead>
         <tbody>

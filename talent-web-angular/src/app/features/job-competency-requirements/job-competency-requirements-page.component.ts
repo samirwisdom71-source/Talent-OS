@@ -12,6 +12,7 @@ import {
   UpdateJobCompetencyRequirementRequest,
 } from '../../shared/models/job-competency-requirement.models';
 import { LookupItemDto } from '../../shared/models/lookup.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { I18nService } from '../../shared/services/i18n.service';
 
 type JcrViewMode = 'table' | 'cards';
@@ -19,7 +20,7 @@ type JcrViewMode = 'table' | 'cards';
 @Component({
   selector: 'app-job-competency-requirements-page',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './job-competency-requirements-page.component.html',
   styleUrl: './job-competency-requirements-page.component.scss',
 })
@@ -70,7 +71,7 @@ export class JobCompetencyRequirementsPageComponent implements OnInit {
   private loadPositions(): void {
     this.lookups.getPositions('', 200).subscribe({
       next: (r) => this.positions.set(r),
-      error: () => this.toast.show('تعذر تحميل قائمة المناصب', 'error'),
+      error: () => this.toast.show(this.i18n.t('تعذر تحميل قائمة المناصب'), 'error'),
     });
   }
 
@@ -78,7 +79,7 @@ export class JobCompetencyRequirementsPageComponent implements OnInit {
   private loadCompetencies(): void {
     this.competenciesApi.getLookup({ take: 200, lang: this.i18n.lang() }).subscribe({
       next: (r) => this.competencies.set(r),
-      error: () => this.toast.show('تعذر تحميل قائمة الكفاءات', 'error'),
+      error: () => this.toast.show(this.i18n.t('تعذر تحميل قائمة الكفاءات'), 'error'),
     });
   }
 
@@ -86,7 +87,7 @@ export class JobCompetencyRequirementsPageComponent implements OnInit {
   private loadCompetencyLevels(): void {
     this.competencyLevelsApi.getLookup({ take: 200 }).subscribe({
       next: (r) => this.competencyLevels.set(r),
-      error: () => this.toast.show('تعذر تحميل مستويات الكفاءة', 'error'),
+      error: () => this.toast.show(this.i18n.t('تعذر تحميل مستويات الكفاءة'), 'error'),
     });
   }
 
@@ -105,7 +106,7 @@ export class JobCompetencyRequirementsPageComponent implements OnInit {
           this.busy.set(false);
         },
         error: () => {
-          this.toast.show('تعذر تحميل متطلبات الكفاءات', 'error');
+          this.toast.show(this.i18n.t('تعذر تحميل متطلبات الكفاءات'), 'error');
           this.busy.set(false);
         },
       });
@@ -134,17 +135,17 @@ export class JobCompetencyRequirementsPageComponent implements OnInit {
 
   saveCreate(): void {
     if (!this.createModel.positionId || !this.createModel.competencyId || !this.createModel.requiredLevelId) {
-      this.toast.show('املأ كل الحقول المطلوبة', 'error');
+      this.toast.show(this.i18n.t('املأ كل الحقول المطلوبة'), 'error');
       return;
     }
     this.api.create(this.createModel).subscribe({
       next: () => {
-        this.toast.show('تم إنشاء المتطلب', 'success');
+        this.toast.show(this.i18n.t('تم إنشاء المتطلب'), 'success');
         this.createOpen.set(false);
         this.page = 1;
         this.load();
       },
-      error: () => this.toast.show('تعذر إنشاء المتطلب', 'error'),
+      error: () => this.toast.show(this.i18n.t('تعذر إنشاء المتطلب'), 'error'),
     });
   }
 
@@ -154,7 +155,7 @@ export class JobCompetencyRequirementsPageComponent implements OnInit {
         this.selected.set(r);
         this.detailsOpen.set(true);
       },
-      error: () => this.toast.show('تعذر تحميل التفاصيل', 'error'),
+      error: () => this.toast.show(this.i18n.t('تعذر تحميل التفاصيل'), 'error'),
     });
   }
 
@@ -169,7 +170,7 @@ export class JobCompetencyRequirementsPageComponent implements OnInit {
         };
         this.editOpen.set(true);
       },
-      error: () => this.toast.show('تعذر تحميل بيانات التعديل', 'error'),
+      error: () => this.toast.show(this.i18n.t('تعذر تحميل بيانات التعديل'), 'error'),
     });
   }
 
@@ -177,16 +178,16 @@ export class JobCompetencyRequirementsPageComponent implements OnInit {
     const row = this.selected();
     if (!row) return;
     if (!this.editModel.positionId || !this.editModel.competencyId || !this.editModel.requiredLevelId) {
-      this.toast.show('املأ كل الحقول المطلوبة', 'error');
+      this.toast.show(this.i18n.t('املأ كل الحقول المطلوبة'), 'error');
       return;
     }
     this.api.update(row.id, this.editModel).subscribe({
       next: () => {
-        this.toast.show('تم تحديث المتطلب', 'success');
+        this.toast.show(this.i18n.t('تم تحديث المتطلب'), 'success');
         this.editOpen.set(false);
         this.load();
       },
-      error: () => this.toast.show('تعذر تحديث المتطلب', 'error'),
+      error: () => this.toast.show(this.i18n.t('تعذر تحديث المتطلب'), 'error'),
     });
   }
 }

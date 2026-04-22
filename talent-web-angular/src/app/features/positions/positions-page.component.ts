@@ -8,13 +8,14 @@ import { PagedResult } from '../../shared/models/api.types';
 import { LookupItemDto } from '../../shared/models/lookup.models';
 import { CreatePositionRequest, PositionDto, UpdatePositionRequest } from '../../shared/models/position.models';
 import { OrganizationUnitDto } from '../../shared/models/organization-unit.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 type ViewMode = 'table' | 'cards';
 
 @Component({
   selector: 'app-positions-page',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './positions-page.component.html',
   styleUrl: './positions-page.component.scss',
 })

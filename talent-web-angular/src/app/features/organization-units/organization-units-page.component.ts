@@ -5,6 +5,7 @@ import { IdentityLookupsApiService } from '../../services/identity-lookups-api.s
 import { OrganizationUnitsApiService } from '../../services/organization-units-api.service';
 import { PagedResult } from '../../shared/models/api.types';
 import { LookupItemDto } from '../../shared/models/lookup.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import {
   CreateOrganizationUnitRequest,
   OrganizationUnitDto,
@@ -16,7 +17,7 @@ type ViewMode = 'table' | 'cards';
 @Component({
   selector: 'app-organization-units-page',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './organization-units-page.component.html',
   styleUrl: './organization-units-page.component.scss',
 })

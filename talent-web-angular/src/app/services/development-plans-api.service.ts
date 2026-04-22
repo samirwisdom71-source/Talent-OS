@@ -7,6 +7,7 @@ import {
   CreateDevelopmentPlanRequest,
   DevelopmentPlanDto,
   DevelopmentPlanFilterRequest,
+  UpdateDevelopmentPlanRequest,
 } from '../shared/models/development.models';
 import { toHttpParams, unwrapApiResponse } from '../shared/utils/api-helpers';
 
@@ -36,6 +37,30 @@ export class DevelopmentPlansApiService {
   create(body: CreateDevelopmentPlanRequest) {
     return this.http
       .post<ApiResponse<DevelopmentPlanDto>>(this.base, body)
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  update(id: string, body: UpdateDevelopmentPlanRequest) {
+    return this.http
+      .put<ApiResponse<DevelopmentPlanDto>>(`${this.base}/${id}`, body)
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  activate(id: string) {
+    return this.http
+      .post<ApiResponse<DevelopmentPlanDto>>(`${this.base}/${id}/activate`, {})
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  complete(id: string) {
+    return this.http
+      .post<ApiResponse<DevelopmentPlanDto>>(`${this.base}/${id}/complete`, {})
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  cancel(id: string) {
+    return this.http
+      .post<ApiResponse<DevelopmentPlanDto>>(`${this.base}/${id}/cancel`, {})
       .pipe(map((r) => unwrapApiResponse(r)));
   }
 }

@@ -4,36 +4,36 @@
       <path d="M15 18l-6-6 6-6" />
     </svg>
   </span>
-  <span class="back-link__label">التعاقب</span>
+  <span class="back-link__label">{{ 'التعاقب' | t }}</span>
 </a>
 <section class="page-head">
-  <h1>خطة تعاقب جديدة</h1>
+  <h1>{{ 'خطة تعاقب جديدة' | t }}</h1>
 </section>
 <div class="card form-card">
   <div class="form-grid">
     <label
-      >منصب حرج
+      >{{ 'منصب حرج' | t }}
       <select class="select" [(ngModel)]="model.criticalPositionId" name="cp">
-        <option value="">— اختر —</option>
+        <option value="">{{ '— اختر —' | t }}</option>
         @for (p of positions(); track p.id) {
           <option [value]="p.id">{{ criticalPositionOptionLabel(p) }}</option>
         }
       </select>
     </label>
     <label
-      >دورة الأداء
+      >{{ 'دورة الأداء' | t }}
       <select class="select" [(ngModel)]="model.performanceCycleId" name="cy">
-        <option value="">— اختر —</option>
+        <option value="">{{ '— اختر —' | t }}</option>
         @for (c of cycles(); track c.id) {
           <option [value]="c.id">{{ cycleLabel(c) }}</option>
         }
       </select>
     </label>
-    <label class="full">اسم الخطة<input [(ngModel)]="model.planName" name="pn" /></label>
-    <label class="full">ملاحظات<textarea rows="2" [(ngModel)]="model.notes" name="nt"></textarea></label>
+    <label class="full">{{ 'اسم الخطة' | t }}<input [(ngModel)]="model.planName" name="pn" /></label>
+    <label class="full">{{ 'ملاحظات' | t }}<textarea rows="2" [(ngModel)]="model.notes" name="nt"></textarea></label>
   </div>
   <div class="form-actions">
-    <button type="button" class="btn-primary" [disabled]="busy()" (click)="save()">{{ busy() ? '…' : 'حفظ' }}</button>
-    <a routerLink="/succession" class="btn-ghost">إلغاء</a>
+    <button type="button" class="btn-primary" [disabled]="busy()" (click)="save()">{{ busy() ? '…' : ('حفظ' | t) }}</button>
+    <a routerLink="/succession" class="btn-ghost">{{ 'إلغاء' | t }}</a>
   </div>
 </div>

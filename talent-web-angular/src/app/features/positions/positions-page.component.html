@@ -1,50 +1,50 @@
 <div class="page-head-row">
   <section class="page-head">
-    <h1>المناصب</h1>
-    <p class="page-head__sub">إدارة المناصب وربطها بالوحدة التنظيمية والدرجة الوظيفية.</p>
+    <h1>{{ 'المناصب' | t }}</h1>
+    <p class="page-head__sub">{{ 'إدارة المناصب وربطها بالوحدة التنظيمية والدرجة الوظيفية.' | t }}</p>
   </section>
   <div class="page-actions">
     <button type="button" class="btn-primary btn-primary--icon" (click)="openCreate()">
       <span class="btn-ico" aria-hidden="true">＋</span>
-      منصب جديد
+      {{ 'منصب جديد' | t }}
     </button>
   </div>
 </div>
 
 <div class="toolbar card card--interactive">
-  <input class="toolbar__search" type="search" [(ngModel)]="search" (keyup.enter)="page = 1; load()" placeholder="بحث بالمسمى..." />
+  <input class="toolbar__search" type="search" [(ngModel)]="search" (keyup.enter)="page = 1; load()" [placeholder]="'بحث بالمسمى...' | t" />
   <select class="toolbar__select" [(ngModel)]="orgUnitId">
-    <option value="">كل الوحدات</option>
+    <option value="">{{ 'كل الوحدات' | t }}</option>
     @for (item of orgUnits(); track item.id) {
       <option [value]="item.id">{{ item.name }}</option>
     }
   </select>
   <select class="toolbar__select" [(ngModel)]="jobGradeId">
-    <option value="">كل الدرجات</option>
+    <option value="">{{ 'كل الدرجات' | t }}</option>
     @for (item of jobGrades(); track item.id) {
       <option [value]="item.id">{{ item.name }}</option>
     }
   </select>
-  <button type="button" class="btn-primary" (click)="page = 1; load()">تطبيق</button>
+  <button type="button" class="btn-primary" (click)="page = 1; load()">{{ 'تطبيق' | t }}</button>
   <div class="view-mode">
-    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='table'" (click)="viewMode='table'">جدول</button>
-    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='cards'" (click)="viewMode='cards'">كارد</button>
+    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='table'" (click)="viewMode='table'">{{ 'جدول' | t }}</button>
+    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='cards'" (click)="viewMode='cards'">{{ 'كارد' | t }}</button>
   </div>
 </div>
 
 @if (failed()) {
-  <div class="card card--muted">تعذر تحميل المناصب.</div>
+  <div class="card card--muted">{{ 'تعذر تحميل المناصب.' | t }}</div>
 } @else if (result()) {
   @if (viewMode === 'table') {
     <div class="card table-card">
       <table class="data-table">
         <thead>
           <tr>
-            <th>المسمى العربي</th>
-            <th>المسمى الإنجليزي</th>
-            <th>الوحدة التنظيمية</th>
-            <th>الدرجة الوظيفية</th>
-            <th class="actions-col-head">إجراءات</th>
+            <th>{{ 'المسمى العربي' | t }}</th>
+            <th>{{ 'المسمى الإنجليزي' | t }}</th>
+            <th>{{ 'الوحدة التنظيمية' | t }}</th>
+            <th>{{ 'الدرجة الوظيفية' | t }}</th>
+            <th class="actions-col-head">{{ 'إجراءات' | t }}</th>
           </tr>
         </thead>
         <tbody>
@@ -56,8 +56,8 @@
               <td>{{ row.jobGradeName }} (L{{ row.jobGradeLevel }})</td>
               <td class="cell-actions">
                 <div class="cell-actions__wrap">
-                  <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">تفاصيل</button>
-                  <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">تعديل</button>
+                  <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">{{ 'تفاصيل' | t }}</button>
+                  <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">{{ 'تعديل' | t }}</button>
                 </div>
               </td>
             </tr>
@@ -65,9 +65,9 @@
         </tbody>
       </table>
       <div class="pager">
-        <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">السابق</button>
+        <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">{{ 'السابق' | t }}</button>
         <span>{{ result()!.page }} / {{ result()!.totalPages || 1 }}</span>
-        <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">التالي</button>
+        <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">{{ 'التالي' | t }}</button>
       </div>
     </div>
   } @else {
@@ -107,16 +107,16 @@
             </span>
           </div>
           <footer class="entity-card__footer">
-            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">تفاصيل</button>
-            <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">تعديل</button>
+            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">{{ 'تفاصيل' | t }}</button>
+            <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row.id)">{{ 'تعديل' | t }}</button>
           </footer>
         </article>
       }
     </div>
     <div class="pager card">
-      <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">السابق</button>
+      <button type="button" (click)="prevPage()" [disabled]="!result()!.hasPreviousPage">{{ 'السابق' | t }}</button>
       <span>{{ result()!.page }} / {{ result()!.totalPages || 1 }}</span>
-      <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">التالي</button>
+      <button type="button" (click)="nextPage()" [disabled]="!result()!.hasNextPage">{{ 'التالي' | t }}</button>
     </div>
   }
 } @else if (busy()) {
@@ -126,18 +126,18 @@
 @if (createOpen()) {
   <div class="modal-backdrop" (click)="createOpen.set(false)"></div>
   <section class="modal card" role="dialog" aria-modal="true">
-    <h2>إنشاء منصب</h2>
+    <h2>{{ 'إنشاء منصب' | t }}</h2>
     <div class="form-grid">
       <label>
-        <span>المسمى العربي</span>
+        <span>{{ 'المسمى العربي' | t }}</span>
         <input type="text" [(ngModel)]="createModel.titleAr" />
       </label>
       <label>
-        <span>المسمى الإنجليزي</span>
+        <span>{{ 'المسمى الإنجليزي' | t }}</span>
         <input type="text" [(ngModel)]="createModel.titleEn" />
       </label>
       <label>
-        <span>الوحدة التنظيمية</span>
+        <span>{{ 'الوحدة التنظيمية' | t }}</span>
         <select [(ngModel)]="createModel.organizationUnitId">
           @for (item of orgUnits(); track item.id) {
             <option [ngValue]="item.id">{{ item.name }}</option>
@@ -145,7 +145,7 @@
         </select>
       </label>
       <label>
-        <span>الدرجة الوظيفية</span>
+        <span>{{ 'الدرجة الوظيفية' | t }}</span>
         <select [(ngModel)]="createModel.jobGradeId">
           @for (item of jobGrades(); track item.id) {
             <option [ngValue]="item.id">{{ item.name }}</option>
@@ -154,8 +154,8 @@
       </label>
     </div>
     <div class="modal-actions">
-      <button type="button" (click)="createOpen.set(false)" [disabled]="actionBusy()">إلغاء</button>
-      <button type="button" class="btn-primary" (click)="saveCreate()" [disabled]="actionBusy()">حفظ</button>
+      <button type="button" (click)="createOpen.set(false)" [disabled]="actionBusy()">{{ 'إلغاء' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveCreate()" [disabled]="actionBusy()">{{ 'حفظ' | t }}</button>
     </div>
   </section>
 }
@@ -163,28 +163,28 @@
 @if (detailsOpen() && selected()) {
   <div class="modal-backdrop" (click)="detailsOpen.set(false)"></div>
   <section class="modal card modal--wide modal--details" role="dialog" aria-modal="true">
-    <h2>تفاصيل المنصب</h2>
+    <h2>{{ 'تفاصيل المنصب' | t }}</h2>
     <div class="details-grid">
       <div class="detail-item">
-        <span>المسمى العربي</span>
+        <span>{{ 'المسمى العربي' | t }}</span>
         <strong>{{ selected()!.titleAr }}</strong>
       </div>
       <div class="detail-item">
-        <span>المسمى الإنجليزي</span>
+        <span>{{ 'المسمى الإنجليزي' | t }}</span>
         <strong>{{ selected()!.titleEn }}</strong>
       </div>
       <div class="detail-item">
-        <span>الوحدة التنظيمية</span>
+        <span>{{ 'الوحدة التنظيمية' | t }}</span>
         <strong>{{ selected()!.organizationUnitNameAr || selected()!.organizationUnitNameEn || '—' }}</strong>
       </div>
       <div class="detail-item">
-        <span>الدرجة الوظيفية</span>
+        <span>{{ 'الدرجة الوظيفية' | t }}</span>
         <strong>{{ selected()!.jobGradeName }} (L{{ selected()!.jobGradeLevel }})</strong>
       </div>
     </div>
     <div class="modal-actions">
-      <button type="button" class="action-btn action-btn--ghost" (click)="detailsOpen.set(false)">إغلاق</button>
-      <button type="button" class="action-btn action-btn--edit" (click)="openEdit(selected()!.id)">تعديل</button>
+      <button type="button" class="action-btn action-btn--ghost" (click)="detailsOpen.set(false)">{{ 'إغلاق' | t }}</button>
+      <button type="button" class="action-btn action-btn--edit" (click)="openEdit(selected()!.id)">{{ 'تعديل' | t }}</button>
     </div>
   </section>
 }
@@ -192,18 +192,18 @@
 @if (editOpen() && selected()) {
   <div class="modal-backdrop" (click)="editOpen.set(false)"></div>
   <section class="modal card" role="dialog" aria-modal="true">
-    <h2>تعديل المنصب</h2>
+    <h2>{{ 'تعديل المنصب' | t }}</h2>
     <div class="form-grid">
       <label>
-        <span>المسمى العربي</span>
+        <span>{{ 'المسمى العربي' | t }}</span>
         <input type="text" [(ngModel)]="editModel.titleAr" />
       </label>
       <label>
-        <span>المسمى الإنجليزي</span>
+        <span>{{ 'المسمى الإنجليزي' | t }}</span>
         <input type="text" [(ngModel)]="editModel.titleEn" />
       </label>
       <label>
-        <span>الوحدة التنظيمية</span>
+        <span>{{ 'الوحدة التنظيمية' | t }}</span>
         <select [(ngModel)]="editModel.organizationUnitId">
           @for (item of orgUnits(); track item.id) {
             <option [ngValue]="item.id">{{ item.name }}</option>
@@ -211,7 +211,7 @@
         </select>
       </label>
       <label>
-        <span>الدرجة الوظيفية</span>
+        <span>{{ 'الدرجة الوظيفية' | t }}</span>
         <select [(ngModel)]="editModel.jobGradeId">
           @for (item of jobGrades(); track item.id) {
             <option [ngValue]="item.id">{{ item.name }}</option>
@@ -220,8 +220,8 @@
       </label>
     </div>
     <div class="modal-actions">
-      <button type="button" (click)="editOpen.set(false)" [disabled]="actionBusy()">إلغاء</button>
-      <button type="button" class="btn-primary" (click)="saveEdit()" [disabled]="actionBusy()">حفظ التعديل</button>
+      <button type="button" (click)="editOpen.set(false)" [disabled]="actionBusy()">{{ 'إلغاء' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveEdit()" [disabled]="actionBusy()">{{ 'حفظ التعديل' | t }}</button>
     </div>
   </section>
 }

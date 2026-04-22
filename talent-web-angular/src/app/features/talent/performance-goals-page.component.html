@@ -1,43 +1,43 @@
 <div class="page-head-row">
   <section class="page-head">
-    <h1>أهداف الأداء</h1>
-    <p class="page-head__sub">تابع الأهداف وحدّث الوزن والحالة بسهولة.</p>
+    <h1>{{ 'أهداف الأداء' | t }}</h1>
+    <p class="page-head__sub">{{ 'تابع الأهداف وحدّث الوزن والحالة بسهولة.' | t }}</p>
   </section>
   <div class="head-actions">
     <button class="btn-primary btn-primary--icon" type="button" (click)="createOpen.set(true)">
       <span class="btn-ico">+</span>
-      <span>هدف جديد</span>
+      <span>{{ 'هدف جديد' | t }}</span>
     </button>
-    <a class="btn-secondary" routerLink="/talent/performance">رجوع لمركز الأداء</a>
+    <a class="btn-secondary" routerLink="/talent/performance">{{ 'رجوع لمركز الأداء' | t }}</a>
   </div>
 </div>
 
 <section class="toolbar card">
   <div class="toolbar__group">
-    <input class="toolbar__search" [(ngModel)]="search" placeholder="بحث بعنوان الهدف..." />
+    <input class="toolbar__search" [(ngModel)]="search" [placeholder]="'بحث بعنوان الهدف...' | t" />
     <app-searchable-select
       [items]="employees()"
       [ngModel]="employeeId"
       (ngModelChange)="onFilterEmployeeChange($event)"
       (searchChange)="onFilterEmployeeSearch($event)"
-      placeholder="كل الموظفين"
-      searchPlaceholder="ابحث عن موظف..."
-      allLabel="كل الموظفين"
+      [placeholder]="'كل الموظفين' | t"
+      [searchPlaceholder]="'ابحث عن موظف...' | t"
+      [allLabel]="'كل الموظفين' | t"
     />
     <app-searchable-select
       [items]="cycles()"
       [ngModel]="cycleId"
       (ngModelChange)="onFilterCycleChange($event)"
       (searchChange)="onCycleSearch($event)"
-      placeholder="دورات نشطة فقط"
-      searchPlaceholder="ابحث عن دورة..."
-      allLabel="كل الدورات النشطة"
+      [placeholder]="'دورات نشطة فقط' | t"
+      [searchPlaceholder]="'ابحث عن دورة...' | t"
+      [allLabel]="'كل الدورات النشطة' | t"
     />
-    <button type="button" class="btn-primary toolbar__apply" (click)="load()">تطبيق</button>
+    <button type="button" class="btn-primary toolbar__apply" (click)="load()">{{ 'تطبيق' | t }}</button>
   </div>
   <div class="view-mode">
-    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='table'" (click)="viewMode='table'">جدول</button>
-    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='cards'" (click)="viewMode='cards'">كارد</button>
+    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='table'" (click)="viewMode='table'">{{ 'جدول' | t }}</button>
+    <button type="button" class="mode-btn" [class.mode-btn--active]="viewMode==='cards'" (click)="viewMode='cards'">{{ 'كارد' | t }}</button>
   </div>
 </section>
 
@@ -46,12 +46,12 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>العنوان</th>
-          <th>الموظف</th>
-          <th>الدورة</th>
-          <th>الوزن</th>
-          <th>الحالة</th>
-          <th>إجراءات</th>
+          <th>{{ 'العنوان' | t }}</th>
+          <th>{{ 'الموظف' | t }}</th>
+          <th>{{ 'الدورة' | t }}</th>
+          <th>{{ 'الوزن' | t }}</th>
+          <th>{{ 'الحالة' | t }}</th>
+          <th>{{ 'إجراءات' | t }}</th>
         </tr>
       </thead>
       <tbody>
@@ -62,7 +62,7 @@
             <td class="muted">{{ cycleName(row.performanceCycleId) }}</td>
             <td><span class="weight-pill">{{ row.weight | number:'1.0-2' }}%</span></td>
             <td><span class="chip" [attr.data-status]="row.status">{{ statusLabel(row.status) }}</span></td>
-            <td><button class="action-btn action-btn--info" type="button" (click)="openDetails(row)">تفاصيل</button></td>
+            <td><button class="action-btn action-btn--info" type="button" (click)="openDetails(row)">{{ 'تفاصيل' | t }}</button></td>
           </tr>
         }
       </tbody>
@@ -80,17 +80,17 @@
         </header>
         <div class="goal-card__meta">
           <div class="meta-item">
-            <span>الموظف</span>
+            <span>{{ 'الموظف' | t }}</span>
             <strong>{{ empName(row.employeeId) }}</strong>
           </div>
           <div class="meta-item">
-            <span>الدورة</span>
+            <span>{{ 'الدورة' | t }}</span>
             <strong>{{ cycleName(row.performanceCycleId) }}</strong>
           </div>
         </div>
         <div class="goal-card__weight">
           <div class="weight-head">
-            <span>الوزن</span>
+            <span>{{ 'الوزن' | t }}</span>
             <strong>{{ row.weight | number:'1.0-2' }}%</strong>
           </div>
           <div class="progress">
@@ -98,7 +98,7 @@
           </div>
         </div>
         <div class="goal-card__actions">
-          <button class="action-btn action-btn--info" type="button" (click)="openDetails(row)">تفاصيل وتعديل</button>
+          <button class="action-btn action-btn--info" type="button" (click)="openDetails(row)">{{ 'تفاصيل وتعديل' | t }}</button>
         </div>
       </article>
     }
@@ -110,60 +110,60 @@
   <section class="modal modal--form" role="dialog" aria-modal="true">
     <header class="modal__head">
       <div>
-        <h3>إنشاء هدف جديد</h3>
-        <p>أدخل بيانات الهدف والقيمة المستهدفة.</p>
+        <h3>{{ 'إنشاء هدف جديد' | t }}</h3>
+        <p>{{ 'أدخل بيانات الهدف والقيمة المستهدفة.' | t }}</p>
       </div>
       <button class="modal__close" type="button" (click)="createOpen.set(false)" aria-label="إغلاق">×</button>
     </header>
     <div class="modal__body">
       <div class="form-grid">
         <label class="field">
-          <span>الموظف</span>
+          <span>{{ 'الموظف' | t }}</span>
           <app-searchable-select
             [items]="createEmployees()"
             [(ngModel)]="createModel.employeeId"
             (searchChange)="onCreateEmployeeSearch($event)"
-            placeholder="اختر الموظف"
-            searchPlaceholder="ابحث عن موظف..."
+            [placeholder]="'اختر الموظف' | t"
+            [searchPlaceholder]="'ابحث عن موظف...' | t"
             [showAllOption]="false"
           />
         </label>
         <label class="field">
-          <span>دورة الأداء</span>
+          <span>{{ 'دورة الأداء' | t }}</span>
           <app-searchable-select
             [items]="cycles()"
             [(ngModel)]="createModel.performanceCycleId"
             (searchChange)="onCycleSearch($event)"
-            placeholder="اختر دورة نشطة"
-            searchPlaceholder="ابحث عن دورة..."
+            [placeholder]="'اختر دورة نشطة' | t"
+            [searchPlaceholder]="'ابحث عن دورة...' | t"
             [showAllOption]="false"
           />
         </label>
         <label class="field">
-          <span>العنوان بالعربية</span>
-          <input [(ngModel)]="createModel.titleAr" placeholder="عنوان الهدف" />
+          <span>{{ 'العنوان بالعربية' | t }}</span>
+          <input [(ngModel)]="createModel.titleAr" [placeholder]="'عنوان الهدف' | t" />
         </label>
         <label class="field">
-          <span>العنوان بالإنجليزية</span>
+          <span>{{ 'العنوان بالإنجليزية' | t }}</span>
           <input [(ngModel)]="createModel.titleEn" placeholder="Goal title" />
         </label>
         <label class="field">
-          <span>الوزن (%)</span>
+          <span>{{ 'الوزن (%)' | t }}</span>
           <input type="number" min="0" max="100" step="0.1" [(ngModel)]="createModel.weight" />
         </label>
         <label class="field">
-          <span>القيمة المستهدفة</span>
-          <input [(ngModel)]="createModel.targetValue" placeholder="مثال: 95% أو 120 عميل" />
+          <span>{{ 'القيمة المستهدفة' | t }}</span>
+          <input [(ngModel)]="createModel.targetValue" [placeholder]="'مثال: 95% أو 120 عميل' | t" />
         </label>
         <label class="field field--full">
-          <span>الوصف</span>
-          <textarea rows="3" [(ngModel)]="createModel.description" placeholder="وصف الهدف وكيفية قياسه..."></textarea>
+          <span>{{ 'الوصف' | t }}</span>
+          <textarea rows="3" [(ngModel)]="createModel.description" [placeholder]="'وصف الهدف وكيفية قياسه...' | t"></textarea>
         </label>
       </div>
     </div>
     <footer class="modal__foot">
-      <button type="button" class="btn-ghost" (click)="createOpen.set(false)">إلغاء</button>
-      <button type="button" class="btn-primary" (click)="saveCreate()">حفظ الهدف</button>
+      <button type="button" class="btn-ghost" (click)="createOpen.set(false)">{{ 'إلغاء' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveCreate()">{{ 'حفظ الهدف' | t }}</button>
     </footer>
   </section>
 }
@@ -181,50 +181,50 @@
     <div class="modal__body">
       <div class="summary-row">
         <div class="summary-block">
-          <span>الوزن الحالي</span>
+          <span>{{ 'الوزن الحالي' | t }}</span>
           <strong>{{ selected()!.weight | number:'1.0-2' }}%</strong>
         </div>
         <div class="summary-block">
-          <span>الحالة</span>
+          <span>{{ 'الحالة' | t }}</span>
           <strong><span class="chip" [attr.data-status]="selected()!.status">{{ statusLabel(selected()!.status) }}</span></strong>
         </div>
       </div>
 
       <div class="form-grid">
         <label class="field">
-          <span>العنوان بالعربية</span>
+          <span>{{ 'العنوان بالعربية' | t }}</span>
           <input [(ngModel)]="editModel.titleAr" />
         </label>
         <label class="field">
-          <span>العنوان بالإنجليزية</span>
+          <span>{{ 'العنوان بالإنجليزية' | t }}</span>
           <input [(ngModel)]="editModel.titleEn" />
         </label>
         <label class="field">
-          <span>الوزن (%)</span>
+          <span>{{ 'الوزن (%)' | t }}</span>
           <input type="number" min="0" max="100" step="0.1" [(ngModel)]="editModel.weight" />
         </label>
         <label class="field">
-          <span>القيمة المستهدفة</span>
+          <span>{{ 'القيمة المستهدفة' | t }}</span>
           <input [(ngModel)]="editModel.targetValue" />
         </label>
         <label class="field">
-          <span>الحالة</span>
+          <span>{{ 'الحالة' | t }}</span>
           <select [(ngModel)]="editModel.status">
-            <option [ngValue]="1">مسودة</option>
-            <option [ngValue]="2">نشط</option>
-            <option [ngValue]="3">مكتمل</option>
-            <option [ngValue]="4">ملغى</option>
+            <option [ngValue]="1">{{ 'مسودة' | t }}</option>
+            <option [ngValue]="2">{{ 'نشط' | t }}</option>
+            <option [ngValue]="3">{{ 'مكتمل' | t }}</option>
+            <option [ngValue]="4">{{ 'ملغى' | t }}</option>
           </select>
         </label>
         <label class="field field--full">
-          <span>الوصف</span>
+          <span>{{ 'الوصف' | t }}</span>
           <textarea rows="3" [(ngModel)]="editModel.description"></textarea>
         </label>
       </div>
     </div>
     <footer class="modal__foot">
-      <button type="button" class="btn-ghost" (click)="closeEdit()">إلغاء</button>
-      <button type="button" class="btn-primary" (click)="saveSelected()">حفظ التعديل</button>
+      <button type="button" class="btn-ghost" (click)="closeEdit()">{{ 'إلغاء' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveSelected()">{{ 'حفظ التعديل' | t }}</button>
     </footer>
   </section>
 }

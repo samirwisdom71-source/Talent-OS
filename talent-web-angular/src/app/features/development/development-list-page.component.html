@@ -1,67 +1,249 @@
-<div class="page-head-row">
-  <section class="page-head">
-    <h1>خطط التطوير</h1>
-  </section>
+<section class="dev-hero">
+  <div class="dev-hero__text">
+    <span class="dev-hero__eyebrow">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2l3 6 6 .9-4.5 4.3 1 6.3L12 16.8 6.5 19.5l1-6.3L3 8.9 9 8z"/>
+      </svg>
+      {{ 'development.hero.eyebrow' | t }}
+    </span>
+    <h1>{{ 'development.title' | t }}</h1>
+    <p>{{ 'development.subtitle' | t }}</p>
+  </div>
   @if (auth.hasPermission(PermissionCodes.DevelopmentManage)) {
-    <div class="page-actions">
-      <a class="btn-primary btn-primary--icon" routerLink="/development/create">
-        <span class="btn-ico" aria-hidden="true">＋</span>
-        خطة جديدة
+    <div class="dev-hero__cta">
+      <a class="btn-cta" routerLink="/development/create">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        {{ 'development.createPlan' | t }}
       </a>
     </div>
   }
-</div>
+</section>
 
 @if (summary() && !summaryFailed()) {
-  <div class="card stat-grid">
-    <div class="stat">
-      <div class="stat__label">خطط نشطة</div>
-      <div class="stat__value">{{ summary()!.activeDevelopmentPlans }}/{{ summary()!.totalDevelopmentPlans }}</div>
-    </div>
-    <div class="stat">
-      <div class="stat__label">بنود مكتملة</div>
-      <div class="stat__value">{{ summary()!.completedDevelopmentPlanItems }}/{{ summary()!.totalDevelopmentPlanItems }}</div>
-    </div>
-    <div class="stat">
-      <div class="stat__label">قيد التنفيذ</div>
-      <div class="stat__value">{{ summary()!.inProgressDevelopmentPlanItems }}</div>
-    </div>
-    @if (summary()!.averageProgressPercentageActiveItems != null) {
-      <div class="stat">
-        <div class="stat__label">متوسط التقدّم (نشط)</div>
-        <div class="stat__value">{{ summary()!.averageProgressPercentageActiveItems | number: '1.0-0' }}%</div>
+  <div class="kpi-row">
+    <article class="kpi kpi--indigo">
+      <div class="kpi__icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12l4-7 4 4 4-8 4 9 2-1"/>
+          <path d="M3 19h18"/>
+        </svg>
       </div>
+      <div>
+        <div class="kpi__label">{{ 'development.summary.activePlans' | t }}</div>
+        <div class="kpi__value">{{ summary()!.activeDevelopmentPlans }}<span class="kpi__sub">/ {{ summary()!.totalDevelopmentPlans }}</span></div>
+      </div>
+    </article>
+
+    <article class="kpi kpi--emerald">
+      <div class="kpi__icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/>
+          <path d="M22 4l-10 10-3-3"/>
+        </svg>
+      </div>
+      <div>
+        <div class="kpi__label">{{ 'development.summary.completedItems' | t }}</div>
+        <div class="kpi__value">{{ summary()!.completedDevelopmentPlanItems }}<span class="kpi__sub">/ {{ summary()!.totalDevelopmentPlanItems }}</span></div>
+      </div>
+    </article>
+
+    <article class="kpi kpi--amber">
+      <div class="kpi__icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 7v5l3 2"/>
+        </svg>
+      </div>
+      <div>
+        <div class="kpi__label">{{ 'development.summary.inProgress' | t }}</div>
+        <div class="kpi__value">{{ summary()!.inProgressDevelopmentPlanItems }}</div>
+      </div>
+    </article>
+
+    @if (summary()!.averageProgressPercentageActiveItems != null) {
+      <article class="kpi kpi--rose">
+        <div class="kpi__ring" [style.--p]="(summary()!.averageProgressPercentageActiveItems || 0)">
+          <span>{{ summary()!.averageProgressPercentageActiveItems | number: '1.0-0' }}%</span>
+        </div>
+        <div>
+          <div class="kpi__label">{{ 'development.summary.avgProgress' | t }}</div>
+          <div class="kpi__value kpi__value--sm">{{ 'development.summary.avgProgressSub' | t }}</div>
+        </div>
+      </article>
     }
   </div>
 } @else if (summaryFailed()) {
-  <div class="card card--muted">تعذر تحميل ملخص التطوير.</div>
+  <div class="notice notice--muted">{{ 'development.summary.loadFailed' | t }}</div>
 }
 
-@if (failed()) {
-  <div class="card card--muted">تعذر التحميل.</div>
-} @else if (data()) {
-  <div class="card table-card">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>العنوان</th>
-          <th>الموظف</th>
-          <th>الحالة</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (row of data()!.items; track row.id) {
-          <tr>
-            <td>{{ row.planTitle }}</td>
-            <td><app-id-chip [id]="row.employeeId" /></td>
-            <td>{{ planStatus(row.status) }}</td>
-            <td class="cell-actions"><a class="link" [routerLink]="['/development', row.id]">عرض</a></td>
-          </tr>
+<section class="filter-bar">
+  <div class="filter-bar__group">
+    <label class="field">
+      <span>{{ 'الموظف' | t }}</span>
+      <select [(ngModel)]="employeeId">
+        <option value="">{{ 'development.filter.allEmployees' | t }}</option>
+        @for (item of employees(); track item.id) {
+          <option [value]="item.id">{{ item.name }}</option>
         }
-      </tbody>
-    </table>
+      </select>
+    </label>
+    <label class="field">
+      <span>{{ 'الدورة' | t }}</span>
+      <select [(ngModel)]="performanceCycleId">
+        <option value="">{{ 'development.filter.allCycles' | t }}</option>
+        @for (item of cycles(); track item.id) {
+          <option [value]="item.id">{{ item.name }}</option>
+        }
+      </select>
+    </label>
   </div>
-} @else {
-  <div class="skeleton table-skel"></div>
+
+  <div class="filter-bar__actions">
+    <button type="button" class="btn-apply" (click)="applyFilters()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/>
+      </svg>
+      {{ 'development.apply' | t }}
+    </button>
+    <button type="button" class="btn-ghost" (click)="refreshAll()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 4v6h-6"/><path d="M20.5 15A9 9 0 1 1 18 5"/>
+      </svg>
+      {{ 'development.refresh' | t }}
+    </button>
+    <div class="seg">
+      <button type="button" [class.seg--on]="viewMode==='table'" (click)="viewMode='table'">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 16h18M9 4v16"/>
+        </svg>
+        {{ 'جدول' | t }}
+      </button>
+      <button type="button" [class.seg--on]="viewMode==='cards'" (click)="viewMode='cards'">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/>
+          <rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>
+        </svg>
+        {{ 'كارد' | t }}
+      </button>
+    </div>
+  </div>
+</section>
+
+@if (failed()) {
+  <div class="notice notice--muted">{{ 'تعذر التحميل.' | t }}</div>
+} @else if (data()) {
+  @if (!data()!.items.length) {
+    <div class="empty-state">
+      <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/>
+      </svg>
+      <h3>{{ 'development.empty.title' | t }}</h3>
+      <p>{{ 'development.empty.subtitle' | t }}</p>
+      @if (auth.hasPermission(PermissionCodes.DevelopmentManage)) {
+        <a class="btn-cta" routerLink="/development/create">{{ 'development.createPlan' | t }}</a>
+      }
+    </div>
+  } @else if (viewMode === 'table') {
+    <div class="table-wrap">
+      <table class="plans-table">
+        <thead>
+          <tr>
+            <th>{{ 'العنوان' | t }}</th>
+            <th>{{ 'الموظف' | t }}</th>
+            <th>{{ 'الدورة' | t }}</th>
+            <th>{{ 'development.sourceType' | t }}</th>
+            <th>{{ 'الحالة' | t }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of data()!.items; track row.id) {
+            <tr>
+              <td class="td-title">
+                <span class="row-ico">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-6"/>
+                  </svg>
+                </span>
+                <span>{{ row.planTitle }}</span>
+              </td>
+              <td>{{ employeeName(row.employeeId) }}</td>
+              <td>{{ cycleName(row.performanceCycleId) }}</td>
+              <td><span class="chip chip--soft">{{ sourceType(row.sourceType) }}</span></td>
+              <td><span class="chip" [class]="'chip--s' + row.status">{{ planStatus(row.status) }}</span></td>
+              <td class="td-actions">
+                <a class="link-pill" [routerLink]="['/development', row.id]">
+                  {{ 'عرض' | t }}
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 6l6 6-6 6"/>
+                  </svg>
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="plan-grid">
+      @for (row of data()!.items; track row.id) {
+        <article class="plan-card" [attr.data-status]="row.status">
+          <div class="plan-card__band"></div>
+          <header class="plan-card__head">
+            <div class="plan-card__titles">
+              <span class="plan-card__eyebrow">{{ sourceType(row.sourceType) }}</span>
+              <h3>{{ row.planTitle }}</h3>
+            </div>
+            <span class="chip" [class]="'chip--s' + row.status">{{ planStatus(row.status) }}</span>
+          </header>
+
+          <div class="plan-card__body">
+            <div class="info-row">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+              </svg>
+              <span>{{ employeeName(row.employeeId) }}</span>
+            </div>
+            <div class="info-row">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+              </svg>
+              <span>{{ cycleName(row.performanceCycleId) }}</span>
+            </div>
+          </div>
+
+          <footer class="plan-card__foot">
+            <a [routerLink]="['/development', row.id]" class="btn-open">
+              {{ 'development.openPlan' | t }}
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 6l6 6-6 6"/>
+              </svg>
+            </a>
+          </footer>
+        </article>
+      }
+    </div>
+  }
+
+  @if (data()!.items.length) {
+    <div class="pager-bar">
+      <button type="button" class="pager-btn" (click)="prevPage()" [disabled]="!data()!.hasPreviousPage">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        {{ 'السابق' | t }}
+      </button>
+      <span class="pager-indicator">{{ data()!.page }} / {{ data()!.totalPages || 1 }}</span>
+      <button type="button" class="pager-btn" (click)="nextPage()" [disabled]="!data()!.hasNextPage">
+        {{ 'التالي' | t }}
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  }
+} @else if (busy()) {
+  <div class="plan-grid">
+    @for (n of [1,2,3,4]; track n) {
+      <div class="skeleton-card"></div>
+    }
+  </div>
 }

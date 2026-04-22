@@ -4,10 +4,10 @@
       <path d="M15 18l-6-6 6-6" />
     </svg>
   </span>
-  <span class="back-link__label">نظرة التعاقب</span>
+  <span class="back-link__label">{{ 'نظرة التعاقب' | t }}</span>
 </a>
 @if (failed()) {
-  <div class="card card--muted">تعذر التحميل.</div>
+  <div class="card card--muted">{{ 'تعذر التحميل.' | t }}</div>
 } @else if (plan()) {
   <section class="page-head">
     <h1>{{ plan()!.planName }}</h1>
@@ -15,20 +15,20 @@
   </section>
   <div class="card grid">
     <div>
-      <div class="label">منصب حرج</div>
+      <div class="label">{{ 'منصب حرج' | t }}</div>
       <div class="value">{{ criticalLabel(plan()!.criticalPositionId) || '—' }}</div>
     </div>
     <div>
-      <div class="label">دورة الأداء</div>
+      <div class="label">{{ 'دورة الأداء' | t }}</div>
       <div class="value">{{ cycleLabel(plan()!.performanceCycleId) || '—' }}</div>
     </div>
     @if (plan()!.coverageSnapshot; as c) {
       <div>
-        <div class="label">درجة التغطية</div>
+        <div class="label">{{ 'درجة التغطية' | t }}</div>
         <div class="value">{{ c.coverageScore | number: '1.0-2' }}</div>
       </div>
       <div>
-        <div class="label">عدد المرشحين</div>
+        <div class="label">{{ 'عدد المرشحين' | t }}</div>
         <div class="value">{{ c.totalCandidates }}</div>
       </div>
     }
@@ -36,23 +36,23 @@
 
   <div class="card candidates">
     <div class="candidates__head">
-      <h2 class="h2">مرشحو الخلافة</h2>
+      <h2 class="h2">{{ 'مرشحو الخلافة' | t }}</h2>
       @if (auth.hasPermission(PermissionCodes.SuccessionManage)) {
-        <button type="button" class="btn-primary" [disabled]="busy()" (click)="openAdd()">إضافة مرشح</button>
+        <button type="button" class="btn-primary" [disabled]="busy()" (click)="openAdd()">{{ 'إضافة مرشح' | t }}</button>
       }
     </div>
     @if (!sortedCandidates().length) {
-      <p class="muted">لا يوجد مرشحون مسجّلون.</p>
+      <p class="muted">{{ 'لا يوجد مرشحون مسجّلون.' | t }}</p>
     } @else {
       <table class="data-table">
         <thead>
           <tr>
-            <th>الترتيب</th>
-            <th>الموظف</th>
-            <th>الجاهزية</th>
-            <th>أساسي</th>
+            <th>{{ 'الترتيب' | t }}</th>
+            <th>{{ 'الموظف' | t }}</th>
+            <th>{{ 'الجاهزية' | t }}</th>
+            <th>{{ 'أساسي' | t }}</th>
             @if (auth.hasPermission(PermissionCodes.SuccessionManage)) {
-              <th class="actions-col-head">إجراءات</th>
+              <th class="actions-col-head">{{ 'إجراءات' | t }}</th>
             }
           </tr>
         </thead>
@@ -64,7 +64,7 @@
               <td>{{ readiness(c.readinessLevel) }}</td>
               <td>
                 @if (c.isPrimarySuccessor) {
-                  <span class="pill pill--primary">أساسي</span>
+                  <span class="pill pill--primary">{{ 'أساسي' | t }}</span>
                 } @else {
                   <span class="muted">—</span>
                 }
@@ -78,7 +78,7 @@
                       [disabled]="busyRowId() === c.id"
                       (click)="markPrimary(c)"
                     >
-                      {{ busyRowId() === c.id ? '…' : 'تعيين كأساسي' }}
+                      {{ busyRowId() === c.id ? '…' : ('تعيين كأساسي' | t) }}
                     </button>
                   }
                   <button
@@ -87,7 +87,7 @@
                     [disabled]="busyRowId() === c.id"
                     (click)="removeCandidate(c)"
                   >
-                    حذف
+                    {{ 'حذف' | t }}
                   </button>
                 </td>
               }
@@ -104,32 +104,32 @@
 @if (showAddModal()) {
   <div class="modal-backdrop" (click)="closeAdd()"></div>
   <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
-    <h3>مرشح جديد</h3>
+    <h3>{{ 'مرشح جديد' | t }}</h3>
     <div class="modal-field modal-field--full">
       <app-lookup-search-combo
         kind="employee"
         [(value)]="addForm.employeeId"
-        label="الموظف"
-        placeholder="اكتب للبحث واختر من القائمة…"
+        [label]="'الموظف' | t"
+        [placeholder]="'اكتب للبحث واختر من القائمة…' | t"
       />
     </div>
     <label
-      >الجاهزية
+      >{{ 'الجاهزية' | t }}
       <select class="select" [(ngModel)]="addForm.readinessLevel" name="rl">
-        <option [ngValue]="1">جاهز الآن</option>
-        <option [ngValue]="2">جاهز قريباً</option>
-        <option [ngValue]="3">جاهز لاحقاً</option>
+        <option [ngValue]="1">{{ 'جاهز الآن' | t }}</option>
+        <option [ngValue]="2">{{ 'جاهز قريباً' | t }}</option>
+        <option [ngValue]="3">{{ 'جاهز لاحقاً' | t }}</option>
       </select>
     </label>
-    <label>الترتيب <input type="number" [(ngModel)]="addForm.rankOrder" name="ro" min="1" /></label>
+    <label>{{ 'الترتيب' | t }} <input type="number" [(ngModel)]="addForm.rankOrder" name="ro" min="1" /></label>
     <label class="inline-check">
       <input type="checkbox" [(ngModel)]="addForm.isPrimarySuccessor" name="ip" />
-      خليفة أساسي
+      {{ 'خليفة أساسي' | t }}
     </label>
-    <label>ملاحظات<input type="text" [(ngModel)]="addForm.notes" name="nt" /></label>
+    <label>{{ 'ملاحظات' | t }}<input type="text" [(ngModel)]="addForm.notes" name="nt" /></label>
     <div class="modal__actions">
-      <button type="button" class="btn-primary" [disabled]="busy()" (click)="saveCandidate()">حفظ</button>
-      <button type="button" class="btn-secondary" (click)="closeAdd()">إلغاء</button>
+      <button type="button" class="btn-primary" [disabled]="busy()" (click)="saveCandidate()">{{ 'حفظ' | t }}</button>
+      <button type="button" class="btn-secondary" (click)="closeAdd()">{{ 'إلغاء' | t }}</button>
     </div>
   </div>
 }

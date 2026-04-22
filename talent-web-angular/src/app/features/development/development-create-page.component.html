@@ -1,42 +1,134 @@
 <a routerLink="/development" class="back-link">
-  <span class="back-link__ico" aria-hidden="true">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <span aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M15 18l-6-6 6-6" />
     </svg>
   </span>
-  <span class="back-link__label">خطط التطوير</span>
+  <span>{{ 'development.backToList' | t }}</span>
 </a>
-<section class="page-head">
-  <h1>خطة تطوير جديدة</h1>
-</section>
-<div class="card form-card">
-  <div class="form-grid">
-    <label>معرّف الموظف<input [(ngModel)]="model.employeeId" name="eid" /></label>
-    <label
-      >دورة الأداء
-      <select class="select" [(ngModel)]="model.performanceCycleId" name="cy">
-        <option value="">— اختر —</option>
-        @for (c of cycles(); track c.id) {
-          <option [value]="c.id">{{ cycleLabel(c) }}</option>
-        }
-      </select>
-    </label>
-    <label>عنوان الخطة<input [(ngModel)]="model.planTitle" name="pt" /></label>
-    <label
-      >مصدر الخطة
-      <select [(ngModel)]="model.sourceType" name="st">
-        <option [ngValue]="1">يدوي</option>
-        <option [ngValue]="2">فجوة كفاءات</option>
-        <option [ngValue]="3">تعاقب</option>
-        <option [ngValue]="4">أداء</option>
-        <option [ngValue]="5">إمكانات</option>
-      </select>
-    </label>
-    <label>تاريخ الهدف<input type="date" [(ngModel)]="model.targetCompletionDate" name="td" /></label>
-    <label class="full">ملاحظات<textarea rows="2" [(ngModel)]="model.notes" name="nt"></textarea></label>
-  </div>
-  <div class="form-actions">
-    <button type="button" class="btn-primary" [disabled]="busy()" (click)="save()">{{ busy() ? '…' : 'حفظ' }}</button>
-    <a routerLink="/development" class="btn-ghost">إلغاء</a>
-  </div>
+
+<div class="create-layout">
+  <aside class="create-aside">
+    <div class="aside-card">
+      <div class="aside-card__icon">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2l3 6 6 .9-4.5 4.3 1 6.3L12 16.8 6.5 19.5l1-6.3L3 8.9 9 8z"/>
+        </svg>
+      </div>
+      <h2>{{ 'development.create.aside.title' | t }}</h2>
+      <p>{{ 'development.create.aside.desc' | t }}</p>
+      <ul class="tips">
+        <li>
+          <span class="tip-ico"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <span>{{ 'development.create.tip1' | t }}</span>
+        </li>
+        <li>
+          <span class="tip-ico"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <span>{{ 'development.create.tip2' | t }}</span>
+        </li>
+        <li>
+          <span class="tip-ico"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <span>{{ 'development.create.tip3' | t }}</span>
+        </li>
+      </ul>
+    </div>
+  </aside>
+
+  <section class="create-main">
+    <header class="create-head">
+      <span class="create-head__eyebrow">{{ 'development.title' | t }}</span>
+      <h1>{{ 'development.createPlan' | t }}</h1>
+      <p>{{ 'development.create.subtitle' | t }}</p>
+    </header>
+
+    <form class="form-card" (submit)="$event.preventDefault(); save()">
+      <fieldset class="form-block">
+        <legend>
+          <span class="legend-num">1</span>
+          {{ 'development.create.step.subject' | t }}
+        </legend>
+        <div class="form-grid">
+          <label class="field">
+            <span>{{ 'الموظف' | t }} <em>*</em></span>
+            <div class="select-wrap">
+              <select [(ngModel)]="model.employeeId" name="eid">
+                <option value="">{{ 'اختر الموظف' | t }}</option>
+                @for (e of employees(); track e.id) {
+                  <option [value]="e.id">{{ e.name }}</option>
+                }
+              </select>
+              <svg class="select-caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </label>
+
+          <label class="field">
+            <span>{{ 'دورة الأداء' | t }}</span>
+            <div class="select-wrap">
+              <select [(ngModel)]="model.performanceCycleId" name="cy">
+                <option value="">{{ '— اختر —' | t }}</option>
+                @for (c of cycles(); track c.id) {
+                  <option [value]="c.id">{{ c.name }}</option>
+                }
+              </select>
+              <svg class="select-caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-block">
+        <legend>
+          <span class="legend-num">2</span>
+          {{ 'development.create.step.plan' | t }}
+        </legend>
+        <div class="form-grid">
+          <label class="field full">
+            <span>{{ 'development.planTitle' | t }} <em>*</em></span>
+            <input [(ngModel)]="model.planTitle" name="pt" placeholder="{{ 'development.create.placeholder.planTitle' | t }}" />
+          </label>
+
+          <label class="field">
+            <span>{{ 'development.sourceType' | t }}</span>
+            <div class="source-picker">
+              @for (s of sourceOptions; track s) {
+                <button type="button" class="src-opt" [class.src-opt--on]="model.sourceType === s" (click)="model.sourceType = s">
+                  {{ sourceType(s) }}
+                </button>
+              }
+            </div>
+          </label>
+
+          <label class="field">
+            <span>{{ 'development.targetDate' | t }}</span>
+            <input type="date" [(ngModel)]="model.targetCompletionDate" name="td" />
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-block">
+        <legend>
+          <span class="legend-num">3</span>
+          {{ 'development.create.step.notes' | t }}
+        </legend>
+        <label class="field">
+          <span>{{ 'ملاحظات' | t }}</span>
+          <textarea rows="3" [(ngModel)]="model.notes" name="nt" placeholder="{{ 'development.create.placeholder.notes' | t }}"></textarea>
+        </label>
+      </fieldset>
+
+      <footer class="form-actions">
+        <a routerLink="/development" class="btn-ghost">{{ 'إلغاء' | t }}</a>
+        <button type="submit" class="btn-save" [disabled]="busy()">
+          @if (busy()) {
+            <span class="spin"></span>
+          } @else {
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/>
+            </svg>
+          }
+          {{ busy() ? ('جاري الحفظ' | t) : ('حفظ' | t) }}
+        </button>
+      </footer>
+    </form>
+  </section>
 </div>

@@ -1,12 +1,12 @@
 <div class="page-head-row pot-head">
 <section class="page-head">
-  <h1>تقييمات الإمكانات</h1>
-    <p class="page-head__sub">عرض وتصفية تقييمات الإمكانات، مع تفاصيل كاملة من الخادم لكل سجل.</p>
+  <h1>{{ 'تقييمات الإمكانات' | t }}</h1>
+    <p class="page-head__sub">{{ 'عرض وتصفية تقييمات الإمكانات، مع تفاصيل كاملة من الخادم لكل سجل.' | t }}</p>
   </section>
   <div class="page-actions">
     <button type="button" class="btn-head-primary" (click)="openCreate()">
       <span class="btn-head-primary__ico" aria-hidden="true">+</span>
-      <span>تقييم جديد</span>
+      <span>{{ 'تقييم جديد' | t }}</span>
     </button>
   </div>
 </div>
@@ -14,51 +14,51 @@
 <section class="toolbar card pot-toolbar">
   <div class="pot-toolbar__grid">
     <label class="pot-field">
-      <span class="pot-field__label">الموظف</span>
+      <span class="pot-field__label">{{ 'الموظف' | t }}</span>
       <select class="pot-field__control" [(ngModel)]="filterEmployeeId">
-        <option value="">كل الموظفين</option>
+        <option value="">{{ 'كل الموظفين' | t }}</option>
         @for (e of employees(); track e.id) {
           <option [value]="e.id">{{ e.name }}</option>
         }
       </select>
     </label>
     <label class="pot-field">
-      <span class="pot-field__label">الدورة</span>
+      <span class="pot-field__label">{{ 'الدورة' | t }}</span>
       <select class="pot-field__control" [(ngModel)]="filterCycleId">
-        <option value="">كل الدورات</option>
+        <option value="">{{ 'كل الدورات' | t }}</option>
         @for (c of cycles(); track c.id) {
           <option [value]="c.id">{{ c.name }}</option>
         }
       </select>
     </label>
     <label class="pot-field">
-      <span class="pot-field__label">مستوى الإمكانات</span>
+      <span class="pot-field__label">{{ 'مستوى الإمكانات' | t }}</span>
       <select class="pot-field__control" [(ngModel)]="filterPotentialLevel">
-        <option value="">الكل</option>
-        <option value="1">منخفض</option>
-        <option value="2">متوسط</option>
-        <option value="3">عالٍ</option>
+        <option value="">{{ 'الكل' | t }}</option>
+        <option value="1">{{ 'منخفض' | t }}</option>
+        <option value="2">{{ 'متوسط' | t }}</option>
+        <option value="3">{{ 'عالٍ' | t }}</option>
       </select>
     </label>
     <label class="pot-field">
-      <span class="pot-field__label">الحالة</span>
+      <span class="pot-field__label">{{ 'الحالة' | t }}</span>
       <select class="pot-field__control" [(ngModel)]="filterStatus">
-        <option value="">كل الحالات</option>
-        <option value="1">مسودة</option>
-        <option value="2">مُرسل</option>
-        <option value="3">قيد المراجعة</option>
-        <option value="4">معتمد</option>
+        <option value="">{{ 'كل الحالات' | t }}</option>
+        <option value="1">{{ 'مسودة' | t }}</option>
+        <option value="2">{{ 'مُرسل' | t }}</option>
+        <option value="3">{{ 'قيد المراجعة' | t }}</option>
+        <option value="4">{{ 'معتمد' | t }}</option>
       </select>
     </label>
-    <button type="button" class="pot-apply" (click)="applyFilters()">تطبيق الفلتر</button>
-    <div class="pot-view-mode" role="group" aria-label="طريقة العرض">
+    <button type="button" class="pot-apply" (click)="applyFilters()">{{ 'تطبيق الفلتر' | t }}</button>
+    <div class="pot-view-mode" role="group" [attr.aria-label]="'طريقة العرض' | t">
       <button
         type="button"
         class="pot-mode-btn"
         [class.pot-mode-btn--active]="viewMode === 'table'"
         (click)="viewMode = 'table'"
       >
-        جدول
+        {{ 'جدول' | t }}
       </button>
       <button
         type="button"
@@ -66,7 +66,7 @@
         [class.pot-mode-btn--active]="viewMode === 'cards'"
         (click)="viewMode = 'cards'"
       >
-        بطاقات
+        {{ 'بطاقات' | t }}
       </button>
     </div>
   </div>
@@ -75,19 +75,19 @@
 @if (viewMode === 'table') {
   <div class="table-shell card pot-table-shell">
     @if (busy()) {
-      <div class="table-shell__loading">جاري التحميل…</div>
+      <div class="table-shell__loading">{{ 'جاري التحميل…' | t }}</div>
     }
     <div class="table-scroll">
       <table class="data-table pot-table">
       <thead>
         <tr>
-          <th>الموظف</th>
-          <th>الدورة</th>
-            <th>المقيّم</th>
-            <th>الإجمالي</th>
-          <th>المستوى</th>
-          <th>الحالة</th>
-            <th class="pot-actions-head">إجراءات</th>
+          <th>{{ 'الموظف' | t }}</th>
+          <th>{{ 'الدورة' | t }}</th>
+            <th>{{ 'المقيّم' | t }}</th>
+            <th>{{ 'الإجمالي' | t }}</th>
+          <th>{{ 'المستوى' | t }}</th>
+          <th>{{ 'الحالة' | t }}</th>
+            <th class="pot-actions-head">{{ 'إجراءات' | t }}</th>
         </tr>
       </thead>
       <tbody>
@@ -100,8 +100,8 @@
               <td><span class="level-tag">{{ potentialLevel(row.potentialLevel) }}</span></td>
               <td><span class="chip" [attr.data-status]="row.status">{{ assessmentStatus(row.status) }}</span></td>
               <td class="cell-actions">
-                <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">تفاصيل</button>
-                <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row)">تعديل</button>
+                <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id)">{{ 'تفاصيل' | t }}</button>
+                <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row)">{{ 'تعديل' | t }}</button>
               </td>
           </tr>
         }
@@ -109,15 +109,15 @@
     </table>
     </div>
     <div class="pager pot-pager">
-      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!data()?.hasPreviousPage">السابق</button>
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!data()?.hasPreviousPage">{{ 'السابق' | t }}</button>
       <span class="pager__meta">{{ data()?.page ?? 1 }} / {{ data()?.totalPages ?? 1 }}</span>
-      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!data()?.hasNextPage">التالي</button>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!data()?.hasNextPage">{{ 'التالي' | t }}</button>
     </div>
   </div>
 } @else {
   <section class="pot-cards-wrap card" [attr.aria-busy]="busy() ? 'true' : 'false'">
     @if (busy()) {
-      <div class="pot-cards-loading">جاري التحميل…</div>
+      <div class="pot-cards-loading">{{ 'جاري التحميل…' | t }}</div>
     }
     <div class="pot-cards-grid">
       @for (row of data()?.items ?? []; track row.id; let i = $index) {
@@ -132,11 +132,11 @@
           <div class="pot-card__scores">
             <div class="pot-score-big">
               <strong>{{ row.overallPotentialScore | number: '1.0-2' }}</strong>
-              <span>إجمالي</span>
+              <span>{{ 'إجمالي' | t }}</span>
             </div>
             <div class="pot-card__meta">
               <span class="level-tag">{{ potentialLevel(row.potentialLevel) }}</span>
-              <span class="pot-assessor muted">المقيّم: {{ nameFrom(employees(), row.assessedByEmployeeId) }}</span>
+              <span class="pot-assessor muted">{{ 'المقيّم:' | t }} {{ nameFrom(employees(), row.assessedByEmployeeId) }}</span>
             </div>
           </div>
           <div class="pot-mini-bars" aria-hidden="true">
@@ -146,16 +146,16 @@
             <div class="pot-mini-bar"><span [style.width.%]="meterPct(row.mobilityScore)"></span></div>
           </div>
           <footer class="pot-card__foot">
-            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id); $event.stopPropagation()">تفاصيل</button>
-            <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row); $event.stopPropagation()">تعديل</button>
+            <button type="button" class="action-btn action-btn--info" (click)="openDetails(row.id); $event.stopPropagation()">{{ 'تفاصيل' | t }}</button>
+            <button type="button" class="action-btn action-btn--edit" (click)="openEdit(row); $event.stopPropagation()">{{ 'تعديل' | t }}</button>
           </footer>
         </article>
       }
     </div>
     <div class="pager pot-pager">
-      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!data()?.hasPreviousPage">السابق</button>
+      <button type="button" class="pager__btn" (click)="prevPage()" [disabled]="!data()?.hasPreviousPage">{{ 'السابق' | t }}</button>
       <span class="pager__meta">{{ data()?.page ?? 1 }} / {{ data()?.totalPages ?? 1 }}</span>
-      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!data()?.hasNextPage">التالي</button>
+      <button type="button" class="pager__btn" (click)="nextPage()" [disabled]="!data()?.hasNextPage">{{ 'التالي' | t }}</button>
     </div>
   </section>
 }
@@ -165,48 +165,48 @@
   <section class="modal pot-details-modal" role="dialog" aria-modal="true" aria-labelledby="pot-details-title">
     <header class="pot-details-modal__head">
       <div>
-        <h2 id="pot-details-title">تفاصيل تقييم الإمكانات</h2>
-        <p class="muted">يتم جلب التفاصيل من الخادم لكل تقييم (المعرّف الفريد).</p>
+        <h2 id="pot-details-title">{{ 'تفاصيل تقييم الإمكانات' | t }}</h2>
+        <p class="muted">{{ 'يتم جلب التفاصيل من الخادم لكل تقييم (المعرّف الفريد).' | t }}</p>
       </div>
-      <button type="button" class="pot-details-close" (click)="closeDetails()" aria-label="إغلاق">×</button>
+      <button type="button" class="pot-details-close" (click)="closeDetails()" [attr.aria-label]="'إغلاق' | t">×</button>
     </header>
     <div class="pot-details-modal__body">
       @if (detailsBusy()) {
-        <p class="pot-details-loading">جاري تحميل التفاصيل…</p>
+        <p class="pot-details-loading">{{ 'جاري تحميل التفاصيل…' | t }}</p>
       } @else if (detailRecord()) {
         @let d = detailRecord()!;
         <div class="pot-detail-grid">
           <div class="detail-block">
-            <span>الموظف</span>
+            <span>{{ 'الموظف' | t }}</span>
             <strong>{{ nameFrom(employees(), d.employeeId) }}</strong>
           </div>
           <div class="detail-block">
-            <span>الدورة</span>
+            <span>{{ 'الدورة' | t }}</span>
             <strong>{{ nameFrom(cycleLabels(), d.performanceCycleId) }}</strong>
           </div>
           <div class="detail-block">
-            <span>المقيّم</span>
+            <span>{{ 'المقيّم' | t }}</span>
             <strong>{{ nameFrom(employees(), d.assessedByEmployeeId) }}</strong>
           </div>
           <div class="detail-block">
-            <span>تاريخ التقييم</span>
+            <span>{{ 'تاريخ التقييم' | t }}</span>
             <strong>{{ d.assessedOnUtc ? (d.assessedOnUtc | date: 'medium') : '—' }}</strong>
           </div>
           <div class="detail-block">
-            <span>درجة الإجمالي</span>
+            <span>{{ 'درجة الإجمالي' | t }}</span>
             <strong>{{ d.overallPotentialScore | number: '1.0-4' }}</strong>
           </div>
           <div class="detail-block">
-            <span>مستوى الإمكانات</span>
+            <span>{{ 'مستوى الإمكانات' | t }}</span>
             <strong>{{ potentialLevel(d.potentialLevel) }}</strong>
           </div>
           <div class="detail-block detail-block--full">
-            <span>الحالة</span>
+            <span>{{ 'الحالة' | t }}</span>
             <span class="chip" [attr.data-status]="d.status">{{ assessmentStatus(d.status) }}</span>
           </div>
         </div>
 
-        <h3 class="pot-subhead">الدرجات الفرعية</h3>
+        <h3 class="pot-subhead">{{ 'الدرجات الفرعية' | t }}</h3>
         <div class="pot-score-grid">
           <div class="pot-score-cell"><span>Agility</span><strong>{{ d.agilityScore | number: '1.0-2' }}</strong></div>
           <div class="pot-score-cell"><span>Leadership</span><strong>{{ d.leadershipScore | number: '1.0-2' }}</strong></div>
@@ -215,20 +215,20 @@
         </div>
 
         @if (d.comments && d.comments.trim()) {
-          <h3 class="pot-subhead">ملاحظات</h3>
+          <h3 class="pot-subhead">{{ 'ملاحظات' | t }}</h3>
           <p class="pot-comments">{{ d.comments }}</p>
         }
 
         @if (d.factors.length > 0) {
-          <h3 class="pot-subhead">العوامل</h3>
+          <h3 class="pot-subhead">{{ 'العوامل' | t }}</h3>
           <div class="table-scroll pot-factors-scroll">
             <table class="data-table pot-factors-table">
               <thead>
                 <tr>
-                  <th>العامل</th>
-                  <th>الدرجة</th>
-                  <th>الوزن</th>
-                  <th>ملاحظات</th>
+                  <th>{{ 'العامل' | t }}</th>
+                  <th>{{ 'الدرجة' | t }}</th>
+                  <th>{{ 'الوزن' | t }}</th>
+                  <th>{{ 'ملاحظات' | t }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -248,9 +248,9 @@
     </div>
     <footer class="pot-details-modal__foot">
       @if (detailRecord()) {
-        <button type="button" class="btn-ghost" (click)="editFromDetails()">تعديل هذا التقييم</button>
+        <button type="button" class="btn-ghost" (click)="editFromDetails()">{{ 'تعديل هذا التقييم' | t }}</button>
       }
-      <button type="button" class="btn-primary" (click)="closeDetails()">إغلاق</button>
+      <button type="button" class="btn-primary" (click)="closeDetails()">{{ 'إغلاق' | t }}</button>
     </footer>
   </section>
 }
@@ -259,45 +259,45 @@
   <div class="modal-backdrop" (click)="createOpen.set(false)"></div>
   <section class="modal pot-form-modal" role="dialog" aria-modal="true">
     <header class="pot-form-modal__head">
-      <h3>إنشاء تقييم إمكانات</h3>
-      <button type="button" class="pot-details-close" (click)="createOpen.set(false)" aria-label="إغلاق">×</button>
+      <h3>{{ 'إنشاء تقييم إمكانات' | t }}</h3>
+      <button type="button" class="pot-details-close" (click)="createOpen.set(false)" [attr.aria-label]="'إغلاق' | t">×</button>
     </header>
     <div class="pot-form-modal__body">
       <div class="form-grid">
         <label class="field">
-          <span>الموظف</span>
+          <span>{{ 'الموظف' | t }}</span>
           <select [(ngModel)]="createModel.employeeId">
-            <option value="">اختر الموظف</option>
+            <option value="">{{ 'اختر الموظف' | t }}</option>
             @for (e of employees(); track e.id) {
               <option [value]="e.id">{{ e.name }}</option>
             }
           </select>
         </label>
         <label class="field">
-          <span>الدورة</span>
+          <span>{{ 'الدورة' | t }}</span>
           <select [(ngModel)]="createModel.performanceCycleId">
-            <option value="">اختر الدورة</option>
+            <option value="">{{ 'اختر الدورة' | t }}</option>
             @for (c of cycles(); track c.id) {
               <option [value]="c.id">{{ c.name }}</option>
             }
           </select>
         </label>
         <label class="field">
-          <span>قيّم بواسطة</span>
+          <span>{{ 'قيّم بواسطة' | t }}</span>
           <select [(ngModel)]="createModel.assessedByEmployeeId">
-            <option value="">اختر المقيّم</option>
+            <option value="">{{ 'اختر المقيّم' | t }}</option>
             @for (e of employees(); track e.id) {
               <option [value]="e.id">{{ e.name }}</option>
             }
           </select>
         </label>
         <label class="field">
-          <span>الحالة</span>
+          <span>{{ 'الحالة' | t }}</span>
           <select [(ngModel)]="createModel.status">
-            <option [ngValue]="1">مسودة</option>
-            <option [ngValue]="2">مُرسل</option>
-            <option [ngValue]="3">قيد المراجعة</option>
-            <option [ngValue]="4">معتمد</option>
+            <option [ngValue]="1">{{ 'مسودة' | t }}</option>
+            <option [ngValue]="2">{{ 'مُرسل' | t }}</option>
+            <option [ngValue]="3">{{ 'قيد المراجعة' | t }}</option>
+            <option [ngValue]="4">{{ 'معتمد' | t }}</option>
           </select>
         </label>
         <label class="field"><span>Agility</span><input type="number" min="0" max="100" step="0.1" [(ngModel)]="createModel.agilityScore" /></label>
@@ -305,14 +305,14 @@
         <label class="field"><span>Growth</span><input type="number" min="0" max="100" step="0.1" [(ngModel)]="createModel.growthScore" /></label>
         <label class="field"><span>Mobility</span><input type="number" min="0" max="100" step="0.1" [(ngModel)]="createModel.mobilityScore" /></label>
         <label class="field field--full">
-          <span>ملاحظات</span>
+          <span>{{ 'ملاحظات' | t }}</span>
           <textarea rows="3" [(ngModel)]="createModel.comments"></textarea>
         </label>
       </div>
     </div>
     <footer class="pot-form-modal__foot">
-      <button type="button" class="btn-ghost" (click)="createOpen.set(false)">إلغاء</button>
-      <button type="button" class="btn-primary" (click)="submitCreate()">حفظ</button>
+      <button type="button" class="btn-ghost" (click)="createOpen.set(false)">{{ 'إلغاء' | t }}</button>
+      <button type="button" class="btn-primary" (click)="submitCreate()">{{ 'حفظ' | t }}</button>
     </footer>
   </section>
 }
@@ -321,13 +321,13 @@
   <div class="modal-backdrop" (click)="editOpen.set(false)"></div>
   <section class="modal pot-form-modal" role="dialog" aria-modal="true">
     <header class="pot-form-modal__head">
-      <h3>تعديل تقييم الإمكانات</h3>
-      <button type="button" class="pot-details-close" (click)="editOpen.set(false)" aria-label="إغلاق">×</button>
+      <h3>{{ 'تعديل تقييم الإمكانات' | t }}</h3>
+      <button type="button" class="pot-details-close" (click)="editOpen.set(false)" [attr.aria-label]="'إغلاق' | t">×</button>
     </header>
     <div class="pot-form-modal__body">
       <div class="form-grid">
         <label class="field">
-          <span>قيّم بواسطة</span>
+          <span>{{ 'قيّم بواسطة' | t }}</span>
           <select [(ngModel)]="editModel.assessedByEmployeeId">
             @for (e of employees(); track e.id) {
               <option [value]="e.id">{{ e.name }}</option>
@@ -335,12 +335,12 @@
           </select>
         </label>
         <label class="field">
-          <span>الحالة</span>
+          <span>{{ 'الحالة' | t }}</span>
           <select [(ngModel)]="editModel.status">
-            <option [ngValue]="1">مسودة</option>
-            <option [ngValue]="2">مُرسل</option>
-            <option [ngValue]="3">قيد المراجعة</option>
-            <option [ngValue]="4">معتمد</option>
+            <option [ngValue]="1">{{ 'مسودة' | t }}</option>
+            <option [ngValue]="2">{{ 'مُرسل' | t }}</option>
+            <option [ngValue]="3">{{ 'قيد المراجعة' | t }}</option>
+            <option [ngValue]="4">{{ 'معتمد' | t }}</option>
           </select>
         </label>
         <label class="field"><span>Agility</span><input type="number" min="0" max="100" step="0.1" [(ngModel)]="editModel.agilityScore" /></label>
@@ -348,14 +348,14 @@
         <label class="field"><span>Growth</span><input type="number" min="0" max="100" step="0.1" [(ngModel)]="editModel.growthScore" /></label>
         <label class="field"><span>Mobility</span><input type="number" min="0" max="100" step="0.1" [(ngModel)]="editModel.mobilityScore" /></label>
         <label class="field field--full">
-          <span>ملاحظات</span>
+          <span>{{ 'ملاحظات' | t }}</span>
           <textarea rows="3" [(ngModel)]="editModel.comments"></textarea>
         </label>
       </div>
     </div>
     <footer class="pot-form-modal__foot">
-      <button type="button" class="btn-ghost" (click)="editOpen.set(false)">إلغاء</button>
-      <button type="button" class="btn-primary" (click)="submitEdit()">حفظ</button>
+      <button type="button" class="btn-ghost" (click)="editOpen.set(false)">{{ 'إلغاء' | t }}</button>
+      <button type="button" class="btn-primary" (click)="submitEdit()">{{ 'حفظ' | t }}</button>
     </footer>
   </section>
 }

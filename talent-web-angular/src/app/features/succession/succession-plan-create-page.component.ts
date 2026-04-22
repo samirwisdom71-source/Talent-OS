@@ -8,13 +8,14 @@ import { PerformanceCyclesApiService } from '../../services/performance-cycles-a
 import { SuccessionApiService } from '../../services/succession-api.service';
 import { PerformanceCycleDto } from '../../shared/models/performance.models';
 import { CreateSuccessionPlanRequest, CriticalPositionDto } from '../../shared/models/succession.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { I18nService } from '../../shared/services/i18n.service';
 import { EnumLabels, UiLang } from '../../shared/utils/enum-labels';
 
 @Component({
   selector: 'app-succession-plan-create-page',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, TranslatePipe],
   templateUrl: './succession-plan-create-page.component.html',
   styleUrl: '../development/development-create-page.component.scss',
 })
@@ -80,7 +81,7 @@ export class SuccessionPlanCreatePageComponent implements OnInit {
     this.api.createPlan(this.model).subscribe({
       next: (p) => {
         this.busy.set(false);
-        this.toast.show('تم إنشاء الخطة', 'success');
+        this.toast.show(this.i18n.t('تم إنشاء الخطة'), 'success');
         void this.router.navigate(['/succession/plans', p.id]);
       },
       error: () => {

@@ -4,8 +4,10 @@ import { map } from 'rxjs/operators';
 import { apiUrl } from '../core/config/api-url';
 import { ApiResponse, PagedResult } from '../shared/models/api.types';
 import {
+  CreateDevelopmentPlanItemRequest,
   DevelopmentPlanItemDto,
   DevelopmentPlanItemFilterRequest,
+  UpdateDevelopmentPlanItemRequest,
   UpdateDevelopmentPlanItemProgressRequest,
 } from '../shared/models/development-item.models';
 import { toHttpParams, unwrapApiResponse, unwrapApiVoid } from '../shared/utils/api-helpers';
@@ -29,6 +31,18 @@ export class DevelopmentPlanItemsApiService {
   getById(id: string) {
     return this.http
       .get<ApiResponse<DevelopmentPlanItemDto>>(`${this.base}/${id}`)
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  create(body: CreateDevelopmentPlanItemRequest) {
+    return this.http
+      .post<ApiResponse<DevelopmentPlanItemDto>>(this.base, body)
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  update(id: string, body: UpdateDevelopmentPlanItemRequest) {
+    return this.http
+      .put<ApiResponse<DevelopmentPlanItemDto>>(`${this.base}/${id}`, body)
       .pipe(map((r) => unwrapApiResponse(r)));
   }
 

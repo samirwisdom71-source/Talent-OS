@@ -15,6 +15,7 @@ import {
   SuccessorCandidateDto,
 } from '../../shared/models/successor-candidate.models';
 import { SuccessionPlanDto } from '../../shared/models/succession.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { I18nService } from '../../shared/services/i18n.service';
 import { LookupSearchComboComponent } from '../../shared/ui/lookup-search-combo.component';
 import { EnumLabels, UiLang } from '../../shared/utils/enum-labels';
@@ -22,7 +23,7 @@ import { EnumLabels, UiLang } from '../../shared/utils/enum-labels';
 @Component({
   selector: 'app-succession-plan-detail-page',
   standalone: true,
-  imports: [RouterLink, DecimalPipe, FormsModule, LookupSearchComboComponent],
+  imports: [RouterLink, DecimalPipe, FormsModule, LookupSearchComboComponent, TranslatePipe],
   templateUrl: './succession-plan-detail-page.component.html',
   styleUrl: './succession-plan-detail-page.component.scss',
 })
@@ -143,7 +144,7 @@ export class SuccessionPlanDetailPageComponent implements OnInit {
 
   saveCandidate(): void {
     if (!this.addForm.employeeId.trim()) {
-      this.toast.show('اختر الموظف من القائمة', 'error');
+      this.toast.show(this.i18n.t('اختر الموظف من القائمة'), 'error');
       return;
     }
     this.busy.set(true);
@@ -160,12 +161,12 @@ export class SuccessionPlanDetailPageComponent implements OnInit {
         next: () => {
           this.busy.set(false);
           this.closeAdd();
-          this.toast.show('تمت إضافة المرشح', 'success');
+          this.toast.show(this.i18n.t('تمت إضافة المرشح'), 'success');
           this.reload(this.addForm.successionPlanId);
         },
         error: () => {
           this.busy.set(false);
-          this.toast.show('تعذرت الإضافة', 'error');
+          this.toast.show(this.i18n.t('تعذرت الإضافة'), 'error');
         },
       });
   }
@@ -177,12 +178,12 @@ export class SuccessionPlanDetailPageComponent implements OnInit {
     this.candidatesApi.markPrimary(c.id).subscribe({
       next: () => {
         this.busyRowId.set(null);
-        this.toast.show('تم تعيين الخليفة الأساسي', 'success');
+        this.toast.show(this.i18n.t('تم تعيين الخليفة الأساسي'), 'success');
         this.reload(pid);
       },
       error: () => {
         this.busyRowId.set(null);
-        this.toast.show('تعذر التعيين', 'error');
+        this.toast.show(this.i18n.t('تعذر التعيين'), 'error');
       },
     });
   }
@@ -194,12 +195,12 @@ export class SuccessionPlanDetailPageComponent implements OnInit {
     this.candidatesApi.remove(c.id).subscribe({
       next: () => {
         this.busyRowId.set(null);
-        this.toast.show('تم الحذف', 'success');
+        this.toast.show(this.i18n.t('تم الحذف'), 'success');
         this.reload(pid);
       },
       error: () => {
         this.busyRowId.set(null);
-        this.toast.show('تعذر الحذف', 'error');
+        this.toast.show(this.i18n.t('تعذر الحذف'), 'error');
       },
     });
   }

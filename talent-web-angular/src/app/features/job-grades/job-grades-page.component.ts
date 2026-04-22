@@ -4,19 +4,22 @@ import { ToastService } from '../../core/services/toast.service';
 import { JobGradesApiService } from '../../services/job-grades-api.service';
 import { PagedResult } from '../../shared/models/api.types';
 import { CreateJobGradeRequest, JobGradeDto, UpdateJobGradeRequest } from '../../shared/models/job-grade.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { I18nService } from '../../shared/services/i18n.service';
 
 type ViewMode = 'table' | 'cards';
 
 @Component({
   selector: 'app-job-grades-page',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './job-grades-page.component.html',
   styleUrl: './job-grades-page.component.scss',
 })
 export class JobGradesPageComponent implements OnInit {
   private readonly api = inject(JobGradesApiService);
   private readonly toast = inject(ToastService);
+  private readonly i18n = inject(I18nService);
 
   search = '';
   level: number | '' = '';
@@ -79,21 +82,21 @@ export class JobGradesPageComponent implements OnInit {
   saveCreate(): void {
     const name = this.createModel.name.trim();
     if (!name || this.createModel.level <= 0) {
-      this.toast.show('أدخل اسم صحيح ومستوى أكبر من 0', 'error');
+      this.toast.show(this.i18n.t('أدخل اسم صحيح ومستوى أكبر من 0'), 'error');
       return;
     }
 
     this.actionBusy.set(true);
     this.api.create({ name, level: this.createModel.level }).subscribe({
       next: () => {
-        this.toast.show('تم إنشاء الدرجة الوظيفية', 'success');
+        this.toast.show(this.i18n.t('تم إنشاء الدرجة الوظيفية'), 'success');
         this.createOpen.set(false);
         this.actionBusy.set(false);
         this.page = 1;
         this.load();
       },
       error: () => {
-        this.toast.show('تعذر إنشاء الدرجة الوظيفية', 'error');
+        this.toast.show(this.i18n.t('تعذر إنشاء الدرجة الوظيفية'), 'error');
         this.actionBusy.set(false);
       },
     });
@@ -108,7 +111,7 @@ export class JobGradesPageComponent implements OnInit {
         this.actionBusy.set(false);
       },
       error: () => {
-        this.toast.show('تعذر تحميل التفاصيل', 'error');
+        this.toast.show(this.i18n.t('تعذر تحميل التفاصيل'), 'error');
         this.actionBusy.set(false);
       },
     });
@@ -125,7 +128,7 @@ export class JobGradesPageComponent implements OnInit {
         this.actionBusy.set(false);
       },
       error: () => {
-        this.toast.show('تعذر تحميل بيانات التعديل', 'error');
+        this.toast.show(this.i18n.t('تعذر تحميل بيانات التعديل'), 'error');
         this.actionBusy.set(false);
       },
     });
@@ -136,20 +139,20 @@ export class JobGradesPageComponent implements OnInit {
     if (!selected) return;
     const name = this.editModel.name.trim();
     if (!name || this.editModel.level <= 0) {
-      this.toast.show('أدخل اسم صحيح ومستوى أكبر من 0', 'error');
+      this.toast.show(this.i18n.t('أدخل اسم صحيح ومستوى أكبر من 0'), 'error');
       return;
     }
 
     this.actionBusy.set(true);
     this.api.update(selected.id, { name, level: this.editModel.level }).subscribe({
       next: () => {
-        this.toast.show('تم تحديث الدرجة الوظيفية', 'success');
+        this.toast.show(this.i18n.t('تم تحديث الدرجة الوظيفية'), 'success');
         this.editOpen.set(false);
         this.actionBusy.set(false);
         this.load();
       },
       error: () => {
-        this.toast.show('تعذر تحديث الدرجة الوظيفية', 'error');
+        this.toast.show(this.i18n.t('تعذر تحديث الدرجة الوظيفية'), 'error');
         this.actionBusy.set(false);
       },
     });

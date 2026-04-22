@@ -9,13 +9,14 @@ import { SuccessionApiService } from '../../services/succession-api.service';
 import { SuccessionAnalyticsSummaryDto } from '../../shared/models/domain-analytics.models';
 import { CriticalPositionDto, SuccessionPlanDto } from '../../shared/models/succession.models';
 import { PermissionCodes as PermissionCodesConst } from '../../shared/models/permission-codes';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { I18nService } from '../../shared/services/i18n.service';
 import { EnumLabels, UiLang } from '../../shared/utils/enum-labels';
 
 @Component({
   selector: 'app-succession-overview-page',
   standalone: true,
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, DecimalPipe, TranslatePipe],
   templateUrl: './succession-overview-page.component.html',
   styleUrl: './succession-overview-page.component.scss',
 })

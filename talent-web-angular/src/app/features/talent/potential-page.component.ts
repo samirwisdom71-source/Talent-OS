@@ -12,6 +12,7 @@ import {
   PotentialAssessmentDto,
   UpdatePotentialAssessmentRequest,
 } from '../../shared/models/potential.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { I18nService } from '../../shared/services/i18n.service';
 import { LookupItemDto } from '../../shared/models/lookup.models';
 import { PERFORMANCE_CYCLE_STATUS_ACTIVE } from '../../shared/constants/performance-cycle-status';
@@ -22,7 +23,7 @@ type PotentialViewMode = 'table' | 'cards';
 @Component({
   selector: 'app-potential-page',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, FormsModule],
+  imports: [DatePipe, DecimalPipe, FormsModule, TranslatePipe],
   templateUrl: './potential-page.component.html',
   styleUrl: './potential-page.component.scss',
 })

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TalentSystem.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6899162b740104ea0acb5a7c2fe843f57262437e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f9bab3016d4fd571568dc3d2aa93b695e6ac5812")]
 [assembly: System.Reflection.AssemblyProductAttribute("TalentSystem.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TalentSystem.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
