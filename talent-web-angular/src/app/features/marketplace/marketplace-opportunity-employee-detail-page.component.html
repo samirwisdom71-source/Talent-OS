@@ -1,0 +1,34 @@
+<a routerLink="/marketplace/opportunities" class="emp-back">{{ 'marketplace.employee.backToList' | t }}</a>
+
+@if (loading()) {
+  <div class="skeleton box"></div>
+} @else if (failed() || !opp()) {
+  <div class="card card--muted">{{ 'marketplace.employee.loadFailed' | t }}</div>
+} @else {
+  <article class="detail">
+    <header class="detail__head">
+      <h1>{{ opp()!.title }}</h1>
+      <span class="type">{{ oppType(opp()!.opportunityType) }}</span>
+    </header>
+
+    <section class="detail__content">
+      <p>{{ opp()!.description || '—' }}</p>
+      <ul>
+        <li><span>{{ 'employeeCreate.form.organizationUnit' | t }}</span><strong>{{ opp()!.organizationUnitName || '—' }}</strong></li>
+        @if (opp()!.positionTitle) {
+          <li><span>{{ 'employeeCreate.form.position' | t }}</span><strong>{{ opp()!.positionTitle }}</strong></li>
+        }
+        <li><span>{{ 'marketplace.create.fieldOpen' | t }}</span><strong>{{ opp()!.openDate | date: 'mediumDate' }}</strong></li>
+        @if (opp()!.closeDate) {
+          <li><span>{{ 'marketplace.create.fieldClose' | t }}</span><strong>{{ opp()!.closeDate | date: 'mediumDate' }}</strong></li>
+        }
+      </ul>
+    </section>
+
+    <footer class="detail__footer">
+      <a class="btn-primary" [routerLink]="['/marketplace/opportunities', opp()!.id, 'apply']">
+        {{ 'marketplace.employee.apply' | t }}
+      </a>
+    </footer>
+  </article>
+}

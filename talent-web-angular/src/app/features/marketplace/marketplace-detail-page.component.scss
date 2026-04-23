@@ -1,27 +1,119 @@
 @import '../employees/employee-detail-page.component.scss';
 
-.prose {
-  padding: 1.25rem 1.5rem;
-  line-height: 1.6;
+:host {
+  display: block;
+  padding: 18px clamp(14px, 3vw, 30px) 34px;
 }
 
-.subtle {
-  color: var(--color-muted);
-  font-size: 0.88rem;
+.market-admin-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.apps {
-  margin-top: 1rem;
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-radius: 20px;
+  padding: 16px 18px;
+  color: #f8fafc;
+  background: linear-gradient(135deg, #0f172a, #1d4ed8 55%, #7c3aed);
+  box-shadow: 0 16px 34px -22px rgba(15, 23, 42, 0.75);
 }
 
-.h2 {
-  margin: 0 0 0.75rem;
-  font-size: 1rem;
+.hero__main {
+  min-width: 0;
+  flex: 1;
 }
 
-.muted {
-  color: var(--color-muted);
+.hero h1 {
+  margin: 0 0 6px;
+  font-size: clamp(1.2rem, 2.3vw, 1.55rem);
+  letter-spacing: -0.02em;
+}
+
+.hero__sub {
+  margin: 0;
+  opacity: 0.9;
   font-size: 0.9rem;
+}
+
+.opp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.danger {
+  color: #b91c1c;
+  border-color: rgba(185, 28, 28, 0.3);
+}
+
+.prose {
+  padding: 1rem 1.1rem;
+  line-height: 1.65;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.meta-grid {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  span {
+    color: var(--color-muted, #64748b);
+    font-size: 0.78rem;
+  }
+  strong {
+    color: #0f172a;
+    font-size: 0.92rem;
+  }
+}
+
+.apps-card {
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  padding: 0.95rem 1rem 1rem;
+}
+
+.apps-card__title {
+  margin: 0 0 0.65rem;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.table-wrap {
+  overflow: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.status-pill {
+  display: inline-flex;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #334155;
+  background: #e2e8f0;
 }
 
 .cell-actions {
@@ -31,17 +123,21 @@
 }
 
 .linkish {
-  border: none;
-  background: none;
-  color: var(--color-accent-strong);
+  border: 1px solid #dbeafe;
+  background: #eff6ff;
+  color: #1d4ed8;
   cursor: pointer;
   font: inherit;
-  text-decoration: underline;
-  padding: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.26rem 0.55rem;
+  border-radius: 999px;
 }
 
 .linkish.danger {
   color: #b91c1c;
+  border-color: #fecaca;
+  background: #fef2f2;
 }
 
 .linkish:disabled {

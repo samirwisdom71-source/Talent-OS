@@ -41,3 +41,6 @@ D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSyste
 D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Infrastructure\obj\Debug\net9.0\refint\TalentSystem.Infrastructure.dll
 D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Infrastructure\obj\Debug\net9.0\TalentSystem.Infrastructure.pdb
 D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSystem.Infrastructure\obj\Debug\net9.0\ref\TalentSystem.Infrastructure.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\.tmp-build-out\TalentSystem.Infrastructure.deps.json
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\.tmp-build-out\TalentSystem.Infrastructure.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\.tmp-build-out\TalentSystem.Infrastructure.pdb

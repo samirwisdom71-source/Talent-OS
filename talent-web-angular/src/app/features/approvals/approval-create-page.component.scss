@@ -1,0 +1,90 @@
+.form-card {
+  padding: 1.35rem 1.5rem;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  min-width: 0;
+}
+
+.field__label {
+  font-weight: 650;
+  color: #334155;
+  font-size: 0.82rem;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-md, 12px);
+  background: #f8fafc;
+  padding: 0.62rem 0.85rem;
+  font: inherit;
+  color: #0f172a;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.2s ease,
+    background 0.15s ease;
+}
+
+.field textarea {
+  min-height: 3.2rem;
+  resize: vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+}
+
+.field select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #64748b 50%),
+    linear-gradient(135deg, #64748b 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.1rem) 55%,
+    calc(100% - 0.65rem) 55%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-inline-end: 2rem;
+}
+
+html[dir='rtl'] .field select {
+  background-position:
+    1.1rem 55%,
+    0.65rem 55%;
+  background-image: linear-gradient(135deg, transparent 50%, #64748b 50%),
+    linear-gradient(45deg, #64748b 50%, transparent 50%);
+  padding-inline-end: 0.85rem;
+  padding-inline-start: 2rem;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--color-border, #e2e8f0);
+}

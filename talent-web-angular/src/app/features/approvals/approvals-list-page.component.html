@@ -1,28 +1,63 @@
+<section class="approvals-toolbar">
+  <div class="view-toggle">
+    <button type="button" class="toggle-btn" [class.toggle-btn--active]="viewMode() === 'table'" (click)="setViewMode('table')">
+      {{ 'common.table' | t }}
+    </button>
+    <button type="button" class="toggle-btn" [class.toggle-btn--active]="viewMode() === 'cards'" (click)="setViewMode('cards')">
+      {{ 'common.cards' | t }}
+    </button>
+  </div>
+</section>
+
 @if (failed()) {
-  <div class="card card--muted">تعذر التحميل.</div>
-} @else if (data()) {
+  <div class="card card--muted">
+    {{ 'approvals.loadFailed' | t }}
+    <button type="button" class="link-btn" (click)="load()">{{ 'common.retry' | t }}</button>
+  </div>
+} @else if (busy() && !data()) {
+  <div class="skeleton table-skel"></div>
+} @else if (data() && !data()!.items.length) {
+  <div class="card card--muted">{{ 'approvals.empty' | t }}</div>
+} @else if (data() && viewMode() === 'table') {
   <div class="card table-card">
     <table class="data-table">
       <thead>
         <tr>
-          <th>العنوان</th>
-          <th>النوع</th>
-          <th>الحالة</th>
-          <th></th>
+          <th>{{ 'approvals.table.title' | t }}</th>
+          <th>{{ 'approvals.table.type' | t }}</th>
+          <th>{{ 'common.status' | t }}</th>
+          <th>{{ 'approvals.table.submittedOn' | t }}</th>
+          <th>{{ 'common.actions' | t }}</th>
         </tr>
       </thead>
       <tbody>
         @for (row of data()!.items; track row.id) {
           <tr>
             <td>{{ row.title }}</td>
-            <td>{{ row.requestType }}</td>
-            <td>{{ row.status }}</td>
-            <td class="cell-actions"><a class="link" [routerLink]="['/approvals', row.id]">عرض</a></td>
+            <td>{{ requestTypeLabel(row.requestType) }}</td>
+            <td><span class="pill">{{ statusLabel(row.status) }}</span></td>
+            <td>{{ row.submittedOnUtc ? (row.submittedOnUtc | date: 'short') : '—' }}</td>
+            <td class="cell-actions"><a class="link" [routerLink]="['/approvals', row.id]">{{ 'common.view' | t }}</a></td>
           </tr>
         }
       </tbody>
     </table>
   </div>
-} @else {
-  <div class="skeleton table-skel"></div>
+} @else if (data()) {
+  <div class="cards-grid">
+    @for (row of data()!.items; track row.id) {
+      <article class="card req-card">
+        <h3 class="req-card__title">{{ row.title }}</h3>
+        <div class="req-card__meta">
+          <span class="pill">{{ statusLabel(row.status) }}</span>
+          <span>{{ requestTypeLabel(row.requestType) }}</span>
+        </div>
+        <div class="req-card__date">
+          {{ 'approvals.table.submittedOn' | t }}:
+          {{ row.submittedOnUtc ? (row.submittedOnUtc | date: 'short') : '—' }}
+        </div>
+        <a class="req-card__open" [routerLink]="['/approvals', row.id]">{{ 'common.view' | t }}</a>
+      </article>
+    }
+  </div>
 }

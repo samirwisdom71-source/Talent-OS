@@ -1,78 +1,115 @@
 <div class="exec">
   <header class="exec__hero">
     <div class="exec__hero-text">
-      <h1 class="exec__title">التحليلات التنفيذية</h1>
-      <p class="exec__lead">مؤشرات موحّدة من ملخص التنفيذ — نفس مصدر لوحة التحكم للاتساق.</p>
+      <h1 class="exec__title">{{ 'analytics.executive.title' | t }}</h1>
+      <p class="exec__lead">{{ 'analytics.executive.lead' | t }}</p>
     </div>
-    <a class="exec__back" routerLink="/dashboard">← لوحة التحكم</a>
+    <a class="back-link exec__back" routerLink="/dashboard">
+      <span class="back-link__ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+      </span>
+      <span class="back-link__label">{{ 'analytics.executive.back' | t }}</span>
+    </a>
   </header>
 
   @if (failed()) {
     <app-empty-state
-      icon="📊"
-      title="تعذر تحميل التحليلات"
-      message="تحقق من الاتصال بالخادم وصلاحياتك ثم أعد المحاولة."
-      retryLabel="إعادة المحاولة"
+      [chartIcon]="true"
+      [title]="'analytics.executive.loadFailed' | t"
+      [message]="'analytics.executive.loadHint' | t"
+      [retryLabel]="'common.retry' | t"
       (retryClick)="load()"
     />
   } @else if (summary()) {
     <section class="exec__section exec__section--enter">
-      <h2 class="exec__section-title">مؤشرات المواهب والأداء</h2>
+      <h2 class="exec__section-title">{{ 'analytics.executive.section.talent' | t }}</h2>
       <div class="exec__kpi-grid">
         <article class="exec__kpi exec__kpi--indigo">
-          <span class="exec__kpi-ico" aria-hidden="true">👥</span>
-          <div class="exec__kpi-meta">الموظفون</div>
+          <span class="exec__kpi-ico" aria-hidden="true"
+            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+              ><path d="M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0Z" /><path d="M4 20a8 8 0 1 1 16 0" /></svg
+            ></span>
+          <div class="exec__kpi-meta">{{ 'analytics.kpi.employees' | t }}</div>
           <div class="exec__kpi-value">{{ summary()!.totalEmployees | number }}</div>
         </article>
         <article class="exec__kpi exec__kpi--sky">
-          <span class="exec__kpi-ico" aria-hidden="true">📑</span>
-          <div class="exec__kpi-meta">التصنيفات</div>
+          <span class="exec__kpi-ico" aria-hidden="true"
+            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+              ><path d="M4 5h16M4 12h16M4 19h16" /></svg
+            ></span>
+          <div class="exec__kpi-meta">{{ 'analytics.kpi.classifications' | t }}</div>
           <div class="exec__kpi-value">{{ summary()!.totalTalentClassifications | number }}</div>
         </article>
         <article class="exec__kpi exec__kpi--teal">
-          <span class="exec__kpi-ico" aria-hidden="true">✨</span>
-          <div class="exec__kpi-meta">إمكانات مرتفعة</div>
+          <span class="exec__kpi-ico" aria-hidden="true"
+            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+              ><path d="M4 19V5m0 14h16M8 15l3-3 2 2 5-5" /></svg
+            ></span>
+          <div class="exec__kpi-meta">{{ 'analytics.kpi.highPotential' | t }}</div>
           <div class="exec__kpi-value">{{ summary()!.highPotentialCount | number }}</div>
         </article>
         <article class="exec__kpi exec__kpi--violet">
-          <span class="exec__kpi-ico" aria-hidden="true">🚀</span>
-          <div class="exec__kpi-meta">أداء مرتفع</div>
+          <span class="exec__kpi-ico" aria-hidden="true"
+            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+              ><path d="m4 14 4-4 4 4 8-8" /></svg
+            ></span>
+          <div class="exec__kpi-meta">{{ 'analytics.kpi.highPerformer' | t }}</div>
           <div class="exec__kpi-value">{{ summary()!.highPerformerCount | number }}</div>
         </article>
         <article class="exec__kpi exec__kpi--amber">
-          <span class="exec__kpi-ico" aria-hidden="true">🎯</span>
-          <div class="exec__kpi-meta">قادة استراتيجيون</div>
+          <span class="exec__kpi-ico" aria-hidden="true"
+            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+              ><path d="M12 3v18M3 12h18" /></svg
+            ></span>
+          <div class="exec__kpi-meta">{{ 'analytics.kpi.strategicLeader' | t }}</div>
           <div class="exec__kpi-value">{{ summary()!.strategicLeaderCount | number }}</div>
         </article>
         <article class="exec__kpi exec__kpi--rose">
-          <span class="exec__kpi-ico" aria-hidden="true">📈</span>
-          <div class="exec__kpi-meta">درجات مواهب</div>
+          <span class="exec__kpi-ico" aria-hidden="true"
+            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+              ><path d="M3 3v18h18" /><path d="M7 16l4-4 3 3 5-6" /></svg
+            ></span>
+          <div class="exec__kpi-meta">{{ 'analytics.kpi.talentScores' | t }}</div>
           <div class="exec__kpi-value">{{ summary()!.totalTalentScores | number }}</div>
         </article>
       </div>
     </section>
 
     <section class="exec__section exec__section--enter exec__section--delay">
-      <h2 class="exec__section-title">العمليات والسوق</h2>
+      <h2 class="exec__section-title">{{ 'analytics.executive.section.ops' | t }}</h2>
       <div class="exec__kpi-grid exec__kpi-grid--dense">
         <article class="exec__kpi exec__kpi--slate">
-          <span class="exec__kpi-ico" aria-hidden="true">📆</span>
-          <div class="exec__kpi-meta">دورات أداء نشطة</div>
+          <span class="exec__kpi-ico" aria-hidden="true"
+            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+              ><path d="M7 3v4M17 3v4M4 9h16M5 5h14v16H5z" /></svg
+            ></span>
+          <div class="exec__kpi-meta">{{ 'analytics.kpi.activeCycles' | t }}</div>
           <div class="exec__kpi-value">{{ summary()!.activePerformanceCycleCount | number }}</div>
         </article>
         <article class="exec__kpi exec__kpi--slate">
-          <span class="exec__kpi-ico" aria-hidden="true">🔀</span>
-          <div class="exec__kpi-meta">خطط تعاقب نشطة</div>
+          <span class="exec__kpi-ico" aria-hidden="true"
+            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+              ><path d="M4 6h16M4 12h10M4 18h7" /></svg
+            ></span>
+          <div class="exec__kpi-meta">{{ 'analytics.kpi.successionPlans' | t }}</div>
           <div class="exec__kpi-value">{{ summary()!.activeSuccessionPlanCount | number }}</div>
         </article>
         <article class="exec__kpi exec__kpi--slate">
-          <span class="exec__kpi-ico" aria-hidden="true">🏪</span>
-          <div class="exec__kpi-meta">فرص مفتوحة</div>
+          <span class="exec__kpi-ico" aria-hidden="true"
+            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+              ><path d="M3 7h18v12H3zM7 7V5h10v2" /></svg
+            ></span>
+          <div class="exec__kpi-meta">{{ 'analytics.kpi.marketplace' | t }}</div>
           <div class="exec__kpi-value">{{ summary()!.openMarketplaceOpportunityCount | number }}</div>
         </article>
         <article class="exec__kpi exec__kpi--slate">
-          <span class="exec__kpi-ico" aria-hidden="true">🎓</span>
-          <div class="exec__kpi-meta">خطط تطوير نشطة</div>
+          <span class="exec__kpi-ico" aria-hidden="true"
+            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+              ><path d="M4 19h16M6 5h12v10H6z" /></svg
+            ></span>
+          <div class="exec__kpi-meta">{{ 'analytics.kpi.developmentPlans' | t }}</div>
           <div class="exec__kpi-value">{{ summary()!.activeDevelopmentPlanCount | number }}</div>
         </article>
       </div>

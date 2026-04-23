@@ -382,105 +382,113 @@ public sealed class IntelligenceService : IIntelligenceService
                 IntelligenceErrors.CycleArchived);
         }
 
-        IntelligenceRun? run = null;
-
         var context = await BuildContextAsync(request.EmployeeId, request.PerformanceCycleId, cancellationToken)
             .ConfigureAwait(false);
 
         var insightCount = 0;
         var recommendationCount = 0;
+        IntelligenceRun? run = null;
 
-        await using var tx = await _db.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
-        try
+        // SqlServerRetryingExecutionStrategy + explicit transactions: wrap in CreateExecutionStrategy().
+        var strategy = _db.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async () =>
         {
-            if (!skipRun)
+            insightCount = 0;
+            recommendationCount = 0;
+            run = null;
+
+            await using var tx = await _db.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+            try
             {
-                run = new IntelligenceRun
+                if (!skipRun)
                 {
-                    RunType = IntelligenceRunType.Employee,
-                    PerformanceCycleId = request.PerformanceCycleId,
-                    EmployeeId = request.EmployeeId,
-                    StartedOnUtc = DateTime.UtcNow,
-                    Status = IntelligenceRunStatus.Started,
-                    Notes = $"scope:{scope}"
-                };
-                _db.IntelligenceRuns.Add(run);
-            }
+                    run = new IntelligenceRun
+                    {
+                        RunType = IntelligenceRunType.Employee,
+                        PerformanceCycleId = request.PerformanceCycleId,
+                        EmployeeId = request.EmployeeId,
+                        StartedOnUtc = DateTime.UtcNow,
+                        Status = IntelligenceRunStatus.Started,
+                        Notes = $"scope:{scope}"
+                    };
+                    _db.IntelligenceRuns.Add(run);
+                }
 
-            if (scope == IntelligenceScope.InsightsOnly || scope == IntelligenceScope.All)
-            {
-                await ArchiveRulesEngineActiveInsightsAsync(
-                        request.EmployeeId,
-                        request.PerformanceCycleId,
-                        cancellationToken)
-                    .ConfigureAwait(false);
-            }
-
-            if (scope == IntelligenceScope.RecommendationsOnly || scope == IntelligenceScope.All)
-            {
-                await ArchiveRulesEngineActiveRecommendationsAsync(
-                        request.EmployeeId,
-                        request.PerformanceCycleId,
-                        cancellationToken)
-                    .ConfigureAwait(false);
-            }
-
-            if (context is not null)
-            {
                 if (scope == IntelligenceScope.InsightsOnly || scope == IntelligenceScope.All)
                 {
-                    var insights = _provider.BuildInsights(context);
-                    foreach (var insight in insights)
-                    {
-                        _db.TalentInsights.Add(insight);
-                    }
-
-                    insightCount = insights.Count;
+                    await ArchiveRulesEngineActiveInsightsAsync(
+                            request.EmployeeId,
+                            request.PerformanceCycleId,
+                            cancellationToken)
+                        .ConfigureAwait(false);
                 }
 
                 if (scope == IntelligenceScope.RecommendationsOnly || scope == IntelligenceScope.All)
                 {
-                    var recs = _provider.BuildRecommendations(context);
-                    foreach (var rec in recs)
+                    await ArchiveRulesEngineActiveRecommendationsAsync(
+                            request.EmployeeId,
+                            request.PerformanceCycleId,
+                            cancellationToken)
+                        .ConfigureAwait(false);
+                }
+
+                if (context is not null)
+                {
+                    if (scope == IntelligenceScope.InsightsOnly || scope == IntelligenceScope.All)
                     {
-                        _db.TalentRecommendations.Add(rec);
+                        var insights = _provider.BuildInsights(context);
+                        foreach (var insight in insights)
+                        {
+                            _db.TalentInsights.Add(insight);
+                        }
+
+                        insightCount = insights.Count;
                     }
 
-                    recommendationCount = recs.Count;
+                    if (scope == IntelligenceScope.RecommendationsOnly || scope == IntelligenceScope.All)
+                    {
+                        var recs = _provider.BuildRecommendations(context);
+                        foreach (var rec in recs)
+                        {
+                            _db.TalentRecommendations.Add(rec);
+                        }
+
+                        recommendationCount = recs.Count;
+                    }
                 }
-            }
 
-            await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-            if (run is not null)
-            {
-                run.Status = IntelligenceRunStatus.Completed;
-                run.CompletedOnUtc = DateTime.UtcNow;
-                run.TotalInsightsGenerated = insightCount;
-                run.TotalRecommendationsGenerated = recommendationCount;
                 await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            }
 
-            await tx.CommitAsync(cancellationToken).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                ex,
-                "Intelligence employee run failed for employee {EmployeeId}, cycle {CycleId}, scope {Scope}.",
-                request.EmployeeId,
-                request.PerformanceCycleId,
-                scope);
-            await tx.RollbackAsync(cancellationToken).ConfigureAwait(false);
-            if (run is not null)
+                if (run is not null)
+                {
+                    run.Status = IntelligenceRunStatus.Completed;
+                    run.CompletedOnUtc = DateTime.UtcNow;
+                    run.TotalInsightsGenerated = insightCount;
+                    run.TotalRecommendationsGenerated = recommendationCount;
+                    await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                }
+
+                await tx.CommitAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
             {
-                run.Status = IntelligenceRunStatus.Failed;
-                run.CompletedOnUtc = DateTime.UtcNow;
-                await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-            }
+                _logger.LogError(
+                    ex,
+                    "Intelligence employee run failed for employee {EmployeeId}, cycle {CycleId}, scope {Scope}.",
+                    request.EmployeeId,
+                    request.PerformanceCycleId,
+                    scope);
+                await tx.RollbackAsync(cancellationToken).ConfigureAwait(false);
+                if (run is not null)
+                {
+                    run.Status = IntelligenceRunStatus.Failed;
+                    run.CompletedOnUtc = DateTime.UtcNow;
+                    await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                }
 
-            throw;
-        }
+                throw;
+            }
+        }).ConfigureAwait(false);
 
         if (insightCount > 0 || recommendationCount > 0)
         {

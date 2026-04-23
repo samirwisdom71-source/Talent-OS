@@ -32,23 +32,9 @@
   line-height: 1.55;
 }
 
-.exec__back {
-  font-size: 0.88rem;
-  font-weight: 600;
-  text-decoration: none;
-  color: var(--color-indigo, #4f46e5);
-  padding: 0.45rem 0.9rem;
-  border-radius: 999px;
-  border: 1px solid rgba(79, 70, 229, 0.25);
-  background: rgba(255, 255, 255, 0.85);
-  transition:
-    background 0.15s ease,
-    transform 0.15s ease;
-}
-
-.exec__back:hover {
-  background: #fff;
-  transform: translateY(-1px);
+/* Hero link uses global .back-link; keep spacing only */
+a.exec__back {
+  flex-shrink: 0;
 }
 
 .exec__section-title {
@@ -136,9 +122,14 @@
 }
 
 .exec__kpi-ico {
+  display: flex;
+  margin-bottom: 0.3rem;
+  color: var(--color-muted, #64748b);
+}
+.exec__kpi-ico svg {
+  width: 1.35rem;
+  height: 1.35rem;
   display: block;
-  font-size: 1.2rem;
-  margin-bottom: 0.25rem;
 }
 
 .exec__kpi-meta {

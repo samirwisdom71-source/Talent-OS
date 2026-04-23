@@ -1,0 +1,114 @@
+<a routerLink="/settings" class="back-link">
+  <span class="back-link__ico" aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  </span>
+  <span class="back-link__label">{{ 'nav.settings' | t }}</span>
+</a>
+
+<section class="page-head page-head--system">
+  <div>
+    <h1>{{ 'settings.health.title' | t }}</h1>
+    <p class="page-head__sub">{{ 'settings.hub.systemDesc' | t }}</p>
+  </div>
+  <div class="page-head__badge">Excel Import Hub</div>
+</section>
+
+<section class="card health">
+  <header class="health__head">
+    <h2>{{ 'settings.health.title' | t }}</h2>
+    <button type="button" class="btn-primary" (click)="check()" [disabled]="loading()">
+      {{ loading() ? ('common.loading' | t) : ('settings.health.check' | t) }}
+    </button>
+  </header>
+
+  @if (failed()) {
+    <p class="state state--error">{{ 'settings.health.failed' | t }}</p>
+  } @else {
+    <p class="state state--ok">{{ health() || ('settings.health.ok' | t) }}</p>
+  }
+</section>
+
+<section class="card import-guide">
+  <header class="import-guide__head">
+    <h2>{{ 'settings.import.guide.title' | t }}</h2>
+    <p>{{ 'settings.import.guide.subtitle' | t }}</p>
+  </header>
+
+  <ol class="import-guide__list">
+    <li>{{ 'settings.import.guide.step1' | t }}</li>
+    <li>{{ 'settings.import.guide.step2' | t }}</li>
+    <li>{{ 'settings.import.guide.step3' | t }}</li>
+    <li>{{ 'settings.import.guide.step4' | t }}</li>
+    <li>{{ 'settings.import.guide.step5' | t }}</li>
+    <li>{{ 'settings.import.guide.step6' | t }}</li>
+  </ol>
+</section>
+
+<section class="card excel-import">
+  <header class="excel-import__head">
+    <h2>{{ 'settings.import.title' | t }}</h2>
+    <p>{{ 'settings.import.subtitle' | t }}</p>
+  </header>
+
+  <div class="excel-import__controls">
+    <label class="excel-import__scope">
+      <span>{{ 'settings.import.scope.label' | t }}</span>
+      <select [value]="selectedTable()" (change)="onScopeChange($any($event.target).value)">
+        @for (option of tableOptions; track option.value) {
+          <option [value]="option.value">{{ option.key | t }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="excel-import__actions">
+      <button type="button" class="btn-primary" (click)="downloadTemplate()" [disabled]="importBusy()">
+        {{ 'settings.import.download' | t }}
+      </button>
+      <button type="button" class="btn-secondary" (click)="downloadTemplate(true)" [disabled]="importBusy()">
+        {{ 'settings.import.downloadSample' | t }}
+      </button>
+      <label class="btn-upload" [class.btn-upload--disabled]="importBusy()">
+        <input type="file" accept=".xlsx" (change)="onFileChosen($event)" [disabled]="importBusy()" />
+        <span>{{ importBusy() ? ('common.loading' | t) : ('settings.import.upload' | t) }}</span>
+      </label>
+    </div>
+  </div>
+
+  @if (importError()) {
+    <p class="state state--error">{{ importError() }}</p>
+  }
+
+  @if (importResult(); as result) {
+    <div class="excel-import__result">
+      @for (table of result.tables; track table.table) {
+        <article class="result-item">
+          <header class="result-item__head">
+            <h3>{{ table.table }}</h3>
+            <span class="result-badge" [class.result-badge--danger]="table.errors.length">
+              {{ table.errors.length ? 'Needs Review' : 'OK' }}
+            </span>
+          </header>
+          <div class="result-stats">
+            <p class="result-stat result-stat--inserted">
+              <span>{{ 'settings.import.inserted' | t }}</span>
+              <strong>{{ table.inserted }}</strong>
+            </p>
+            <p class="result-stat result-stat--skipped">
+              <span>{{ 'settings.import.skipped' | t }}</span>
+              <strong>{{ table.skipped }}</strong>
+            </p>
+          </div>
+          @if (table.errors.length) {
+            <ul>
+              @for (error of table.errors; track error) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          }
+        </article>
+      }
+    </div>
+  }
+</section>

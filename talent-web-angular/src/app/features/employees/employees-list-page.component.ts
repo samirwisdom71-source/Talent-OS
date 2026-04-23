@@ -14,13 +14,14 @@ import { PositionDto } from '../../shared/models/position.models';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { PermissionCodes } from '../../shared/models/permission-codes';
 import { I18nService } from '../../shared/services/i18n.service';
+import { LookupSearchComboComponent } from '../../shared/ui/lookup-search-combo.component';
 
 type ViewMode = 'table' | 'cards';
 
 @Component({
   selector: 'app-employees-list-page',
   standalone: true,
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, TranslatePipe, LookupSearchComboComponent],
   templateUrl: './employees-list-page.component.html',
   styleUrl: './employees-list-page.component.scss',
 })
@@ -141,6 +142,16 @@ export class EmployeesListPageComponent implements OnInit {
       positionId: '',
     };
     this.createOpen.set(true);
+  }
+
+  onCreateOrganizationUnitChange(id: string): void {
+    this.createModel.organizationUnitId = id;
+    this.createModel.positionId = '';
+  }
+
+  onEditOrganizationUnitChange(id: string): void {
+    this.editModel.organizationUnitId = id;
+    this.editModel.positionId = '';
   }
 
   closeCreate(): void {

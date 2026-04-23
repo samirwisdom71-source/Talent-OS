@@ -10,12 +10,13 @@ import { MarketplaceAnalyticsSummaryDto } from '../../shared/models/domain-analy
 import { MarketplaceOpportunityDto } from '../../shared/models/marketplace.models';
 import { PermissionCodes } from '../../shared/models/permission-codes';
 import { I18nService } from '../../shared/services/i18n.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { EnumLabels, UiLang } from '../../shared/utils/enum-labels';
 
 @Component({
   selector: 'app-marketplace-list-page',
   standalone: true,
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, DecimalPipe, TranslatePipe],
   templateUrl: './marketplace-list-page.component.html',
   styleUrl: './marketplace-list-page.component.scss',
 })
@@ -61,5 +62,9 @@ export class MarketplaceListPageComponent implements OnInit {
 
   oppStatus(s: number): string {
     return EnumLabels.marketplaceOpportunityStatus(this.lang(), s);
+  }
+
+  appStatus(s: number): string {
+    return EnumLabels.opportunityApplicationStatus(this.lang(), s);
   }
 }

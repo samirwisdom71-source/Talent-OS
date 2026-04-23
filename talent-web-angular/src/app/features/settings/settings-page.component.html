@@ -1,6 +1,69 @@
 <section class="page-head">
   <h1>{{ 'nav.settings' | t }}</h1>
+  <p class="page-head__sub">{{ 'settings.subtitle' | t }}</p>
 </section>
-<div class="card">
-  <p>API base URL is configured per environment file (<code>src/environments/environment.ts</code>).</p>
-</div>
+
+<section class="settings-hub">
+  <a class="card nav-card nav-card--health" routerLink="/settings/system">
+    <span class="nav-card__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/></svg>
+    </span>
+    <h2>{{ 'settings.health.title' | t }}</h2>
+    <p>{{ 'settings.hub.systemDesc' | t }}</p>
+  </a>
+  <a class="card nav-card nav-card--rules" routerLink="/settings/classification-rule-sets">
+    <span class="nav-card__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </span>
+    <h2>{{ 'settings.rules.title' | t }}</h2>
+    <p>{{ 'settings.hub.rulesDesc' | t }}</p>
+  </a>
+  <a class="card nav-card nav-card--analytics" routerLink="/settings/executive-analytics">
+    <span class="nav-card__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M4 19V5m0 14h16M8 15l3-3 2 2 5-5"/></svg>
+    </span>
+    <h2>{{ 'settings.executive.title' | t }}</h2>
+    <p>{{ 'settings.hub.executiveDesc' | t }}</p>
+  </a>
+  <a class="card nav-card nav-card--approvals" routerLink="/approvals">
+    <span class="nav-card__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 9h8M8 13h8"/></svg>
+    </span>
+    <h2>{{ 'nav.approvals' | t }}</h2>
+    <p>{{ 'settings.hub.approvalsDesc' | t }}</p>
+  </a>
+</section>
+
+<section class="quick-actions">
+  <div class="card quick-card">
+    <header class="quick-card__head">
+      <span class="quick-card__ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" /></svg>
+      </span>
+      <div>
+        <h3>{{ 'settings.hub.quickActions' | t }}</h3>
+        <p>{{ 'settings.subtitle' | t }}</p>
+      </div>
+    </header>
+    <div class="quick-links">
+      <a class="quick-action quick-action--health" routerLink="/settings/system">
+        <span class="quick-action__ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-3-6.2M20 4v5h-5" /></svg>
+        </span>
+        <span class="quick-action__label">{{ 'settings.health.check' | t }}</span>
+      </a>
+      <a class="quick-action quick-action--rules" routerLink="/settings/classification-rule-sets">
+        <span class="quick-action__ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+        </span>
+        <span class="quick-action__label">{{ 'settings.rules.create' | t }}</span>
+      </a>
+      <a class="quick-action quick-action--analytics" routerLink="/settings/executive-analytics">
+        <span class="quick-action__ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 19V5m0 14h16M8 15l3-3 2 2 5-5" /></svg>
+        </span>
+        <span class="quick-action__label">{{ 'settings.executive.title' | t }}</span>
+      </a>
+    </div>
+  </div>
+</section>

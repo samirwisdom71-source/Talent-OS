@@ -33,10 +33,11 @@ public sealed class IdentityLookupsController : ControllerBase
     public async Task<IActionResult> GetUsers(
         [FromQuery] string? search,
         [FromQuery] int? take,
+        [FromQuery] string? lang,
         CancellationToken cancellationToken)
     {
         var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-        var result = await _identityLookupService.GetUsersAsync(search, take, cancellationToken);
+        var result = await _identityLookupService.GetUsersAsync(search, take, lang, cancellationToken);
         return result.ToApiActionResult(this, traceId);
     }
 
@@ -66,10 +67,11 @@ public sealed class IdentityLookupsController : ControllerBase
     public async Task<IActionResult> GetPositions(
         [FromQuery] string? search,
         [FromQuery] int? take,
+        [FromQuery] Guid? organizationUnitId,
         CancellationToken cancellationToken)
     {
         var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-        var result = await _identityLookupService.GetPositionsAsync(search, take, cancellationToken);
+        var result = await _identityLookupService.GetPositionsAsync(search, take, organizationUnitId, cancellationToken);
         return result.ToApiActionResult(this, traceId);
     }
 
@@ -114,6 +116,66 @@ public sealed class IdentityLookupsController : ControllerBase
     {
         var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
         var result = await _identityLookupService.GetCompetencyLevelsAsync(search, take, cancellationToken);
+        return result.ToApiActionResult(this, traceId);
+    }
+
+    [HttpGet("performance-evaluations")]
+    public async Task<IActionResult> GetPerformanceEvaluations(
+        [FromQuery] string? search,
+        [FromQuery] int? take,
+        [FromQuery] string? lang,
+        CancellationToken cancellationToken)
+    {
+        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var result = await _identityLookupService.GetPerformanceEvaluationsAsync(search, take, lang, cancellationToken);
+        return result.ToApiActionResult(this, traceId);
+    }
+
+    [HttpGet("talent-classifications")]
+    public async Task<IActionResult> GetTalentClassifications(
+        [FromQuery] string? search,
+        [FromQuery] int? take,
+        [FromQuery] string? lang,
+        CancellationToken cancellationToken)
+    {
+        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var result = await _identityLookupService.GetTalentClassificationsAsync(search, take, lang, cancellationToken);
+        return result.ToApiActionResult(this, traceId);
+    }
+
+    [HttpGet("development-plans")]
+    public async Task<IActionResult> GetDevelopmentPlans(
+        [FromQuery] string? search,
+        [FromQuery] int? take,
+        [FromQuery] string? lang,
+        CancellationToken cancellationToken)
+    {
+        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var result = await _identityLookupService.GetDevelopmentPlansAsync(search, take, lang, cancellationToken);
+        return result.ToApiActionResult(this, traceId);
+    }
+
+    [HttpGet("marketplace-opportunities")]
+    public async Task<IActionResult> GetMarketplaceOpportunities(
+        [FromQuery] string? search,
+        [FromQuery] int? take,
+        [FromQuery] string? lang,
+        CancellationToken cancellationToken)
+    {
+        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var result = await _identityLookupService.GetMarketplaceOpportunitiesAsync(search, take, lang, cancellationToken);
+        return result.ToApiActionResult(this, traceId);
+    }
+
+    [HttpGet("opportunity-applications")]
+    public async Task<IActionResult> GetOpportunityApplications(
+        [FromQuery] string? search,
+        [FromQuery] int? take,
+        [FromQuery] string? lang,
+        CancellationToken cancellationToken)
+    {
+        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var result = await _identityLookupService.GetOpportunityApplicationsAsync(search, take, lang, cancellationToken);
         return result.ToApiActionResult(this, traceId);
     }
 }

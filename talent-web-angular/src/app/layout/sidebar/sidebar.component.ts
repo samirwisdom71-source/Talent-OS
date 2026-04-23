@@ -99,6 +99,7 @@ export class SidebarComponent {
         { path: '/succession', labelKey: 'nav.succession', permissions: [] },
         { path: '/development', labelKey: 'nav.development', permissions: [] },
         { path: '/marketplace', labelKey: 'nav.marketplace', permissions: [] },
+        { path: '/marketplace/opportunities', labelKey: 'nav.marketplaceOpenOpportunities', permissions: [PermissionCodes.MarketplaceApply] },
       ],
     },
     {
@@ -254,6 +255,7 @@ export class SidebarComponent {
       '/succession/critical-positions': 'fa-solid fa-bullseye',
       '/development': 'fa-solid fa-graduation-cap',
       '/marketplace': 'fa-solid fa-store',
+      '/marketplace/opportunities': 'fa-solid fa-briefcase',
       '/analytics/executive': 'fa-solid fa-chart-column',
       '/analytics/intelligence': 'fa-solid fa-brain',
       '/analytics/insights': 'fa-solid fa-lightbulb',

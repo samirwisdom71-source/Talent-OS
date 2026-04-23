@@ -5,7 +5,17 @@ import { Component, Input, output } from '@angular/core';
   standalone: true,
   template: `
     <div class="empty" role="status">
-      <div class="empty__icon" aria-hidden="true">{{ icon }}</div>
+      @if (chartIcon) {
+        <div class="empty__icon empty__icon--svg" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18" />
+            <path d="M7 16l4-4 3 3 5-6" />
+            <rect x="15" y="5" width="3" height="3" rx="0.5" />
+          </svg>
+        </div>
+      } @else {
+        <div class="empty__icon" aria-hidden="true">{{ icon || '—' }}</div>
+      }
       <h3 class="empty__title">{{ title }}</h3>
       <p class="empty__msg">{{ message }}</p>
       @if (retryLabel) {
@@ -26,6 +36,17 @@ import { Component, Input, output } from '@angular/core';
       margin-bottom: 0.75rem;
       filter: grayscale(0.2);
     }
+    .empty__icon--svg {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+    }
+    .empty__icon--svg svg {
+      width: 2.5rem;
+      height: 2.5rem;
+      color: var(--color-muted, #64748b);
+    }
     .empty__title {
       margin: 0 0 0.35rem;
       font-size: 1.1rem;
@@ -44,7 +65,9 @@ import { Component, Input, output } from '@angular/core';
   `,
 })
 export class EmptyStateComponent {
-  @Input() icon = '📭';
+  @Input() icon = '';
+  /** When true, show a chart-style SVG instead of `icon` (for analytics / data empty states). */
+  @Input() chartIcon = false;
   @Input({ required: true }) title!: string;
   @Input({ required: true }) message!: string;
   @Input() retryLabel: string | null = null;

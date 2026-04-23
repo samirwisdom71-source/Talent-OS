@@ -1,8 +1,16 @@
+<a routerLink="/analytics/intelligence" class="back-link">
+  <span class="back-link__ico" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  </span>
+  <span class="back-link__label">{{ 'analytics.intelligence.title' | t }}</span>
+</a>
 <section class="page-head">
-  <h1>الرؤى</h1>
+  <h1>{{ 'analytics.insights.title' | t }}</h1>
 </section>
 @if (failed()) {
-  <div class="card card--muted">تعذر التحميل.</div>
+  <div class="card card--muted">{{ 'analytics.insights.loadFailed' | t }}</div>
 } @else if (data()) {
   <div class="stack">
     @for (row of data()!.items; track row.id) {
@@ -12,19 +20,25 @@
           <span class="pill">{{ statusLabel(row.status) }}</span>
         </div>
         <p>{{ row.summary }}</p>
-        <div class="insight__ids">
+        <dl class="insight__meta-grid">
           @if (row.employeeId) {
-            <app-id-chip label="موظف" [id]="row.employeeId" />
+            <div class="insight__meta">
+              <dt>{{ 'analytics.insights.metaEmployee' | t }}</dt>
+              <dd>{{ employeeName(row.employeeId) }}</dd>
+            </div>
           }
           @if (row.performanceCycleId) {
-            <app-id-chip label="دورة" [id]="row.performanceCycleId" />
+            <div class="insight__meta">
+              <dt>{{ 'analytics.insights.metaCycle' | t }}</dt>
+              <dd>{{ cycleName(row.performanceCycleId) }}</dd>
+            </div>
           }
-        </div>
-        <footer class="insight__meta">{{ row.generatedOnUtc | date: 'medium' }}</footer>
+        </dl>
+        <footer class="insight__foot">{{ row.generatedOnUtc | date: 'medium' }}</footer>
         <div class="insight__actions">
           @if (row.status === 1 && auth.hasPermission(PermissionCodes.IntelligenceManage)) {
             <button type="button" class="btn-ghost" [disabled]="isRowBusy(row.id)" (click)="dismiss(row)">
-              {{ isRowBusy(row.id) ? '…' : 'تجاهل' }}
+              {{ isRowBusy(row.id) ? '…' : ('analytics.insights.dismiss' | t) }}
             </button>
           }
         </div>

@@ -1,19 +1,26 @@
 <div class="page-head-row">
   <section class="page-head">
     <h1>{{ 'nav.approvals' | t }}</h1>
+    <p class="page-head__sub">{{ 'approvals.subtitle' | t }}</p>
   </section>
   @if (auth.hasPermission(PermissionCodes.ApprovalRequestCreate)) {
     <div class="page-actions">
       <a class="btn-primary btn-primary--icon" routerLink="/approvals/create">
         <span class="btn-ico" aria-hidden="true">＋</span>
-        طلب جديد
+        {{ 'approvals.create' | t }}
       </a>
     </div>
   }
 </div>
-<nav class="tabs" aria-label="Approval views">
-  <a routerLink="/approvals" routerLinkActive="tabs__link--active" [routerLinkActiveOptions]="{ exact: true }">All</a>
-  <a routerLink="/approvals/submitted" routerLinkActive="tabs__link--active">My submitted</a>
-  <a routerLink="/approvals/assigned" routerLinkActive="tabs__link--active">My assigned</a>
+<nav class="tabs" [attr.aria-label]="'approvals.views' | t">
+  <a routerLink="/approvals" routerLinkActive="tabs__link--active" [routerLinkActiveOptions]="{ exact: true }">
+    {{ 'approvals.tab.all' | t }}
+  </a>
+  <a routerLink="/approvals/submitted" routerLinkActive="tabs__link--active">
+    {{ 'approvals.tab.submitted' | t }}
+  </a>
+  <a routerLink="/approvals/assigned" routerLinkActive="tabs__link--active">
+    {{ 'approvals.tab.assigned' | t }}
+  </a>
 </nav>
 <router-outlet />

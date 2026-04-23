@@ -1,8 +1,16 @@
+<a routerLink="/analytics/intelligence" class="back-link">
+  <span class="back-link__ico" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  </span>
+  <span class="back-link__label">{{ 'analytics.intelligence.title' | t }}</span>
+</a>
 <section class="page-head">
-  <h1>التوصيات</h1>
+  <h1>{{ 'analytics.recommendations.title' | t }}</h1>
 </section>
 @if (failed()) {
-  <div class="card card--muted">تعذر التحميل.</div>
+  <div class="card card--muted">{{ 'analytics.recommendations.loadFailed' | t }}</div>
 } @else if (data()) {
   <div class="stack">
     @for (row of data()!.items; track row.id) {
@@ -12,21 +20,29 @@
           <span class="pill">{{ statusLabel(row.status) }}</span>
         </div>
         <p>{{ row.description }}</p>
-        <p class="action"><strong>الإجراء المقترح:</strong> {{ row.recommendedAction }}</p>
-        <div class="insight__ids">
-          <app-id-chip label="موظف" [id]="row.employeeId" />
+        <p class="action"
+          ><strong>{{ 'analytics.recommendations.suggestedAction' | t }}:</strong> {{ row.recommendedAction }}</p
+        >
+        <dl class="insight__meta-grid">
+          <div class="insight__meta">
+            <dt>{{ 'analytics.recommendations.metaEmployee' | t }}</dt>
+            <dd>{{ employeeName(row.employeeId) }}</dd>
+          </div>
           @if (row.performanceCycleId) {
-            <app-id-chip label="دورة" [id]="row.performanceCycleId" />
+            <div class="insight__meta">
+              <dt>{{ 'analytics.recommendations.metaCycle' | t }}</dt>
+              <dd>{{ cycleName(row.performanceCycleId) }}</dd>
+            </div>
           }
-        </div>
-        <footer class="insight__meta">{{ row.generatedOnUtc | date: 'medium' }}</footer>
+        </dl>
+        <footer class="insight__foot">{{ row.generatedOnUtc | date: 'medium' }}</footer>
         <div class="insight__actions">
           @if (row.status === 1 && auth.hasPermission(PermissionCodes.IntelligenceManage)) {
             <button type="button" class="btn-ghost" [disabled]="isRowBusy(row.id)" (click)="accept(row)">
-              {{ isRowBusy(row.id) ? '…' : 'قبول' }}
+              {{ isRowBusy(row.id) ? '…' : ('analytics.recommendations.accept' | t) }}
             </button>
             <button type="button" class="btn-ghost" [disabled]="isRowBusy(row.id)" (click)="dismiss(row)">
-              تجاهل
+              {{ 'analytics.recommendations.dismiss' | t }}
             </button>
           }
         </div>

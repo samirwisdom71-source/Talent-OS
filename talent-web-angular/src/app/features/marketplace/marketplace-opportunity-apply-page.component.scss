@@ -1,0 +1,74 @@
+:host {
+  display: block;
+  padding: 18px clamp(14px, 3vw, 28px) 30px;
+}
+
+.emp-back {
+  display: inline-flex;
+  margin-bottom: 12px;
+  color: #334155;
+  text-decoration: none;
+}
+
+.apply-shell {
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  padding: 20px;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+}
+
+.apply-shell header {
+  margin-bottom: 14px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #0f766e;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.apply-shell h1 {
+  margin: 0 0 6px;
+  font-size: clamp(1.2rem, 2.3vw, 1.55rem);
+}
+
+.apply-shell p {
+  margin: 0;
+  color: #64748b;
+}
+
+.apply-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field span {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 0.62rem 0.75rem;
+  font: inherit;
+  resize: vertical;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}

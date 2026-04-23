@@ -14,7 +14,11 @@ public sealed class MarketplaceOpportunityDto
 
     public Guid OrganizationUnitId { get; set; }
 
+    public string? OrganizationUnitName { get; set; }
+
     public Guid? PositionId { get; set; }
+
+    public string? PositionTitle { get; set; }
 
     public string? RequiredCompetencySummary { get; set; }
 

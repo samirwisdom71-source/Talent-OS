@@ -9,6 +9,7 @@ import { PagedResult } from '../../shared/models/api.types';
 import { LookupItemDto } from '../../shared/models/lookup.models';
 import { PermissionCodes } from '../../shared/models/permission-codes';
 import { I18nService } from '../../shared/services/i18n.service';
+import { LookupSearchComboComponent } from '../../shared/ui/lookup-search-combo.component';
 import {
   AssignUserRolesRequest,
   CreateUserRequest,
@@ -22,7 +23,7 @@ type ViewMode = 'table' | 'cards';
 @Component({
   selector: 'app-users-page',
   standalone: true,
-  imports: [FormsModule, DatePipe, TranslatePipe],
+  imports: [FormsModule, DatePipe, TranslatePipe, LookupSearchComboComponent],
   templateUrl: './users-page.component.html',
   styleUrl: './users-page.component.scss',
 })
@@ -44,7 +45,6 @@ export class UsersPageComponent implements OnInit {
   readonly busy = signal(false);
 
   readonly roles = signal<LookupItemDto[]>([]);
-  readonly employees = signal<LookupItemDto[]>([]);
 
   readonly createOpen = signal(false);
   readonly createBusy = signal(false);
@@ -112,10 +112,6 @@ export class UsersPageComponent implements OnInit {
     this.lookupApi.getRoles('', 200).subscribe({
       next: (rows) => this.roles.set(rows),
       error: () => this.toast.show(this.i18n.t('users.toast.loadRolesFailed'), 'error'),
-    });
-    this.lookupApi.getEmployees('', 200).subscribe({
-      next: (rows) => this.employees.set(rows),
-      error: () => this.toast.show(this.i18n.t('users.toast.loadEmployeesFailed'), 'error'),
     });
   }
 

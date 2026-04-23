@@ -3,7 +3,12 @@ import { Injectable, inject } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { apiUrl } from '../core/config/api-url';
 import { ApiResponse, PagedResult } from '../shared/models/api.types';
-import { OpportunityApplicationDto, OpportunityApplicationFilterRequest } from '../shared/models/opportunity-application.models';
+import {
+  ApplyOpportunityRequest,
+  OpportunityApplicationDto,
+  OpportunityApplicationFilterRequest,
+  UpdateOpportunityApplicationRequest,
+} from '../shared/models/opportunity-application.models';
 import { toHttpParams, unwrapApiResponse } from '../shared/utils/api-helpers';
 
 @Injectable({ providedIn: 'root' })
@@ -26,6 +31,18 @@ export class OpportunityApplicationsApiService {
   getById(id: string) {
     return this.http
       .get<ApiResponse<OpportunityApplicationDto>>(`${this.base}/${id}`)
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  apply(body: ApplyOpportunityRequest) {
+    return this.http
+      .post<ApiResponse<OpportunityApplicationDto>>(`${this.base}/apply`, body)
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  update(id: string, body: UpdateOpportunityApplicationRequest) {
+    return this.http
+      .put<ApiResponse<OpportunityApplicationDto>>(`${this.base}/${id}`, body)
       .pipe(map((r) => unwrapApiResponse(r)));
   }
 

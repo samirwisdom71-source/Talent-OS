@@ -6,23 +6,44 @@
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1rem 1.25rem;
 }
 
-label {
+.field {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
   font-size: 0.82rem;
   color: var(--color-muted);
+  min-width: 0;
 }
 
-input {
+.field__label {
+  font-weight: 650;
+  color: #334155;
+}
+
+.required {
+  color: #dc2626;
+  margin-inline-start: 0.15rem;
+}
+
+.field input {
   border-radius: var(--radius-md, 12px);
   border: 1px solid var(--color-border);
-  padding: 0.5rem 0.65rem;
+  padding: 0.62rem 0.85rem;
   font: inherit;
+  background: #f8fafc;
+  color: #0f172a;
+  transition: border-color 0.15s ease, box-shadow 0.2s ease, background 0.15s ease;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
 }
 
 .form-actions {

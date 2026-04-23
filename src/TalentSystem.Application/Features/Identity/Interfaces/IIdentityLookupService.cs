@@ -13,6 +13,7 @@ public interface IIdentityLookupService
     Task<Result<IReadOnlyList<LookupItemDto>>> GetUsersAsync(
         string? search = null,
         int? take = null,
+        string? displayLang = null,
         CancellationToken cancellationToken = default);
 
     Task<Result<IReadOnlyList<LookupItemDto>>> GetRolesAsync(
@@ -28,6 +29,7 @@ public interface IIdentityLookupService
     Task<Result<IReadOnlyList<LookupItemDto>>> GetPositionsAsync(
         string? search = null,
         int? take = null,
+        Guid? organizationUnitId = null,
         CancellationToken cancellationToken = default);
 
     Task<Result<IReadOnlyList<LookupItemDto>>> GetOrganizationUnitsAsync(
@@ -48,5 +50,35 @@ public interface IIdentityLookupService
     Task<Result<IReadOnlyList<LookupItemDto>>> GetCompetencyLevelsAsync(
         string? search = null,
         int? take = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<IReadOnlyList<LookupItemDto>>> GetPerformanceEvaluationsAsync(
+        string? search = null,
+        int? take = null,
+        string? displayLang = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<IReadOnlyList<LookupItemDto>>> GetTalentClassificationsAsync(
+        string? search = null,
+        int? take = null,
+        string? displayLang = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<IReadOnlyList<LookupItemDto>>> GetDevelopmentPlansAsync(
+        string? search = null,
+        int? take = null,
+        string? displayLang = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<IReadOnlyList<LookupItemDto>>> GetMarketplaceOpportunitiesAsync(
+        string? search = null,
+        int? take = null,
+        string? displayLang = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<IReadOnlyList<LookupItemDto>>> GetOpportunityApplicationsAsync(
+        string? search = null,
+        int? take = null,
+        string? displayLang = null,
         CancellationToken cancellationToken = default);
 }

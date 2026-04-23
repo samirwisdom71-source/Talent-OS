@@ -1,48 +1,139 @@
 <a routerLink="/marketplace" class="back-link">
-  <span class="back-link__ico" aria-hidden="true">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <span aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M15 18l-6-6 6-6" />
     </svg>
   </span>
-  <span class="back-link__label">الفرص</span>
+  <span>{{ 'marketplace.create.back' | t }}</span>
 </a>
-<section class="page-head">
-  <h1>فرصة جديدة</h1>
-</section>
-<div class="card form-card">
-  <div class="form-grid">
-    <label>العنوان<input [(ngModel)]="model.title" name="ti" /></label>
-    <label
-      >النوع
-      <select [(ngModel)]="model.opportunityType" name="ot">
-        <option [ngValue]="1">مشروع</option>
-        <option [ngValue]="2">فريق مهام</option>
-        <option [ngValue]="3">مهمة موسّعة</option>
-        <option [ngValue]="4">تدوير وظيفي</option>
-        <option [ngValue]="5">دور داخلي</option>
-        <option [ngValue]="6">تكليف مؤقت</option>
-        <option [ngValue]="7">لجنة</option>
-        <option [ngValue]="8">أخرى</option>
-      </select>
-    </label>
-    <label>معرّف الوحدة التنظيمية<input [(ngModel)]="model.organizationUnitId" name="ou" /></label>
-    <label
-      >معرّف المنصب (اختياري)
-      <input [ngModel]="model.positionId ?? ''" (ngModelChange)="model.positionId = $event || null" name="po" />
-    </label>
-    <label>تاريخ الفتح<input type="date" [(ngModel)]="model.openDate" name="od" /></label>
-    <label
-      >تاريخ الإغلاق
-      <input [ngModel]="model.closeDate ?? ''" (ngModelChange)="model.closeDate = $event || null" type="date" name="cd" />
-    </label>
-    <label class="inline-check">
-      <input type="checkbox" [(ngModel)]="model.isConfidential" name="cf" />
-      سرّي
-    </label>
-    <label class="full">الوصف<textarea rows="3" [(ngModel)]="model.description" name="ds"></textarea></label>
-  </div>
-  <div class="form-actions">
-    <button type="button" class="btn-primary" [disabled]="busy()" (click)="save()">{{ busy() ? '…' : 'حفظ' }}</button>
-    <a routerLink="/marketplace" class="btn-ghost">إلغاء</a>
-  </div>
+
+<div class="create-layout">
+  <aside class="create-aside">
+    <div class="aside-card">
+      <div class="aside-card__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <path d="M9 22V12h6v10" />
+        </svg>
+      </div>
+      <h2>{{ 'marketplace.create.asideTitle' | t }}</h2>
+      <p>{{ 'marketplace.create.asideDesc' | t }}</p>
+      <ul class="tips">
+        <li>
+          <span class="tip-ico">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+          </span>
+          <span>{{ 'marketplace.create.tip1' | t }}</span>
+        </li>
+        <li>
+          <span class="tip-ico">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+          </span>
+          <span>{{ 'marketplace.create.tip2' | t }}</span>
+        </li>
+      </ul>
+    </div>
+  </aside>
+
+  <section class="create-main">
+    <header class="create-head">
+      <span class="create-head__eyebrow">{{ 'marketplace.create.eyebrow' | t }}</span>
+      <h1>{{ 'marketplace.create.title' | t }}</h1>
+      <p>{{ 'marketplace.create.subtitle' | t }}</p>
+    </header>
+
+    <form class="form-card" (submit)="$event.preventDefault(); save()">
+      <fieldset class="form-block">
+        <legend>
+          <span class="legend-num">1</span>
+          {{ 'marketplace.create.step1' | t }}
+        </legend>
+        <div class="form-grid">
+          <label class="field">
+            <span>{{ 'marketplace.create.fieldTitle' | t }} <em>*</em></span>
+            <input [(ngModel)]="model.title" name="ti" [placeholder]="'marketplace.create.phTitle' | t" />
+          </label>
+          <label class="field">
+            <span>{{ 'marketplace.create.fieldType' | t }} <em>*</em></span>
+            <div class="select-wrap">
+              <select [(ngModel)]="model.opportunityType" name="ot">
+                @for (t of opportunityTypes; track t) {
+                  <option [ngValue]="t">{{ opportunityTypeLabel(t) }}</option>
+                }
+              </select>
+              <svg class="select-caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+          </label>
+
+          <label class="field field--combo full">
+            <span>{{ 'employeeCreate.form.organizationUnit' | t }} <em>*</em></span>
+            <app-lookup-search-combo
+              kind="organizationUnit"
+              [placeholder]="'employeeCreate.form.organizationUnitPlaceholder' | t"
+              [(value)]="model.organizationUnitId"
+            />
+          </label>
+
+          <label class="field field--combo full">
+            <span>{{ 'marketplace.create.fieldPosition' | t }}</span>
+            <app-lookup-search-combo
+              kind="position"
+              [parentOrganizationUnitId]="model.organizationUnitId || null"
+              [placeholder]="
+                model.organizationUnitId
+                  ? ('employeeCreate.form.positionPlaceholder' | t)
+                  : ('employeeCreate.form.positionPickUnit' | t)
+              "
+              [disabled]="!model.organizationUnitId"
+              [(value)]="positionComboId"
+            />
+          </label>
+
+          <label class="field full">
+            <span>{{ 'marketplace.create.fieldDescription' | t }}</span>
+            <textarea rows="4" [(ngModel)]="model.description" name="ds" [placeholder]="'marketplace.create.phDescription' | t"></textarea>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-block">
+        <legend>
+          <span class="legend-num">2</span>
+          {{ 'marketplace.create.step2' | t }}
+        </legend>
+        <div class="form-grid">
+          <label class="field">
+            <span>{{ 'marketplace.create.fieldOpen' | t }} <em>*</em></span>
+            <input type="date" [(ngModel)]="model.openDate" name="od" />
+          </label>
+          <label class="field">
+            <span>{{ 'marketplace.create.fieldClose' | t }}</span>
+            <input
+              [ngModel]="model.closeDate ?? ''"
+              (ngModelChange)="model.closeDate = $event || null"
+              type="date"
+              name="cd"
+            />
+          </label>
+          <label class="inline-check full">
+            <input type="checkbox" [(ngModel)]="model.isConfidential" name="cf" />
+            {{ 'marketplace.create.confidential' | t }}
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="busy()">
+          {{ busy() ? ('common.saving' | t) : ('marketplace.create.save' | t) }}
+        </button>
+        <a routerLink="/marketplace" class="btn-ghost">{{ 'marketplace.create.cancel' | t }}</a>
+      </div>
+    </form>
+  </section>
 </div>

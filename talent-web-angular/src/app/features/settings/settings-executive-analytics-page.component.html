@@ -1,0 +1,35 @@
+<a routerLink="/settings" class="back-link">
+  <span class="back-link__ico" aria-hidden="true">
+    <svg viewBox="0 0 24 24">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  </span>
+  <span class="back-link__label">{{ 'nav.settings' | t }}</span>
+</a>
+
+<section class="page-head">
+  <h1>{{ 'settings.executive.title' | t }}</h1>
+  <p class="page-head__sub">{{ 'settings.hub.executiveDesc' | t }}</p>
+</section>
+
+@if (failed()) {
+  <div class="card card--muted">
+    {{ 'common.error' | t }}
+    <button type="button" class="btn-ghost" (click)="load()">{{ 'common.retry' | t }}</button>
+  </div>
+} @else if (summary()) {
+  <div class="kpi-grid">
+    <article class="card kpi"><span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0ZM4 20a8 8 0 1 1 16 0"/></svg></span><p>{{ summary()!.totalEmployees | number }}</p><small>{{ 'nav.employees' | t }}</small></article>
+    <article class="card kpi"><span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg></span><p>{{ summary()!.totalTalentClassifications | number }}</p><small>{{ 'nav.talentClassifications' | t }}</small></article>
+    <article class="card kpi"><span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V5m0 14h16M8 15l3-3 2 2 5-5"/></svg></span><p>{{ summary()!.totalTalentScores | number }}</p><small>{{ 'nav.talentScores' | t }}</small></article>
+    <article class="card kpi"><span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 4 8l8 5 8-5-8-5Zm0 10v8"/></svg></span><p>{{ summary()!.highPotentialCount | number }}</p><small>{{ 'settings.executive.highPotential' | t }}</small></article>
+    <article class="card kpi"><span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 14 4-4 4 4 8-8"/></svg></span><p>{{ summary()!.highPerformerCount | number }}</p><small>{{ 'settings.executive.highPerformer' | t }}</small></article>
+    <article class="card kpi"><span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/></svg></span><p>{{ summary()!.strategicLeaderCount | number }}</p><small>{{ 'settings.executive.strategicLeader' | t }}</small></article>
+    <article class="card kpi"><span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3v4M17 3v4M4 9h16M5 5h14v16H5z"/></svg></span><p>{{ summary()!.activePerformanceCycleCount | number }}</p><small>{{ 'nav.performance' | t }}</small></article>
+    <article class="card kpi"><span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/></svg></span><p>{{ summary()!.activeSuccessionPlanCount | number }}</p><small>{{ 'nav.successionPlans' | t }}</small></article>
+    <article class="card kpi"><span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 7h18v12H3zM7 7V5h10v2"/></svg></span><p>{{ summary()!.openMarketplaceOpportunityCount | number }}</p><small>{{ 'nav.marketplace' | t }}</small></article>
+    <article class="card kpi"><span class="kpi__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 5h12v10H6z"/></svg></span><p>{{ summary()!.activeDevelopmentPlanCount | number }}</p><small>{{ 'nav.development' | t }}</small></article>
+  </div>
+} @else {
+  <div class="skeleton table-skel"></div>
+}

@@ -40,3 +40,6 @@ D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSyste
 C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Application.deps.json
 C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Application.dll
 C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Application.pdb
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\.tmp-build-out\TalentSystem.Application.deps.json
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\.tmp-build-out\TalentSystem.Application.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\.tmp-build-out\TalentSystem.Application.pdb

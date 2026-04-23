@@ -1,0 +1,27 @@
+<a [routerLink]="['/marketplace/opportunities', oppId()]" class="emp-back">{{ 'marketplace.employee.backToDetails' | t }}</a>
+
+<section class="apply-shell">
+  <header>
+    <p class="eyebrow">{{ 'marketplace.employee.apply' | t }}</p>
+    <h1>{{ 'marketplace.employee.applyTitle' | t }}</h1>
+    <p>{{ 'marketplace.employee.applyLead' | t }}</p>
+  </header>
+
+  <form class="apply-form" (submit)="$event.preventDefault(); submit()">
+    <label class="field">
+      <span>{{ 'marketplace.app.colEmployee' | t }} *</span>
+      <app-lookup-search-combo kind="employee" [placeholder]="'اختر الموظف' | t" [(value)]="employeeId" />
+    </label>
+
+    <label class="field">
+      <span>{{ 'تعليل التقديم' | t }}</span>
+      <textarea rows="5" [(ngModel)]="motivation" name="motivation"></textarea>
+    </label>
+
+    <div class="actions">
+      <button type="submit" class="btn-primary" [disabled]="busy()">
+        {{ busy() ? ('common.saving' | t) : ('marketplace.detail.applySubmit' | t) }}
+      </button>
+    </div>
+  </form>
+</section>

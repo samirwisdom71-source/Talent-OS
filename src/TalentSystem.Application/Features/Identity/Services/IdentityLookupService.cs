@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TalentSystem.Application.Features.Identity.DTOs;
 using TalentSystem.Application.Features.Identity.Interfaces;
+using TalentSystem.Domain.Identity;
 using TalentSystem.Persistence;
 using TalentSystem.Shared.Results;
 
@@ -44,9 +45,11 @@ public sealed class IdentityLookupService : IIdentityLookupService
     public async Task<Result<IReadOnlyList<LookupItemDto>>> GetUsersAsync(
         string? search = null,
         int? take = null,
+        string? displayLang = null,
         CancellationToken cancellationToken = default)
     {
-        var baseQuery = _db.Users.AsNoTracking().AsQueryable();
+        var preferEn = PreferEnglish(displayLang);
+        IQueryable<User> baseQuery = _db.Users.AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -58,20 +61,25 @@ public sealed class IdentityLookupService : IIdentityLookupService
                 (u.NameEn != null && u.NameEn.Contains(term)));
         }
 
-        var query = baseQuery
-            .OrderBy(u => u.UserName)
+        IQueryable<User> ordered = baseQuery.OrderBy(u => u.UserName);
+        if (take.HasValue && take.Value > 0)
+        {
+            ordered = ordered.Take(Math.Min(take.Value, MaxTake));
+        }
+
+        var rows = await ordered
+            .Select(u => new { u.Id, u.NameAr, u.NameEn, u.UserName, u.Email })
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        var users = rows
             .Select(u => new LookupItemDto
             {
                 Id = u.Id,
-                Name = string.IsNullOrWhiteSpace(u.NameAr)
-                    ? (string.IsNullOrWhiteSpace(u.NameEn) ? u.UserName : u.NameEn)
-                    : u.NameAr,
-                Email = u.Email
-            });
-
-        var users = await ApplySearchAndTake(query, search: null, take, includeEmailSearch: true)
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
+                Name = PickBilingualPersonName(u.NameAr, u.NameEn, u.UserName, preferEn),
+                Email = u.Email,
+            })
+            .ToList();
 
         return Result<IReadOnlyList<LookupItemDto>>.Ok(users);
     }
@@ -124,10 +132,17 @@ public sealed class IdentityLookupService : IIdentityLookupService
     public async Task<Result<IReadOnlyList<LookupItemDto>>> GetPositionsAsync(
         string? search = null,
         int? take = null,
+        Guid? organizationUnitId = null,
         CancellationToken cancellationToken = default)
     {
-        var query = _db.Positions
-            .AsNoTracking()
+        var baseQuery = _db.Positions.AsNoTracking().AsQueryable();
+
+        if (organizationUnitId.HasValue && organizationUnitId.Value != Guid.Empty)
+        {
+            baseQuery = baseQuery.Where(p => p.OrganizationUnitId == organizationUnitId.Value);
+        }
+
+        var query = baseQuery
             .OrderBy(p => p.TitleAr)
             .ThenBy(p => p.TitleEn)
             .Select(p => new LookupItemDto
@@ -235,6 +250,259 @@ public sealed class IdentityLookupService : IIdentityLookupService
             .ConfigureAwait(false);
 
         return Result<IReadOnlyList<LookupItemDto>>.Ok(items);
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetPerformanceEvaluationsAsync(
+        string? search = null,
+        int? take = null,
+        string? displayLang = null,
+        CancellationToken cancellationToken = default)
+    {
+        var preferEn = PreferEnglish(displayLang);
+        var baseQuery =
+            from ev in _db.PerformanceEvaluations.AsNoTracking()
+            join emp in _db.Employees.AsNoTracking() on ev.EmployeeId equals emp.Id
+            orderby ev.EvaluatedOnUtc descending, emp.FullNameAr
+            select new
+            {
+                ev.Id,
+                EmpNameAr = emp.FullNameAr,
+                EmpNameEn = emp.FullNameEn,
+                ev.OverallScore,
+            };
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            baseQuery = baseQuery.Where(x =>
+                (x.EmpNameAr != null && x.EmpNameAr.Contains(term)) ||
+                (x.EmpNameEn != null && x.EmpNameEn.Contains(term)));
+        }
+
+        if (take.HasValue && take.Value > 0)
+        {
+            baseQuery = baseQuery.Take(Math.Min(take.Value, MaxTake));
+        }
+
+        var rows = await baseQuery.ToListAsync(cancellationToken).ConfigureAwait(false);
+        var items = rows
+            .Select(x => new LookupItemDto
+            {
+                Id = x.Id,
+                Name = PickBilingualPersonName(
+                    x.EmpNameAr,
+                    x.EmpNameEn,
+                    x.EmpNameAr ?? x.EmpNameEn ?? string.Empty,
+                    preferEn),
+                Email = preferEn
+                    ? $"Score: {x.OverallScore}"
+                    : $"الدرجة: {x.OverallScore}",
+            })
+            .ToList();
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(items);
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetTalentClassificationsAsync(
+        string? search = null,
+        int? take = null,
+        string? displayLang = null,
+        CancellationToken cancellationToken = default)
+    {
+        var preferEn = PreferEnglish(displayLang);
+        var baseQuery =
+            from tc in _db.TalentClassifications.AsNoTracking()
+            join emp in _db.Employees.AsNoTracking() on tc.EmployeeId equals emp.Id
+            orderby tc.ClassifiedOnUtc descending, emp.FullNameAr
+            select new
+            {
+                tc.Id,
+                EmpNameAr = emp.FullNameAr,
+                EmpNameEn = emp.FullNameEn,
+                tc.CategoryName,
+                tc.NineBoxCode,
+            };
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            baseQuery = baseQuery.Where(x =>
+                (x.EmpNameAr != null && x.EmpNameAr.Contains(term)) ||
+                (x.EmpNameEn != null && x.EmpNameEn.Contains(term)) ||
+                (x.CategoryName != null && x.CategoryName.Contains(term)));
+        }
+
+        if (take.HasValue && take.Value > 0)
+        {
+            baseQuery = baseQuery.Take(Math.Min(take.Value, MaxTake));
+        }
+
+        var rows = await baseQuery.ToListAsync(cancellationToken).ConfigureAwait(false);
+        var items = rows
+            .Select(x =>
+            {
+                var sub = string.IsNullOrWhiteSpace(x.CategoryName)
+                    ? $"9-Box {(int)x.NineBoxCode}"
+                    : x.CategoryName;
+                return new LookupItemDto
+                {
+                    Id = x.Id,
+                    Name = PickBilingualPersonName(
+                        x.EmpNameAr,
+                        x.EmpNameEn,
+                        x.EmpNameAr ?? x.EmpNameEn ?? string.Empty,
+                        preferEn),
+                    Email = sub,
+                };
+            })
+            .ToList();
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(items);
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetDevelopmentPlansAsync(
+        string? search = null,
+        int? take = null,
+        string? displayLang = null,
+        CancellationToken cancellationToken = default)
+    {
+        var preferEn = PreferEnglish(displayLang);
+        var baseQuery =
+            from dp in _db.DevelopmentPlans.AsNoTracking()
+            join emp in _db.Employees.AsNoTracking() on dp.EmployeeId equals emp.Id
+            orderby dp.PlanTitle
+            select new
+            {
+                dp.Id,
+                dp.PlanTitle,
+                EmpNameAr = emp.FullNameAr,
+                EmpNameEn = emp.FullNameEn,
+            };
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            baseQuery = baseQuery.Where(x =>
+                (x.PlanTitle != null && x.PlanTitle.Contains(term)) ||
+                (x.EmpNameAr != null && x.EmpNameAr.Contains(term)) ||
+                (x.EmpNameEn != null && x.EmpNameEn.Contains(term)));
+        }
+
+        if (take.HasValue && take.Value > 0)
+        {
+            baseQuery = baseQuery.Take(Math.Min(take.Value, MaxTake));
+        }
+
+        var rows = await baseQuery.ToListAsync(cancellationToken).ConfigureAwait(false);
+        var items = rows
+            .Select(x => new LookupItemDto
+            {
+                Id = x.Id,
+                Name = x.PlanTitle,
+                Email = PickBilingualPersonName(
+                    x.EmpNameAr,
+                    x.EmpNameEn,
+                    x.EmpNameAr ?? x.EmpNameEn ?? string.Empty,
+                    preferEn),
+            })
+            .ToList();
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(items);
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetMarketplaceOpportunitiesAsync(
+        string? search = null,
+        int? take = null,
+        string? displayLang = null,
+        CancellationToken cancellationToken = default)
+    {
+        _ = displayLang; // Titles are single-locale; reserved for future use.
+        var query = _db.MarketplaceOpportunities
+            .AsNoTracking()
+            .OrderByDescending(x => x.OpenDate)
+            .ThenBy(x => x.Title)
+            .Select(x => new LookupItemDto
+            {
+                Id = x.Id,
+                Name = x.Title,
+                Email = x.Description,
+            });
+
+        var items = await ApplySearchAndTake(query, search, take, includeEmailSearch: true)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(items);
+    }
+
+    public async Task<Result<IReadOnlyList<LookupItemDto>>> GetOpportunityApplicationsAsync(
+        string? search = null,
+        int? take = null,
+        string? displayLang = null,
+        CancellationToken cancellationToken = default)
+    {
+        var preferEn = PreferEnglish(displayLang);
+        var baseQuery =
+            from app in _db.OpportunityApplications.AsNoTracking()
+            join emp in _db.Employees.AsNoTracking() on app.EmployeeId equals emp.Id
+            join opp in _db.MarketplaceOpportunities.AsNoTracking() on app.MarketplaceOpportunityId equals opp.Id
+            orderby app.AppliedOnUtc descending
+            select new
+            {
+                app.Id,
+                EmpNameAr = emp.FullNameAr,
+                EmpNameEn = emp.FullNameEn,
+                OppTitle = opp.Title,
+            };
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            baseQuery = baseQuery.Where(x =>
+                (x.EmpNameAr != null && x.EmpNameAr.Contains(term)) ||
+                (x.EmpNameEn != null && x.EmpNameEn.Contains(term)) ||
+                (x.OppTitle != null && x.OppTitle.Contains(term)));
+        }
+
+        if (take.HasValue && take.Value > 0)
+        {
+            baseQuery = baseQuery.Take(Math.Min(take.Value, MaxTake));
+        }
+
+        var rows = await baseQuery.ToListAsync(cancellationToken).ConfigureAwait(false);
+        var items = rows
+            .Select(x => new LookupItemDto
+            {
+                Id = x.Id,
+                Name = PickBilingualPersonName(
+                    x.EmpNameAr,
+                    x.EmpNameEn,
+                    x.EmpNameAr ?? x.EmpNameEn ?? string.Empty,
+                    preferEn),
+                Email = x.OppTitle,
+            })
+            .ToList();
+
+        return Result<IReadOnlyList<LookupItemDto>>.Ok(items);
+    }
+
+    private static bool PreferEnglish(string? displayLang) =>
+        string.Equals(displayLang, "en", StringComparison.OrdinalIgnoreCase);
+
+    private static string PickBilingualPersonName(string? nameAr, string? nameEn, string fallback, bool preferEnglish)
+    {
+        if (preferEnglish)
+        {
+            if (!string.IsNullOrWhiteSpace(nameEn)) return nameEn!;
+            if (!string.IsNullOrWhiteSpace(nameAr)) return nameAr!;
+        }
+        else
+        {
+            if (!string.IsNullOrWhiteSpace(nameAr)) return nameAr!;
+            if (!string.IsNullOrWhiteSpace(nameEn)) return nameEn!;
+        }
+
+        return string.IsNullOrWhiteSpace(fallback) ? string.Empty : fallback;
     }
 
     private static IQueryable<LookupItemDto> ApplySearchAndTake(

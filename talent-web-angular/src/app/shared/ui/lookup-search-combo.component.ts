@@ -2,6 +2,9 @@ import {
   Component,
   ElementRef,
   HostListener,
+  Input,
+  OnChanges,
+  SimpleChanges,
   effect,
   inject,
   input,
@@ -38,6 +41,7 @@ import { I18nService } from '../services/i18n.service';
           [(ngModel)]="inputText"
           (ngModelChange)="onType($event)"
           (focus)="onFocus()"
+          [disabled]="disabled()"
           autocomplete="off"
         />
         @if (value() && !panelOpen()) {
@@ -170,17 +174,40 @@ import { I18nService } from '../services/i18n.service';
     }
   `,
 })
-export class LookupSearchComboComponent implements OnInit, OnDestroy {
+export class LookupSearchComboComponent implements OnInit, OnDestroy, OnChanges {
   private readonly identity = inject(IdentityLookupsApiService);
   private readonly cyclesApi = inject(PerformanceCyclesApiService);
   private readonly successionApi = inject(SuccessionApiService);
   private readonly i18n = inject(I18nService);
   private readonly host = inject(ElementRef<HTMLElement>);
 
-  readonly kind = input.required<'employee' | 'performanceCycle' | 'successionPlan'>();
+  readonly kind = input.required<
+    'employee' | 'user' | 'performanceCycle' | 'successionPlan' | 'organizationUnit' | 'position'
+  >();
   readonly label = input('');
   readonly placeholder = input('');
   readonly value = model<string>('');
+  /** يُستخدم لتصفية المناصب حسب الوحدة التنظيمية فقط عند kind='position'. */
+  private _parentOu: string | null = null;
+  @Input()
+  set parentOrganizationUnitId(value: string | null | undefined) {
+    const next = value ?? null;
+    const prev = this._parentOu;
+    this._parentOu = next;
+    if (this.kind?.() !== 'position') return;
+    if (prev === next) return;
+    this.nameCache.clear();
+    this.items.set([]);
+    this.value.set('');
+    this.inputText = '';
+    if (next) {
+      this.runSearch('');
+    }
+  }
+  get parentOrganizationUnitIdValue(): string | null {
+    return this._parentOu;
+  }
+  readonly disabled = input(false);
 
   readonly inputId = `lsc-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -204,6 +231,12 @@ export class LookupSearchComboComponent implements OnInit, OnDestroy {
       const cached = this.nameCache.get(id);
       if (cached) this.inputText = cached;
     });
+
+  }
+
+  ngOnChanges(_changes: SimpleChanges): void {
+    // Regular @Input() setters react through their own setter; this method
+    // stays for compatibility with any future conventional inputs.
   }
 
   get clearLabel(): string {
@@ -235,38 +268,46 @@ export class LookupSearchComboComponent implements OnInit, OnDestroy {
 
   private fetchLabelForId(id: string): void {
     const lang = this.i18n.lang() as 'ar' | 'en';
-    if (this.kind() === 'successionPlan') {
-      this.successionApi.getSuccessionPlansLookup({ take: 250, search: undefined }).subscribe({
-        next: (rows) => {
-          const row = rows.find((r) => r.id === id);
-          if (row) {
-            this.nameCache.set(id, row.name);
-            this.inputText = row.name;
-          }
-        },
+    const kind = this.kind();
+    const applyRow = (row?: LookupItemDto) => {
+      if (row) {
+        this.nameCache.set(id, row.name);
+        this.inputText = row.name;
+      }
+    };
+    if (kind === 'successionPlan') {
+      this.successionApi
+        .getSuccessionPlansLookup({ take: 250, search: undefined })
+        .subscribe({ next: (rows) => applyRow(rows.find((r) => r.id === id)) });
+      return;
+    }
+    if (kind === 'employee') {
+      this.identity.getEmployees(undefined, 250).subscribe({
+        next: (rows) => applyRow(rows.find((r) => r.id === id)),
       });
       return;
     }
-    if (this.kind() === 'employee') {
-      this.identity.getEmployees(undefined, 250).subscribe({
-        next: (rows) => {
-          const row = rows.find((r) => r.id === id);
-          if (row) {
-            this.nameCache.set(id, row.name);
-            this.inputText = row.name;
-          }
-        },
+    if (kind === 'user') {
+      const uLang = this.i18n.lang() === 'en' ? 'en' : 'ar';
+      this.identity.getUsers(undefined, 250, uLang).subscribe({
+        next: (rows) => applyRow(rows.find((r) => r.id === id)),
       });
+      return;
+    }
+    if (kind === 'organizationUnit') {
+      this.identity.getOrganizationUnits(undefined, 250).subscribe({
+        next: (rows) => applyRow(rows.find((r) => r.id === id)),
+      });
+      return;
+    }
+    if (kind === 'position') {
+      this.identity
+        .getPositions(undefined, 250, this._parentOu || undefined)
+        .subscribe({ next: (rows) => applyRow(rows.find((r) => r.id === id)) });
       return;
     }
     this.cyclesApi.getLookup({ take: 250, lang }).subscribe({
-      next: (rows) => {
-        const row = rows.find((r) => r.id === id);
-        if (row) {
-          this.nameCache.set(id, row.name);
-          this.inputText = row.name;
-        }
-      },
+      next: (rows) => applyRow(rows.find((r) => r.id === id)),
     });
   }
 
@@ -280,49 +321,68 @@ export class LookupSearchComboComponent implements OnInit, OnDestroy {
 
   onFocus(): void {
     this.panelOpen.set(true);
-    const q = this.inputText.trim();
+    // If there is already a selected value, open with broad results
+    // so users can switch directly without manually clearing input text.
+    const q = this.value() ? '' : this.inputText.trim();
+    if (q === '') {
+      // Force refresh even if previous query was also empty.
+      this.runSearch('');
+      return;
+    }
     this.search$.next(q);
   }
 
   private runSearch(query: string): void {
     this.loading.set(true);
     const lang = this.i18n.lang();
-    if (this.kind() === 'successionPlan') {
-      this.successionApi.getSuccessionPlansLookup({ take: 120, search: query || undefined }).subscribe({
-        next: (rows) => {
-          this.items.set(rows);
-          this.loading.set(false);
-        },
-        error: () => {
-          this.items.set([]);
-          this.loading.set(false);
-        },
-      });
+    const kind = this.kind();
+    const applyRows = (rows: LookupItemDto[]) => {
+      this.items.set(rows);
+      this.loading.set(false);
+    };
+    const applyError = () => {
+      this.items.set([]);
+      this.loading.set(false);
+    };
+    if (kind === 'successionPlan') {
+      this.successionApi
+        .getSuccessionPlansLookup({ take: 120, search: query || undefined })
+        .subscribe({ next: applyRows, error: applyError });
       return;
     }
-    if (this.kind() === 'employee') {
+    if (kind === 'employee') {
       this.identity.getEmployees(query || undefined, 80).subscribe({
-        next: (rows) => {
-          this.items.set(rows);
-          this.loading.set(false);
-        },
-        error: () => {
-          this.items.set([]);
-          this.loading.set(false);
-        },
+        next: applyRows,
+        error: applyError,
       });
       return;
     }
-    this.cyclesApi.getLookup({ take: 120, lang: lang as 'ar' | 'en', search: query || undefined }).subscribe({
-      next: (rows) => {
-        this.items.set(rows);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.items.set([]);
-        this.loading.set(false);
-      },
-    });
+    if (kind === 'user') {
+      const uLang = this.i18n.lang() === 'en' ? 'en' : 'ar';
+      this.identity.getUsers(query || undefined, 120, uLang).subscribe({
+        next: applyRows,
+        error: applyError,
+      });
+      return;
+    }
+    if (kind === 'organizationUnit') {
+      this.identity.getOrganizationUnits(query || undefined, 120).subscribe({
+        next: applyRows,
+        error: applyError,
+      });
+      return;
+    }
+    if (kind === 'position') {
+      const ouId = this._parentOu || undefined;
+      this.identity.getPositions(query || undefined, 120, ouId).subscribe({
+        next: applyRows,
+        error: applyError,
+      });
+      return;
+    }
+    this.cyclesApi
+      .getLookup({ take: 120, lang: lang as 'ar' | 'en', search: query || undefined })
+      .subscribe({ next: applyRows, error: applyError });
   }
 
   pick(it: LookupItemDto, ev: Event): void {
@@ -341,7 +401,9 @@ export class LookupSearchComboComponent implements OnInit, OnDestroy {
     this.value.set('');
     this.inputText = '';
     this.items.set([]);
-    this.panelOpen.set(false);
+    this.panelOpen.set(true);
+    // Force refresh; debounce + distinctUntilChanged may ignore repeated ''.
+    this.runSearch('');
   }
 
   @HostListener('document:click', ['$event'])

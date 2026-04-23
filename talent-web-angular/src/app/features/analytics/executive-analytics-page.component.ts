@@ -4,11 +4,12 @@ import { RouterLink } from '@angular/router';
 import { ExecutiveAnalyticsApiService } from '../../services/executive-analytics-api.service';
 import { ExecutiveDashboardSummaryDto } from '../../shared/models/analytics.models';
 import { EmptyStateComponent } from '../../shared/ui/empty-state.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-executive-analytics-page',
   standalone: true,
-  imports: [DecimalPipe, RouterLink, EmptyStateComponent],
+  imports: [DecimalPipe, RouterLink, EmptyStateComponent, TranslatePipe],
   templateUrl: './executive-analytics-page.component.html',
   styleUrl: './executive-analytics-page.component.scss',
 })

@@ -32,3 +32,6 @@ D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\src\TalentSyste
 C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Domain.deps.json
 C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Domain.dll
 C:\Users\YOUSIF\AppData\Local\Temp\TalentOS-AppBuildCheck\TalentSystem.Domain.pdb
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\.tmp-build-out\TalentSystem.Domain.deps.json
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\.tmp-build-out\TalentSystem.Domain.dll
+D:\web\EXSUS\web api\ادارة المواهب\Project\Talent-OS\.tmp-build-out\TalentSystem.Domain.pdb

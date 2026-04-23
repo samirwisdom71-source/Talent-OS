@@ -39,4 +39,22 @@ export class MarketplaceOpportunitiesApiService {
       .post<ApiResponse<MarketplaceOpportunityDto>>(this.base, body)
       .pipe(map((r) => unwrapApiResponse(r)));
   }
+
+  open(id: string) {
+    return this.http
+      .post<ApiResponse<MarketplaceOpportunityDto>>(`${this.base}/${id}/open`, {})
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  close(id: string) {
+    return this.http
+      .post<ApiResponse<MarketplaceOpportunityDto>>(`${this.base}/${id}/close`, {})
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  cancel(id: string) {
+    return this.http
+      .post<ApiResponse<MarketplaceOpportunityDto>>(`${this.base}/${id}/cancel`, {})
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
 }

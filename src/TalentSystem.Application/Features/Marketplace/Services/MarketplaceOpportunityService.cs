@@ -77,7 +77,7 @@ public sealed class MarketplaceOpportunityService : IMarketplaceOpportunityServi
         _db.MarketplaceOpportunities.Add(entity);
         await _db.SaveChangesAsync(cancellationToken);
 
-        return Result<MarketplaceOpportunityDto>.Ok(MapToDto(entity));
+        return Result<MarketplaceOpportunityDto>.Ok(await ToDtoAsync(entity, cancellationToken));
     }
 
     public async Task<Result<MarketplaceOpportunityDto>> UpdateAsync(
@@ -137,22 +137,46 @@ public sealed class MarketplaceOpportunityService : IMarketplaceOpportunityServi
 
         await _db.SaveChangesAsync(cancellationToken);
 
-        return Result<MarketplaceOpportunityDto>.Ok(MapToDto(entity));
+        return Result<MarketplaceOpportunityDto>.Ok(await ToDtoAsync(entity, cancellationToken));
     }
 
     public async Task<Result<MarketplaceOpportunityDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await _db.MarketplaceOpportunities.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var dto = await (
+            from m in _db.MarketplaceOpportunities.AsNoTracking()
+            join ou in _db.OrganizationUnits.AsNoTracking() on m.OrganizationUnitId equals ou.Id
+            join p in _db.Positions.AsNoTracking() on m.PositionId equals p.Id into posJoin
+            from p in posJoin.DefaultIfEmpty()
+            where m.Id == id
+            select new MarketplaceOpportunityDto
+            {
+                Id = m.Id,
+                Title = m.Title,
+                Description = m.Description,
+                OpportunityType = m.OpportunityType,
+                OrganizationUnitId = m.OrganizationUnitId,
+                OrganizationUnitName = string.IsNullOrWhiteSpace(ou.NameAr) ? ou.NameEn : ou.NameAr,
+                PositionId = m.PositionId,
+                PositionTitle = p == null
+                    ? null
+                    : (string.IsNullOrWhiteSpace(p.TitleAr) ? p.TitleEn : p.TitleAr),
+                RequiredCompetencySummary = m.RequiredCompetencySummary,
+                Status = m.Status,
+                OpenDate = m.OpenDate,
+                CloseDate = m.CloseDate,
+                MaxApplicants = m.MaxApplicants,
+                IsConfidential = m.IsConfidential,
+                Notes = m.Notes
+            }).FirstOrDefaultAsync(cancellationToken);
 
-        if (entity is null)
+        if (dto is null)
         {
             return Result<MarketplaceOpportunityDto>.Fail(
                 "The marketplace opportunity was not found.",
                 MarketplaceErrors.OpportunityNotFound);
         }
 
-        return Result<MarketplaceOpportunityDto>.Ok(MapToDto(entity));
+        return Result<MarketplaceOpportunityDto>.Ok(dto);
     }
 
     public async Task<Result<PagedResult<MarketplaceOpportunityDto>>> GetPagedAsync(
@@ -192,26 +216,37 @@ public sealed class MarketplaceOpportunityService : IMarketplaceOpportunityServi
 
         var totalCount = await query.CountAsync(cancellationToken);
 
-        var items = await query
-            .OrderByDescending(x => x.OpenDate)
-            .ThenBy(x => x.Title)
+        var baseQuery =
+            from m in query
+            join ou in _db.OrganizationUnits.AsNoTracking() on m.OrganizationUnitId equals ou.Id
+            join p in _db.Positions.AsNoTracking() on m.PositionId equals p.Id into posJoin
+            from p in posJoin.DefaultIfEmpty()
+            select new { m, ou, p };
+
+        var items = await baseQuery
+            .OrderByDescending(x => x.m.OpenDate)
+            .ThenBy(x => x.m.Title)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(x => new MarketplaceOpportunityDto
             {
-                Id = x.Id,
-                Title = x.Title,
-                Description = x.Description,
-                OpportunityType = x.OpportunityType,
-                OrganizationUnitId = x.OrganizationUnitId,
-                PositionId = x.PositionId,
-                RequiredCompetencySummary = x.RequiredCompetencySummary,
-                Status = x.Status,
-                OpenDate = x.OpenDate,
-                CloseDate = x.CloseDate,
-                MaxApplicants = x.MaxApplicants,
-                IsConfidential = x.IsConfidential,
-                Notes = x.Notes
+                Id = x.m.Id,
+                Title = x.m.Title,
+                Description = x.m.Description,
+                OpportunityType = x.m.OpportunityType,
+                OrganizationUnitId = x.m.OrganizationUnitId,
+                OrganizationUnitName = string.IsNullOrWhiteSpace(x.ou.NameAr) ? x.ou.NameEn : x.ou.NameAr,
+                PositionId = x.m.PositionId,
+                PositionTitle = x.p == null
+                    ? null
+                    : (string.IsNullOrWhiteSpace(x.p.TitleAr) ? x.p.TitleEn : x.p.TitleAr),
+                RequiredCompetencySummary = x.m.RequiredCompetencySummary,
+                Status = x.m.Status,
+                OpenDate = x.m.OpenDate,
+                CloseDate = x.m.CloseDate,
+                MaxApplicants = x.m.MaxApplicants,
+                IsConfidential = x.m.IsConfidential,
+                Notes = x.m.Notes
             })
             .ToListAsync(cancellationToken);
 
@@ -236,7 +271,7 @@ public sealed class MarketplaceOpportunityService : IMarketplaceOpportunityServi
 
         if (entity.Status == MarketplaceOpportunityStatus.Open)
         {
-            return Result<MarketplaceOpportunityDto>.Ok(MapToDto(entity));
+            return Result<MarketplaceOpportunityDto>.Ok(await ToDtoAsync(entity, cancellationToken));
         }
 
         if (entity.Status != MarketplaceOpportunityStatus.Draft)
@@ -249,7 +284,7 @@ public sealed class MarketplaceOpportunityService : IMarketplaceOpportunityServi
         entity.Status = MarketplaceOpportunityStatus.Open;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return Result<MarketplaceOpportunityDto>.Ok(MapToDto(entity));
+        return Result<MarketplaceOpportunityDto>.Ok(await ToDtoAsync(entity, cancellationToken));
     }
 
     public async Task<Result<MarketplaceOpportunityDto>> CloseAsync(Guid id, CancellationToken cancellationToken = default)
@@ -264,7 +299,7 @@ public sealed class MarketplaceOpportunityService : IMarketplaceOpportunityServi
 
         if (entity.Status == MarketplaceOpportunityStatus.Closed)
         {
-            return Result<MarketplaceOpportunityDto>.Ok(MapToDto(entity));
+            return Result<MarketplaceOpportunityDto>.Ok(await ToDtoAsync(entity, cancellationToken));
         }
 
         if (entity.Status != MarketplaceOpportunityStatus.Open)
@@ -277,7 +312,7 @@ public sealed class MarketplaceOpportunityService : IMarketplaceOpportunityServi
         entity.Status = MarketplaceOpportunityStatus.Closed;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return Result<MarketplaceOpportunityDto>.Ok(MapToDto(entity));
+        return Result<MarketplaceOpportunityDto>.Ok(await ToDtoAsync(entity, cancellationToken));
     }
 
     public async Task<Result<MarketplaceOpportunityDto>> CancelAsync(Guid id, CancellationToken cancellationToken = default)
@@ -292,7 +327,7 @@ public sealed class MarketplaceOpportunityService : IMarketplaceOpportunityServi
 
         if (entity.Status == MarketplaceOpportunityStatus.Cancelled)
         {
-            return Result<MarketplaceOpportunityDto>.Ok(MapToDto(entity));
+            return Result<MarketplaceOpportunityDto>.Ok(await ToDtoAsync(entity, cancellationToken));
         }
 
         if (entity.Status is not (MarketplaceOpportunityStatus.Draft or MarketplaceOpportunityStatus.Open))
@@ -305,21 +340,42 @@ public sealed class MarketplaceOpportunityService : IMarketplaceOpportunityServi
         entity.Status = MarketplaceOpportunityStatus.Cancelled;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return Result<MarketplaceOpportunityDto>.Ok(MapToDto(entity));
+        return Result<MarketplaceOpportunityDto>.Ok(await ToDtoAsync(entity, cancellationToken));
     }
 
     private static bool OpportunityAllowsMetadataEdit(MarketplaceOpportunityStatus status) =>
         status is MarketplaceOpportunityStatus.Draft or MarketplaceOpportunityStatus.Open;
 
-    private static MarketplaceOpportunityDto MapToDto(MarketplaceOpportunity entity) =>
-        new()
+    private async Task<MarketplaceOpportunityDto> ToDtoAsync(
+        MarketplaceOpportunity entity,
+        CancellationToken cancellationToken)
+    {
+        var ou = await _db.OrganizationUnits.AsNoTracking()
+            .Where(x => x.Id == entity.OrganizationUnitId)
+            .Select(x => new { x.NameAr, x.NameEn })
+            .FirstAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        string? positionTitle = null;
+        if (entity.PositionId is { } pid)
+        {
+            positionTitle = await _db.Positions.AsNoTracking()
+                .Where(x => x.Id == pid)
+                .Select(x => string.IsNullOrWhiteSpace(x.TitleAr) ? x.TitleEn : x.TitleAr)
+                .FirstOrDefaultAsync(cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        return new MarketplaceOpportunityDto
         {
             Id = entity.Id,
             Title = entity.Title,
             Description = entity.Description,
             OpportunityType = entity.OpportunityType,
             OrganizationUnitId = entity.OrganizationUnitId,
+            OrganizationUnitName = string.IsNullOrWhiteSpace(ou.NameAr) ? ou.NameEn : ou.NameAr,
             PositionId = entity.PositionId,
+            PositionTitle = positionTitle,
             RequiredCompetencySummary = entity.RequiredCompetencySummary,
             Status = entity.Status,
             OpenDate = entity.OpenDate,
@@ -328,4 +384,5 @@ public sealed class MarketplaceOpportunityService : IMarketplaceOpportunityServi
             IsConfidential = entity.IsConfidential,
             Notes = entity.Notes
         };
+    }
 }

@@ -1,56 +1,112 @@
 <div class="page-head-row">
   <section class="page-head">
-    <h1>الفرص</h1>
+    <h1>{{ 'marketplace.list.pageTitle' | t }}</h1>
   </section>
-  @if (auth.hasPermission(PermissionCodes.MarketplaceManage)) {
-    <div class="page-actions">
+  <div class="page-actions mkt-actions">
+    @if (auth.hasPermission(PermissionCodes.MarketplaceApply)) {
+      <a class="btn-ghost" routerLink="/marketplace/opportunities">{{ 'nav.marketplaceOpenOpportunities' | t }}</a>
+    }
+    @if (auth.hasPermission(PermissionCodes.MarketplaceManage)) {
       <a class="btn-primary btn-primary--icon" routerLink="/marketplace/create">
         <span class="btn-ico" aria-hidden="true">＋</span>
-        فرصة جديدة
+        {{ 'marketplace.list.newOpp' | t }}
       </a>
-    </div>
-  }
+    }
+  </div>
 </div>
 
 @if (summary() && !summaryFailed()) {
-  <div class="card stat-grid">
-    <div class="stat">
-      <div class="stat__label">فرص مفتوحة</div>
-      <div class="stat__value">{{ summary()!.openOpportunities }}/{{ summary()!.totalMarketplaceOpportunities }}</div>
+  <section class="mkt-hero" [attr.aria-label]="'marketplace.list.analyticsTitle' | t">
+    <div class="mkt-hero__title">
+      <h2>{{ 'marketplace.list.analyticsTitle' | t }}</h2>
+      <p class="mkt-hero__sub">
+        {{ 'marketplace.list.openVsTotal' | t }}:
+        <strong>{{ summary()!.openOpportunities }}</strong> / {{ summary()!.totalMarketplaceOpportunities }}
+      </p>
     </div>
-    <div class="stat">
-      <div class="stat__label">طلبات</div>
-      <div class="stat__value">{{ summary()!.totalApplications }}</div>
+    <div class="mkt-hero__kpis">
+      <article class="mkt-kpi mkt-kpi--indigo">
+        <span class="mkt-kpi__label">{{ 'analytics.kpi.marketplace' | t }}</span>
+        <span class="mkt-kpi__val">{{ summary()!.openOpportunities | number }}</span>
+      </article>
+      <article class="mkt-kpi mkt-kpi--slate">
+        <span class="mkt-kpi__label">{{ 'marketplace.list.pipeline' | t }}</span>
+        <span class="mkt-kpi__val">{{ summary()!.totalApplications | number }}</span>
+      </article>
+      <article class="mkt-kpi mkt-kpi--amber">
+        <span class="mkt-kpi__label">{{ appStatus(2) }}</span>
+        <span class="mkt-kpi__val">{{ summary()!.underReviewApplications | number }}</span>
+      </article>
+      <article class="mkt-kpi mkt-kpi--emerald">
+        <span class="mkt-kpi__label">{{ appStatus(4) }}</span>
+        <span class="mkt-kpi__val">{{ summary()!.acceptedApplications | number }}</span>
+      </article>
     </div>
-    <div class="stat">
-      <div class="stat__label">قيد المراجعة</div>
-      <div class="stat__value">{{ summary()!.underReviewApplications }}</div>
-    </div>
-    <div class="stat">
-      <div class="stat__label">مقبولة</div>
-      <div class="stat__value">{{ summary()!.acceptedApplications }}</div>
-    </div>
-    @if (summary()!.averageMatchScore != null) {
-      <div class="stat">
-        <div class="stat__label">متوسط التطابق</div>
-        <div class="stat__value">{{ summary()!.averageMatchScore | number: '1.0-1' }}</div>
+    <div class="mkt-hero__stats">
+      <div class="mkt-statline">
+        <span>{{ 'marketplace.list.pipeline' | t }}</span>
+        <ul>
+          <li>
+            <em>{{ appStatus(1) }}</em> <b>{{ summary()!.submittedApplications | number }}</b>
+          </li>
+          <li>
+            <em>{{ appStatus(2) }}</em> <b>{{ summary()!.underReviewApplications | number }}</b>
+          </li>
+          <li>
+            <em>{{ appStatus(3) }}</em> <b>{{ summary()!.shortlistedApplications | number }}</b>
+          </li>
+          <li>
+            <em>{{ appStatus(4) }}</em> <b>{{ summary()!.acceptedApplications | number }}</b>
+          </li>
+          <li>
+            <em>{{ appStatus(5) }}</em> <b>{{ summary()!.rejectedApplications | number }}</b>
+          </li>
+          <li>
+            <em>{{ appStatus(6) }}</em> <b>{{ summary()!.withdrawnApplications | number }}</b>
+          </li>
+        </ul>
       </div>
-    }
-  </div>
+    </div>
+  </section>
+
+  @if (summary()!.opportunitiesByType.length) {
+    <div class="card mkt-type-card">
+      <h3 class="mkt-type-card__h">{{ 'marketplace.list.opportunitiesByType' | t }}</h3>
+      <ul class="mkt-type-bars">
+        @for (row of summary()!.opportunitiesByType; track row.opportunityType) {
+          <li>
+            <div class="mkt-type-bars__label">
+              <span>{{ oppType(row.opportunityType) }}</span>
+              <span class="mkt-type-bars__nums"
+                >{{ row.openCount | number }} / {{ row.opportunityCount | number }}</span
+              >
+            </div>
+            <div class="mkt-type-bars__track" [attr.aria-label]="oppType(row.opportunityType)">
+              <div
+                class="mkt-type-bars__fill"
+                [style.width.%]="row.opportunityCount ? (100 * row.openCount) / row.opportunityCount : 0"
+              ></div>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+  }
 } @else if (summaryFailed()) {
-  <div class="card card--muted">تعذر تحميل ملخص السوق.</div>
+  <div class="card card--muted">{{ 'marketplace.list.summaryFailed' | t }}</div>
 }
 
 @if (failed()) {
-  <div class="card card--muted">تعذر التحميل.</div>
+  <div class="card card--muted">{{ 'marketplace.list.loadFailed' | t }}</div>
 } @else if (data()) {
   <div class="card table-card">
     <table class="data-table">
       <thead>
         <tr>
-          <th>العنوان</th>
-          <th>النوع</th>
-          <th>الحالة</th>
+          <th>{{ 'marketplace.list.colTitle' | t }}</th>
+          <th>{{ 'marketplace.list.colType' | t }}</th>
+          <th>{{ 'marketplace.list.colStatus' | t }}</th>
+          <th>{{ 'marketplace.list.colUnit' | t }}</th>
           <th></th>
         </tr>
       </thead>
@@ -60,7 +116,10 @@
             <td>{{ row.title }}</td>
             <td>{{ oppType(row.opportunityType) }}</td>
             <td>{{ oppStatus(row.status) }}</td>
-            <td class="cell-actions"><a class="link" [routerLink]="['/marketplace', row.id]">عرض</a></td>
+            <td class="cell-narrow">{{ row.organizationUnitName || '—' }}</td>
+            <td class="cell-actions">
+              <a class="link" [routerLink]="['/marketplace', row.id]">{{ 'marketplace.list.actionView' | t }}</a>
+            </td>
           </tr>
         }
       </tbody>

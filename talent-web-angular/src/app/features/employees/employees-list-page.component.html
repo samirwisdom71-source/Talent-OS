@@ -150,28 +150,26 @@
         <input type="email" [(ngModel)]="createModel.email" [placeholder]="'employees.form.email.placeholder' | t" />
       </label>
       <label>
-        <span>{{ 'employees.form.organizationUnitId' | t }} <span class="required">*</span></span>
-        <select [(ngModel)]="createModel.organizationUnitId">
-          <option value="">{{ 'employees.form.selectOrganizationUnit' | t }}</option>
-          @for (org of organizations(); track org.id) {
-            <option [value]="org.id">{{ org.name }}</option>
-          }
-        </select>
-        @if (createModel.organizationUnitId) {
-          <small class="picked-label">{{ selectedOrgUnitName() }}</small>
-        }
+        <span>{{ 'employeeCreate.form.organizationUnit' | t }} <span class="required">*</span></span>
+        <app-lookup-search-combo
+          kind="organizationUnit"
+          [value]="createModel.organizationUnitId"
+          (valueChange)="onCreateOrganizationUnitChange($event)"
+          [placeholder]="'employeeCreate.form.organizationUnitPlaceholder' | t"
+        />
       </label>
       <label>
-        <span>{{ 'employees.form.positionId' | t }} <span class="required">*</span></span>
-        <select [(ngModel)]="createModel.positionId">
-          <option value="">{{ 'employees.form.selectPosition' | t }}</option>
-          @for (position of positions(); track position.id) {
-            <option [value]="position.id">{{ position.name }}</option>
-          }
-        </select>
-        @if (createModel.positionId) {
-          <small class="picked-label">{{ selectedPositionName() }}</small>
-        }
+        <span>{{ 'employeeCreate.form.position' | t }} <span class="required">*</span></span>
+        <app-lookup-search-combo
+          kind="position"
+          [value]="createModel.positionId"
+          (valueChange)="createModel.positionId = $event"
+          [parentOrganizationUnitId]="createModel.organizationUnitId || null"
+          [disabled]="!createModel.organizationUnitId"
+          [placeholder]="createModel.organizationUnitId
+            ? ('employeeCreate.form.positionPlaceholder' | t)
+            : ('employeeCreate.form.positionPickUnit' | t)"
+        />
       </label>
     </div>
     <div class="modal-actions">
@@ -246,22 +244,26 @@
         <input type="email" [(ngModel)]="editModel.email" />
       </label>
       <label>
-        <span>{{ 'employees.form.organizationUnitId' | t }} <span class="required">*</span></span>
-        <select [(ngModel)]="editModel.organizationUnitId">
-          <option value="">{{ 'employees.form.selectOrganizationUnit' | t }}</option>
-          @for (org of organizations(); track org.id) {
-            <option [value]="org.id">{{ org.name }}</option>
-          }
-        </select>
+        <span>{{ 'employeeCreate.form.organizationUnit' | t }} <span class="required">*</span></span>
+        <app-lookup-search-combo
+          kind="organizationUnit"
+          [value]="editModel.organizationUnitId"
+          (valueChange)="onEditOrganizationUnitChange($event)"
+          [placeholder]="'employeeCreate.form.organizationUnitPlaceholder' | t"
+        />
       </label>
       <label>
-        <span>{{ 'employees.form.positionId' | t }} <span class="required">*</span></span>
-        <select [(ngModel)]="editModel.positionId">
-          <option value="">{{ 'employees.form.selectPosition' | t }}</option>
-          @for (position of positions(); track position.id) {
-            <option [value]="position.id">{{ position.name }}</option>
-          }
-        </select>
+        <span>{{ 'employeeCreate.form.position' | t }} <span class="required">*</span></span>
+        <app-lookup-search-combo
+          kind="position"
+          [value]="editModel.positionId"
+          (valueChange)="editModel.positionId = $event"
+          [parentOrganizationUnitId]="editModel.organizationUnitId || null"
+          [disabled]="!editModel.organizationUnitId"
+          [placeholder]="editModel.organizationUnitId
+            ? ('employeeCreate.form.positionPlaceholder' | t)
+            : ('employeeCreate.form.positionPickUnit' | t)"
+        />
       </label>
     </div>
     <div class="modal-actions">

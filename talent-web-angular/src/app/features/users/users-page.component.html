@@ -143,12 +143,12 @@
       </label>
       <label>
         <span>{{ 'users.form.employeeOptional' | t }}</span>
-        <select [(ngModel)]="createModel.employeeId">
-          <option [ngValue]="null">-- {{ 'users.form.none' | t }} --</option>
-          @for (emp of employees(); track emp.id) {
-            <option [value]="emp.id">{{ emp.name }}</option>
-          }
-        </select>
+        <app-lookup-search-combo
+          kind="employee"
+          [value]="createModel.employeeId ?? ''"
+          (valueChange)="createModel.employeeId = $event || null"
+          [placeholder]="'users.form.employeePlaceholder' | t"
+        />
       </label>
       <label class="full">
         <span>{{ 'users.form.roles' | t }} <span class="required">*</span></span>
@@ -276,12 +276,12 @@
       </label>
       <label>
         <span>{{ 'users.form.employeeOptional' | t }}</span>
-        <select [(ngModel)]="editModel.employeeId">
-          <option [ngValue]="null">-- {{ 'users.form.none' | t }} --</option>
-          @for (emp of employees(); track emp.id) {
-            <option [value]="emp.id">{{ emp.name }}</option>
-          }
-        </select>
+        <app-lookup-search-combo
+          kind="employee"
+          [value]="editModel.employeeId ?? ''"
+          (valueChange)="editModel.employeeId = $event || null"
+          [placeholder]="'users.form.employeePlaceholder' | t"
+        />
       </label>
     </div>
     <div class="modal-actions">

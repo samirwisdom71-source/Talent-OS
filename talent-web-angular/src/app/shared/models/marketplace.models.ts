@@ -4,7 +4,9 @@ export interface MarketplaceOpportunityDto {
   description?: string | null;
   opportunityType: number;
   organizationUnitId: string;
+  organizationUnitName?: string | null;
   positionId?: string | null;
+  positionTitle?: string | null;
   requiredCompetencySummary?: string | null;
   status: number;
   openDate: string;

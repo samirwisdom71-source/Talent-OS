@@ -1,14 +1,12 @@
-import { Component, inject } from '@angular/core';
-import { I18nService } from '../../shared/services/i18n.service';
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-settings-page',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, RouterLink],
   templateUrl: './settings-page.component.html',
   styleUrl: './settings-page.component.scss',
 })
-export class SettingsPageComponent {
-  readonly i18n = inject(I18nService);
-}
+export class SettingsPageComponent {}

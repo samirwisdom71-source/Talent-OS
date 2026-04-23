@@ -1,0 +1,87 @@
+<section class="emp-opps">
+  <header class="emp-head">
+    <div>
+      <p class="emp-head__eyebrow">{{ 'marketplace.employee.eyebrow' | t }}</p>
+      <h1>{{ 'marketplace.employee.title' | t }}</h1>
+      <p class="emp-head__lead">{{ 'marketplace.employee.lead' | t }}</p>
+    </div>
+    <div class="emp-head__actions">
+      <button type="button" class="chip-btn" [class.chip-btn--on]="mode() === 'cards'" (click)="mode.set('cards')">
+        {{ 'common.cards' | t }}
+      </button>
+      <button type="button" class="chip-btn" [class.chip-btn--on]="mode() === 'table'" (click)="mode.set('table')">
+        {{ 'common.table' | t }}
+      </button>
+    </div>
+  </header>
+
+  <div class="emp-toolbar">
+    <input
+      type="search"
+      class="search"
+      [placeholder]="'marketplace.employee.search' | t"
+      [ngModel]="query()"
+      (ngModelChange)="query.set($event)"
+    />
+    <div class="count-pill">{{ filtered().length }} {{ 'marketplace.employee.openCount' | t }}</div>
+  </div>
+
+  @if (loading()) {
+    <div class="skeleton box"></div>
+  } @else if (failed()) {
+    <div class="card card--muted">{{ 'marketplace.employee.loadFailed' | t }}</div>
+  } @else if (!filtered().length) {
+    <div class="card card--muted">{{ 'marketplace.employee.empty' | t }}</div>
+  } @else if (mode() === 'cards') {
+    <div class="opp-grid">
+      @for (row of filtered(); track row.id) {
+        <article class="opp-card">
+          <div class="opp-card__top">
+            <span class="tag">{{ oppType(row.opportunityType) }}</span>
+            <span class="mini">{{ row.openDate | date: 'mediumDate' }}</span>
+          </div>
+          <h3>{{ row.title }}</h3>
+          <p class="desc">{{ row.description || '—' }}</p>
+          <div class="meta">
+            <span>{{ row.organizationUnitName || '—' }}</span>
+            @if (row.positionTitle) {
+              <span>{{ row.positionTitle }}</span>
+            }
+          </div>
+          <div class="opp-card__actions">
+            <a class="btn-ghost" [routerLink]="['/marketplace/opportunities', row.id]">{{ 'marketplace.employee.details' | t }}</a>
+            <a class="btn-primary" [routerLink]="['/marketplace/opportunities', row.id, 'apply']">
+              {{ 'marketplace.employee.apply' | t }}
+            </a>
+          </div>
+        </article>
+      }
+    </div>
+  } @else {
+    <div class="table-shell">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>{{ 'marketplace.list.colTitle' | t }}</th>
+            <th>{{ 'marketplace.list.colType' | t }}</th>
+            <th>{{ 'marketplace.list.colUnit' | t }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of filtered(); track row.id) {
+            <tr>
+              <td class="cell-strong">{{ row.title }}</td>
+              <td>{{ oppType(row.opportunityType) }}</td>
+              <td>{{ row.organizationUnitName || '—' }}</td>
+              <td class="cell-actions">
+                <a class="link" [routerLink]="['/marketplace/opportunities', row.id]">{{ 'marketplace.employee.details' | t }}</a>
+                <a class="link" [routerLink]="['/marketplace/opportunities', row.id, 'apply']">{{ 'marketplace.employee.apply' | t }}</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

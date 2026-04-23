@@ -254,6 +254,33 @@ export const routes: Routes = [
           import('./features/marketplace/marketplace-list-page.component').then((m) => m.MarketplaceListPageComponent),
       },
       {
+        path: 'marketplace/opportunities',
+        canActivate: [permissionGuard],
+        data: { permissions: ['MARKETPLACE_APPLY'] },
+        loadComponent: () =>
+          import('./features/marketplace/marketplace-opportunities-employee-page.component').then(
+            (m) => m.MarketplaceOpportunitiesEmployeePageComponent,
+          ),
+      },
+      {
+        path: 'marketplace/opportunities/:id',
+        canActivate: [permissionGuard],
+        data: { permissions: ['MARKETPLACE_APPLY'] },
+        loadComponent: () =>
+          import('./features/marketplace/marketplace-opportunity-employee-detail-page.component').then(
+            (m) => m.MarketplaceOpportunityEmployeeDetailPageComponent,
+          ),
+      },
+      {
+        path: 'marketplace/opportunities/:id/apply',
+        canActivate: [permissionGuard],
+        data: { permissions: ['MARKETPLACE_APPLY'] },
+        loadComponent: () =>
+          import('./features/marketplace/marketplace-opportunity-apply-page.component').then(
+            (m) => m.MarketplaceOpportunityApplyPageComponent,
+          ),
+      },
+      {
         path: 'marketplace/create',
         canActivate: [permissionGuard],
         data: { permissions: ['MARKETPLACE_MANAGE'] },
@@ -357,6 +384,25 @@ export const routes: Routes = [
         path: 'settings',
         loadComponent: () =>
           import('./features/settings/settings-page.component').then((m) => m.SettingsPageComponent),
+      },
+      {
+        path: 'settings/system',
+        loadComponent: () =>
+          import('./features/settings/settings-system-page.component').then((m) => m.SettingsSystemPageComponent),
+      },
+      {
+        path: 'settings/classification-rule-sets',
+        loadComponent: () =>
+          import('./features/settings/classification-rule-sets-page.component').then(
+            (m) => m.ClassificationRuleSetsPageComponent,
+          ),
+      },
+      {
+        path: 'settings/executive-analytics',
+        loadComponent: () =>
+          import('./features/settings/settings-executive-analytics-page.component').then(
+            (m) => m.SettingsExecutiveAnalyticsPageComponent,
+          ),
       },
     ],
   },

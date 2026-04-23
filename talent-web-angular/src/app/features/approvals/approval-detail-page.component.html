@@ -4,37 +4,49 @@
       <path d="M15 18l-6-6 6-6" />
     </svg>
   </span>
-  <span class="back-link__label">الموافقات</span>
+  <span class="back-link__label">{{ 'nav.approvals' | t }}</span>
 </a>
 @if (failed()) {
-  <div class="card card--muted">تعذر التحميل.</div>
+  <div class="card card--muted">{{ 'approvals.loadFailed' | t }}</div>
 } @else if (req()) {
   <section class="page-head">
     <h1>{{ req()!.title }}</h1>
-    <p class="page-head__sub">{{ statusLabel(req()!.status) }} · نوع {{ req()!.requestType }}</p>
+    <p class="page-head__sub">{{ statusLabel(req()!.status) }} · {{ requestTypeLabel(req()!.requestType) }}</p>
   </section>
 
   <div class="card meta">
     <div class="meta__row">
-      <span class="meta__lbl">المُقدِّم</span>
-      <app-id-chip [id]="req()!.requestedByUserId" />
+      <span class="meta__lbl">{{ 'approvals.detail.requestedBy' | t }}</span>
+      <strong>{{ userName(req()!.requestedByUserId) }}</strong>
     </div>
     @if (req()!.currentApproverUserId) {
       <div class="meta__row">
-        <span class="meta__lbl">المعتمد الحالي</span>
-        <app-id-chip [id]="req()!.currentApproverUserId!" />
+        <span class="meta__lbl">{{ 'approvals.detail.currentApprover' | t }}</span>
+        <strong>{{ userName(req()!.currentApproverUserId!) }}</strong>
       </div>
     }
-    <div class="meta__row">
-      <span class="meta__lbl">الكيان المرتبط</span>
-      <app-id-chip [id]="req()!.relatedEntityId" />
+    <div class="meta__row meta__row--entity">
+      <span class="meta__lbl">{{ 'approvals.detail.relatedEntity' | t }}</span>
+      <div class="meta__entity">
+        @if (relatedEntityLoading()) {
+          <span class="meta__entity-loading">{{ 'common.loading' | t }}</span>
+        } @else {
+          <strong class="meta__entity-title">{{ relatedEntityTitle() }}</strong>
+          @if (relatedEntitySub()) {
+            <span class="meta__entity-sub">{{ relatedEntitySub() }}</span>
+          }
+          <span class="meta__entity-id" [attr.title]="req()!.relatedEntityId"
+            >{{ 'approvals.detail.entityId' | t }}: {{ req()!.relatedEntityId }}</span
+          >
+        }
+      </div>
     </div>
   </div>
 
   <div class="card actions">
     @if (req()!.status === Status.Draft && auth.hasPermission(PermissionCodes.ApprovalRequestCreate) && isRequester(req()!)) {
       <button type="button" class="btn-primary" [disabled]="busy()" (click)="submit()">
-        {{ busy() ? '…' : 'إرسال للموافقة' }}
+        {{ busy() ? '…' : ('approvals.detail.submit' | t) }}
       </button>
     }
 
@@ -43,57 +55,126 @@
       auth.hasPermission(PermissionCodes.ApprovalRequestCreate) &&
       isRequester(req()!)
     ) {
-      <button type="button" class="btn-secondary" [disabled]="busy()" (click)="open('cancel')">إلغاء الطلب</button>
+      <button type="button" class="btn-secondary" [disabled]="busy()" (click)="open('cancel')">{{ 'approvals.detail.cancelRequest' | t }}</button>
     }
 
     @if (
       req()!.status === Status.Submitted &&
-      auth.hasPermission(PermissionCodes.ApprovalRequestReview)
+      auth.hasPermission(PermissionCodes.ApprovalRequestReview) &&
+      isCurrentApprover(req()!)
     ) {
-      <button type="button" class="btn-primary" [disabled]="busy()" (click)="open('review')">بدء المراجعة</button>
+      <button type="button" class="btn-primary" [disabled]="busy()" (click)="open('review')">{{ 'approvals.detail.startReview' | t }}</button>
+    }
+
+    @if (req()!.status === Status.Submitted && auth.hasPermission(PermissionCodes.ApprovalRequestAssign)) {
+      <button type="button" class="btn-secondary" [disabled]="busy()" (click)="open('assign')">{{ 'approvals.detail.assign' | t }}</button>
+      <button type="button" class="btn-secondary" [disabled]="busy()" (click)="open('reassign')">{{ 'approvals.detail.reassign' | t }}</button>
     }
 
     @if (
-      (req()!.status === Status.Submitted || req()!.status === Status.InReview) &&
-      auth.hasPermission(PermissionCodes.ApprovalRequestAssign)
+      req()!.status === Status.InReview &&
+      auth.hasPermission(PermissionCodes.ApprovalRequestApprove) &&
+      isCurrentApprover(req()!)
     ) {
-      <button type="button" class="btn-secondary" [disabled]="busy()" (click)="open('assign')">تعيين معتمد</button>
-      <button type="button" class="btn-secondary" [disabled]="busy()" (click)="open('reassign')">إعادة تعيين</button>
-    }
-
-    @if (req()!.status === Status.InReview && auth.hasPermission(PermissionCodes.ApprovalRequestApprove)) {
       <button type="button" class="btn-primary" [disabled]="busy()" (click)="approve()">
-        {{ busy() ? '…' : 'موافقة' }}
+        {{ busy() ? '…' : ('approvals.detail.approve' | t) }}
       </button>
     }
-    @if (req()!.status === Status.InReview && auth.hasPermission(PermissionCodes.ApprovalRequestReject)) {
-      <button type="button" class="btn-danger" [disabled]="busy()" (click)="reject()">رفض</button>
+    @if (
+      req()!.status === Status.InReview &&
+      auth.hasPermission(PermissionCodes.ApprovalRequestReject) &&
+      isCurrentApprover(req()!)
+    ) {
+      <button type="button" class="btn-danger" [disabled]="busy()" (click)="reject()">{{ 'approvals.detail.reject' | t }}</button>
     }
   </div>
 
-  @if (req()!.status === Status.InReview && (auth.hasPermission(PermissionCodes.ApprovalRequestApprove) || auth.hasPermission(PermissionCodes.ApprovalRequestReject))) {
+  @if (
+    req()!.status === Status.InReview &&
+    (auth.hasPermission(PermissionCodes.ApprovalRequestApprove) || auth.hasPermission(PermissionCodes.ApprovalRequestReject)) &&
+    isCurrentApprover(req()!)
+  ) {
     <div class="card notebox">
-      <label>ملاحظات (اختياري) للموافقة / الرفض</label>
+      <label>{{ 'approvals.detail.commentsOptional' | t }}</label>
       <textarea rows="2" [(ngModel)]="workflowComments" name="wfcomments"></textarea>
     </div>
   }
 
-  <div class="card">
-    <h2 class="h2">التعيينات</h2>
-    <ul class="muted">
-      @for (a of req()!.assignments; track a.id) {
-        <li>
-          <app-id-chip label="إلى" [id]="a.assignedToUserId" />
-          <span class="pill">{{ a.isCurrent ? 'حالي' : '' }}</span>
-        </li>
-      }
-    </ul>
-    <h2 class="h2">سجل الإجراءات</h2>
-    <ul class="muted">
-      @for (a of req()!.actions; track a.id) {
-        <li>{{ actionTypeLabel(a.actionType) }} · <app-id-chip [id]="a.actionByUserId" /> · {{ a.actionedOnUtc }}</li>
-      }
-    </ul>
+  <div class="detail-panels">
+    <section class="detail-panel" aria-labelledby="assignments-h">
+      <div class="detail-panel__head">
+        <span class="detail-panel__ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        </span>
+        <h2 class="detail-panel__title" id="assignments-h">{{ 'approvals.detail.assignments' | t }}</h2>
+      </div>
+      <ul class="flow-list">
+        @for (a of req()!.assignments; track a.id) {
+          <li class="flow-item">
+            <div class="flow-item__bar" [class.flow-item__bar--current]="a.isCurrent" aria-hidden="true"></div>
+            <div class="flow-item__body">
+              <div class="flow-item__row1">
+                <span class="flow-item__name">{{ userName(a.assignedToUserId) }}</span>
+                @if (a.isCurrent) {
+                  <span class="pill pill--live">{{ 'approvals.detail.current' | t }}</span>
+                }
+              </div>
+              <div class="flow-item__row2">
+                <span class="flow-item__by"
+                  >{{ 'approvals.detail.assignedBy' | t }} {{ userName(a.assignedByUserId) }}</span
+                >
+                <time class="flow-item__time" [dateTime]="a.assignedOnUtc">{{
+                  a.assignedOnUtc | date: 'medium'
+                }}</time>
+              </div>
+            </div>
+          </li>
+        } @empty {
+          <li class="flow-empty">—</li>
+        }
+      </ul>
+    </section>
+
+    <section class="detail-panel" aria-labelledby="actions-h">
+      <div class="detail-panel__head">
+        <span class="detail-panel__ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 20V10" />
+            <path d="M18 20V4" />
+            <path d="M6 20v-4" />
+          </svg>
+        </span>
+        <h2 class="detail-panel__title" id="actions-h">{{ 'approvals.detail.actionsLog' | t }}</h2>
+      </div>
+      <ul class="flow-list">
+        @for (a of req()!.actions; track a.id) {
+          <li class="flow-item flow-item--action">
+            <div class="flow-item__bar flow-item__bar--action" aria-hidden="true"></div>
+            <div class="flow-item__body">
+              <div class="flow-item__row1">
+                <span class="flow-item__action-type">{{ actionTypeLabel(a.actionType) }}</span>
+              </div>
+              <div class="flow-item__row2">
+                <span class="flow-item__name flow-item__name--sm">{{ userName(a.actionByUserId) }}</span>
+                <time class="flow-item__time" [dateTime]="a.actionedOnUtc">{{
+                  a.actionedOnUtc | date: 'medium'
+                }}</time>
+              </div>
+              @if (a.comments) {
+                <p class="flow-item__comments">{{ a.comments }}</p>
+              }
+            </div>
+          </li>
+        } @empty {
+          <li class="flow-empty">—</li>
+        }
+      </ul>
+    </section>
   </div>
 } @else {
   <div class="skeleton detail-skel"></div>
@@ -103,18 +184,30 @@
   <div class="modal-backdrop" (click)="closeModal()"></div>
   <div class="modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
     @if (m === 'assign') {
-      <h3>تعيين معتمد</h3>
-      <label>معرّف المستخدم (GUID)<input type="text" [(ngModel)]="assignApproverId" name="aid" /></label>
+      <h3>{{ 'approvals.detail.assign' | t }}</h3>
+      <app-lookup-search-combo
+        kind="user"
+        [value]="assignApproverId"
+        (valueChange)="assignApproverId = $event"
+        [label]="'approvals.detail.approver' | t"
+        [placeholder]="'users.form.employeePlaceholder' | t"
+      />
       <div class="modal__actions">
         <button type="button" class="btn-primary" [disabled]="busy() || !assignApproverId.trim()" (click)="confirmAssign()">
-          تأكيد
+          {{ 'users.actions.save' | t }}
         </button>
-        <button type="button" class="btn-secondary" (click)="closeModal()">إلغاء</button>
+        <button type="button" class="btn-secondary" (click)="closeModal()">{{ 'users.actions.cancel' | t }}</button>
       </div>
     }
     @if (m === 'reassign') {
-      <h3>إعادة تعيين المعتمد</h3>
-      <label>معرّف المستخدم الجديد<input type="text" [(ngModel)]="reassignApproverId" name="rid" /></label>
+      <h3>{{ 'approvals.detail.reassign' | t }}</h3>
+      <app-lookup-search-combo
+        kind="user"
+        [value]="reassignApproverId"
+        (valueChange)="reassignApproverId = $event"
+        [label]="'approvals.detail.approver' | t"
+        [placeholder]="'users.form.employeePlaceholder' | t"
+      />
       <div class="modal__actions">
         <button
           type="button"
@@ -122,25 +215,25 @@
           [disabled]="busy() || !reassignApproverId.trim()"
           (click)="confirmReassign()"
         >
-          تأكيد
+          {{ 'users.actions.save' | t }}
         </button>
-        <button type="button" class="btn-secondary" (click)="closeModal()">إلغاء</button>
+        <button type="button" class="btn-secondary" (click)="closeModal()">{{ 'users.actions.cancel' | t }}</button>
       </div>
     }
     @if (m === 'review') {
-      <h3>بدء المراجعة</h3>
-      <label>ملاحظات (اختياري)<textarea rows="2" [(ngModel)]="workflowComments" name="rv"></textarea></label>
+      <h3>{{ 'approvals.detail.startReview' | t }}</h3>
+      <label>{{ 'approvals.detail.commentsOptional' | t }}<textarea rows="2" [(ngModel)]="workflowComments" name="rv"></textarea></label>
       <div class="modal__actions">
-        <button type="button" class="btn-primary" [disabled]="busy()" (click)="confirmStartReview()">تأكيد</button>
-        <button type="button" class="btn-secondary" (click)="closeModal()">إلغاء</button>
+        <button type="button" class="btn-primary" [disabled]="busy()" (click)="confirmStartReview()">{{ 'users.actions.save' | t }}</button>
+        <button type="button" class="btn-secondary" (click)="closeModal()">{{ 'users.actions.cancel' | t }}</button>
       </div>
     }
     @if (m === 'cancel') {
-      <h3>إلغاء الطلب</h3>
-      <label>سبب أو ملاحظات (اختياري)<textarea rows="2" [(ngModel)]="workflowComments" name="cx"></textarea></label>
+      <h3>{{ 'approvals.detail.cancelRequest' | t }}</h3>
+      <label>{{ 'approvals.detail.commentsOptional' | t }}<textarea rows="2" [(ngModel)]="workflowComments" name="cx"></textarea></label>
       <div class="modal__actions">
-        <button type="button" class="btn-danger" [disabled]="busy()" (click)="confirmCancel()">تأكيد الإلغاء</button>
-        <button type="button" class="btn-secondary" (click)="closeModal()">رجوع</button>
+        <button type="button" class="btn-danger" [disabled]="busy()" (click)="confirmCancel()">{{ 'approvals.detail.cancelRequest' | t }}</button>
+        <button type="button" class="btn-secondary" (click)="closeModal()">{{ 'users.actions.cancel' | t }}</button>
       </div>
     }
   </div>

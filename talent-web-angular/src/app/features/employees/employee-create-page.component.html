@@ -4,24 +4,60 @@
       <path d="M15 18l-6-6 6-6" />
     </svg>
   </span>
-  <span class="back-link__label">الموظفون</span>
+  <span class="back-link__label">{{ 'employeeCreate.back' | t }}</span>
 </a>
 <section class="page-head">
-  <h1>إضافة موظف</h1>
+  <h1>{{ 'employeeCreate.title' | t }}</h1>
+  <p class="page-head__sub">{{ 'employeeCreate.subtitle' | t }}</p>
 </section>
+
 <div class="card form-card">
   <div class="form-grid">
-    <label>رقم الموظف<input [(ngModel)]="model.employeeNumber" name="en" /></label>
-    <label>الاسم (عربي)<input [(ngModel)]="model.fullNameAr" name="fa" /></label>
-    <label>الاسم (إنجليزي)<input [(ngModel)]="model.fullNameEn" name="fe" /></label>
-    <label>البريد<input type="email" [(ngModel)]="model.email" name="em" /></label>
-    <label>معرّف الوحدة التنظيمية<input [(ngModel)]="model.organizationUnitId" name="ou" /></label>
-    <label>معرّف المنصب<input [(ngModel)]="model.positionId" name="po" /></label>
+    <label class="field">
+      <span class="field__label">{{ 'employeeCreate.form.employeeNumber' | t }} <span class="required">*</span></span>
+      <input [(ngModel)]="model.employeeNumber" name="en" />
+    </label>
+    <label class="field">
+      <span class="field__label">{{ 'employeeCreate.form.fullNameAr' | t }} <span class="required">*</span></span>
+      <input [(ngModel)]="model.fullNameAr" name="fa" />
+    </label>
+    <label class="field">
+      <span class="field__label">{{ 'employeeCreate.form.fullNameEn' | t }}</span>
+      <input [(ngModel)]="model.fullNameEn" name="fe" />
+    </label>
+    <label class="field">
+      <span class="field__label">{{ 'employeeCreate.form.email' | t }} <span class="required">*</span></span>
+      <input type="email" [(ngModel)]="model.email" name="em" />
+    </label>
+    <div class="field">
+      <app-lookup-search-combo
+        kind="organizationUnit"
+        [value]="organizationUnitId()"
+        (valueChange)="onOrganizationUnitChange($event)"
+        [label]="'employeeCreate.form.organizationUnit' | t"
+        [placeholder]="'employeeCreate.form.organizationUnitPlaceholder' | t"
+      />
+    </div>
+    <div class="field">
+      <app-lookup-search-combo
+        kind="position"
+        [value]="positionId()"
+        (valueChange)="positionId.set($event)"
+        [parentOrganizationUnitId]="positionFilter()"
+        [disabled]="!organizationUnitId()"
+        [label]="'employeeCreate.form.position' | t"
+        [placeholder]="
+          organizationUnitId()
+            ? ('employeeCreate.form.positionPlaceholder' | t)
+            : ('employeeCreate.form.positionPickUnit' | t)
+        "
+      />
+    </div>
   </div>
   <div class="form-actions">
     <button type="button" class="btn-primary" [disabled]="busy()" (click)="save()">
-      {{ busy() ? '…' : 'حفظ' }}
+      {{ busy() ? '…' : ('employeeCreate.actions.save' | t) }}
     </button>
-    <a routerLink="/employees" class="btn-ghost">إلغاء</a>
+    <a routerLink="/employees" class="btn-ghost">{{ 'employeeCreate.actions.cancel' | t }}</a>
   </div>
 </div>

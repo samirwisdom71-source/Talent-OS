@@ -185,20 +185,24 @@ public sealed class OpportunityApplicationService : IOpportunityApplicationServi
 
     public async Task<Result<OpportunityApplicationDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var dto = await _db.OpportunityApplications.AsNoTracking()
-            .Where(x => x.Id == id)
-            .Select(x => new OpportunityApplicationDto
+        var dto = await (
+            from x in _db.OpportunityApplications.AsNoTracking()
+            join e in _db.Employees.AsNoTracking() on x.EmployeeId equals e.Id
+            join o in _db.MarketplaceOpportunities.AsNoTracking() on x.MarketplaceOpportunityId equals o.Id
+            where x.Id == id
+            select new OpportunityApplicationDto
             {
                 Id = x.Id,
                 MarketplaceOpportunityId = x.MarketplaceOpportunityId,
                 EmployeeId = x.EmployeeId,
+                EmployeeDisplayName = string.IsNullOrWhiteSpace(e.FullNameAr) ? e.FullNameEn : e.FullNameAr,
+                MarketplaceOpportunityTitle = o.Title,
                 ApplicationStatus = x.ApplicationStatus,
                 MotivationStatement = x.MotivationStatement,
                 AppliedOnUtc = x.AppliedOnUtc,
                 ReviewedOnUtc = x.ReviewedOnUtc,
                 Notes = x.Notes
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+            }).FirstOrDefaultAsync(cancellationToken);
 
         if (dto is null)
         {
@@ -242,20 +246,28 @@ public sealed class OpportunityApplicationService : IOpportunityApplicationServi
 
         var totalCount = await query.CountAsync(cancellationToken);
 
-        var items = await query
-            .OrderByDescending(x => x.AppliedOnUtc)
+        var baseQuery =
+            from x in query
+            join e in _db.Employees.AsNoTracking() on x.EmployeeId equals e.Id
+            join o in _db.MarketplaceOpportunities.AsNoTracking() on x.MarketplaceOpportunityId equals o.Id
+            select new { x, e, o };
+
+        var items = await baseQuery
+            .OrderByDescending(t => t.x.AppliedOnUtc)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(x => new OpportunityApplicationDto
+            .Select(t => new OpportunityApplicationDto
             {
-                Id = x.Id,
-                MarketplaceOpportunityId = x.MarketplaceOpportunityId,
-                EmployeeId = x.EmployeeId,
-                ApplicationStatus = x.ApplicationStatus,
-                MotivationStatement = x.MotivationStatement,
-                AppliedOnUtc = x.AppliedOnUtc,
-                ReviewedOnUtc = x.ReviewedOnUtc,
-                Notes = x.Notes
+                Id = t.x.Id,
+                MarketplaceOpportunityId = t.x.MarketplaceOpportunityId,
+                EmployeeId = t.x.EmployeeId,
+                EmployeeDisplayName = string.IsNullOrWhiteSpace(t.e.FullNameAr) ? t.e.FullNameEn : t.e.FullNameAr,
+                MarketplaceOpportunityTitle = t.o.Title,
+                ApplicationStatus = t.x.ApplicationStatus,
+                MotivationStatement = t.x.MotivationStatement,
+                AppliedOnUtc = t.x.AppliedOnUtc,
+                ReviewedOnUtc = t.x.ReviewedOnUtc,
+                Notes = t.x.Notes
             })
             .ToListAsync(cancellationToken);
 
@@ -544,19 +556,23 @@ public sealed class OpportunityApplicationService : IOpportunityApplicationServi
 
     private async Task<OpportunityApplicationDto> MapToDtoTrackedAsync(Guid id, CancellationToken cancellationToken)
     {
-        var entity = await _db.OpportunityApplications.AsNoTracking()
-            .FirstAsync(x => x.Id == id, cancellationToken);
-
-        return new OpportunityApplicationDto
-        {
-            Id = entity.Id,
-            MarketplaceOpportunityId = entity.MarketplaceOpportunityId,
-            EmployeeId = entity.EmployeeId,
-            ApplicationStatus = entity.ApplicationStatus,
-            MotivationStatement = entity.MotivationStatement,
-            AppliedOnUtc = entity.AppliedOnUtc,
-            ReviewedOnUtc = entity.ReviewedOnUtc,
-            Notes = entity.Notes
-        };
+        return await (
+            from x in _db.OpportunityApplications.AsNoTracking()
+            join e in _db.Employees.AsNoTracking() on x.EmployeeId equals e.Id
+            join o in _db.MarketplaceOpportunities.AsNoTracking() on x.MarketplaceOpportunityId equals o.Id
+            where x.Id == id
+            select new OpportunityApplicationDto
+            {
+                Id = x.Id,
+                MarketplaceOpportunityId = x.MarketplaceOpportunityId,
+                EmployeeId = x.EmployeeId,
+                EmployeeDisplayName = string.IsNullOrWhiteSpace(e.FullNameAr) ? e.FullNameEn : e.FullNameAr,
+                MarketplaceOpportunityTitle = o.Title,
+                ApplicationStatus = x.ApplicationStatus,
+                MotivationStatement = x.MotivationStatement,
+                AppliedOnUtc = x.AppliedOnUtc,
+                ReviewedOnUtc = x.ReviewedOnUtc,
+                Notes = x.Notes
+            }).FirstAsync(cancellationToken);
     }
 }

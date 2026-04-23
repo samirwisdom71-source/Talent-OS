@@ -8,11 +8,14 @@ import { IntelligenceApiService } from '../../services/intelligence-api.service'
 import { PerformanceCyclesApiService } from '../../services/performance-cycles-api.service';
 import { PermissionCodes as PermissionCodesConst } from '../../shared/models/permission-codes';
 import { PerformanceCycleDto } from '../../shared/models/performance.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { I18nService } from '../../shared/services/i18n.service';
+import { LookupSearchComboComponent } from '../../shared/ui/lookup-search-combo.component';
 
 @Component({
   selector: 'app-intelligence-overview-page',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, ReactiveFormsModule, TranslatePipe, LookupSearchComboComponent],
   templateUrl: './intelligence-overview-page.component.html',
   styleUrl: './intelligence-overview-page.component.scss',
 })
@@ -21,6 +24,7 @@ export class IntelligenceOverviewPageComponent implements OnInit {
   private readonly cyclesApi = inject(PerformanceCyclesApiService);
   private readonly fb = inject(FormBuilder);
   private readonly toast = inject(ToastService);
+  private readonly i18n = inject(I18nService);
   readonly auth = inject(AuthService);
 
   readonly PermissionCodes = PermissionCodesConst;
@@ -79,15 +83,12 @@ export class IntelligenceOverviewPageComponent implements OnInit {
       .subscribe({
         next: (res) => {
           this.genEmployeeBusy.set(false);
-          this.toast.show(
-            `تم التوليد: رؤى ${res.insightsGenerated} · توصيات ${res.recommendationsGenerated}`,
-            'success',
-          );
+          this.toast.show(this.genSuccessMsg(res), 'success');
           this.refreshCounts();
         },
         error: () => {
           this.genEmployeeBusy.set(false);
-          this.toast.show('فشل توليد الذكاء للموظف', 'error');
+          this.toast.show(this.langMsg('فشل توليد الذكاء للموظف', 'Employee intelligence generation failed'), 'error');
         },
       });
   }
@@ -125,6 +126,21 @@ export class IntelligenceOverviewPageComponent implements OnInit {
   }
 
   cycleLabel(c: PerformanceCycleDto): string {
-    return c.nameAr?.trim() ? c.nameAr : c.nameEn;
+    const ar = this.i18n.lang() === 'ar';
+    if (ar) {
+      return c.nameAr?.trim() ? c.nameAr : c.nameEn;
+    }
+    return c.nameEn?.trim() ? c.nameEn : c.nameAr;
+  }
+
+  private genSuccessMsg(res: { insightsGenerated: number; recommendationsGenerated: number }): string {
+    return this.langMsg(
+      `تم التوليد: رؤى ${res.insightsGenerated} · توصيات ${res.recommendationsGenerated}`,
+      `Generated: ${res.insightsGenerated} insights · ${res.recommendationsGenerated} recommendations`,
+    );
+  }
+
+  private langMsg(ar: string, en: string): string {
+    return this.i18n.lang() === 'ar' ? ar : en;
   }
 }
