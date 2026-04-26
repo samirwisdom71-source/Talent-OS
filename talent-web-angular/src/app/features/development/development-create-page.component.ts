@@ -27,6 +27,7 @@ export class DevelopmentCreatePageComponent implements OnInit {
   readonly i18n = inject(I18nService);
 
   readonly busy = signal(false);
+  readonly suggestBusy = signal(false);
   readonly cycles = signal<readonly LookupItemDto[]>([]);
   readonly employees = signal<readonly LookupItemDto[]>([]);
 
@@ -37,8 +38,11 @@ export class DevelopmentCreatePageComponent implements OnInit {
     performanceCycleId: '',
     planTitle: '',
     sourceType: 1,
+    isSystemSuggested: false,
     targetCompletionDate: null,
     notes: null,
+    links: undefined,
+    structuredItems: undefined,
   };
 
   ngOnInit(): void {
@@ -56,16 +60,63 @@ export class DevelopmentCreatePageComponent implements OnInit {
     return EnumLabels.developmentSourceType(this.i18n.lang(), v);
   }
 
+  structuredPreview(): { items: number; paths: number } {
+    const items = this.model.structuredItems?.length ?? 0;
+    let paths = 0;
+    for (const it of this.model.structuredItems ?? []) {
+      paths += it.paths?.length ?? 0;
+    }
+    return { items, paths };
+  }
+
+  suggestFromSystem(): void {
+    if (!this.model.employeeId || !this.model.performanceCycleId) {
+      this.toast.show(this.i18n.t('development.create.suggestNeedSubject'), 'error');
+      return;
+    }
+    this.suggestBusy.set(true);
+    this.api
+      .suggest({
+        employeeId: this.model.employeeId,
+        performanceCycleId: this.model.performanceCycleId,
+        sourceType: this.model.sourceType,
+      })
+      .subscribe({
+        next: (s) => {
+          this.suggestBusy.set(false);
+          this.model.planTitle = s.planTitle;
+          this.model.notes = s.notes ?? null;
+          this.model.structuredItems = s.items.length ? [...s.items] : undefined;
+          this.model.links = s.links.length ? [...s.links] : undefined;
+          this.model.isSystemSuggested = true;
+          this.toast.show(this.i18n.t('development.create.suggestOk'), 'success');
+        },
+        error: () => {
+          this.suggestBusy.set(false);
+          this.toast.show(this.i18n.t('development.create.suggestFail'), 'error');
+        },
+      });
+  }
+
+  clearStructuredDraft(): void {
+    this.model.structuredItems = undefined;
+    this.model.links = undefined;
+    this.model.isSystemSuggested = false;
+  }
+
   save(): void {
     if (!this.model.employeeId || !this.model.performanceCycleId || !this.model.planTitle.trim()) {
       this.toast.show(this.i18n.t('املأ كل الحقول المطلوبة'), 'error');
       return;
     }
     this.busy.set(true);
-    const body = {
+    const body: CreateDevelopmentPlanRequest = {
       ...this.model,
       targetCompletionDate: this.model.targetCompletionDate?.toString().trim() || null,
       notes: this.model.notes?.toString().trim() || null,
+      isSystemSuggested: this.model.isSystemSuggested ?? false,
+      structuredItems: this.model.structuredItems?.length ? this.model.structuredItems : undefined,
+      links: this.model.links?.length ? this.model.links : undefined,
     };
     this.api.create(body).subscribe({
       next: (plan) => {

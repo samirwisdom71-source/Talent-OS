@@ -23,4 +23,6 @@ public sealed class DevelopmentPlanItemDto
     public decimal ProgressPercentage { get; set; }
 
     public string? Notes { get; set; }
+
+    public IReadOnlyList<DevelopmentPlanItemPathDto>? Paths { get; set; }
 }

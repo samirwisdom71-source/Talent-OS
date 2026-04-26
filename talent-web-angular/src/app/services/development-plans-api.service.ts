@@ -7,6 +7,9 @@ import {
   CreateDevelopmentPlanRequest,
   DevelopmentPlanDto,
   DevelopmentPlanFilterRequest,
+  DevelopmentPlanImpactSnapshotDto,
+  SuggestDevelopmentPlanRequest,
+  DevelopmentPlanSuggestionDto,
   UpdateDevelopmentPlanRequest,
 } from '../shared/models/development.models';
 import { toHttpParams, unwrapApiResponse } from '../shared/utils/api-helpers';
@@ -31,6 +34,18 @@ export class DevelopmentPlansApiService {
   getById(id: string) {
     return this.http
       .get<ApiResponse<DevelopmentPlanDto>>(`${this.base}/${id}`)
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  suggest(body: SuggestDevelopmentPlanRequest) {
+    return this.http
+      .post<ApiResponse<DevelopmentPlanSuggestionDto>>(`${this.base}/suggest`, body)
+      .pipe(map((r) => unwrapApiResponse(r)));
+  }
+
+  listImpact(planId: string) {
+    return this.http
+      .get<ApiResponse<DevelopmentPlanImpactSnapshotDto[]>>(`${this.base}/${planId}/impact`)
       .pipe(map((r) => unwrapApiResponse(r)));
   }
 

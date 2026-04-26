@@ -83,6 +83,12 @@ public sealed class TalentDbContext : DbContext
 
     public DbSet<DevelopmentPlanLink> DevelopmentPlanLinks => Set<DevelopmentPlanLink>();
 
+    public DbSet<DevelopmentPlanItemPath> DevelopmentPlanItemPaths => Set<DevelopmentPlanItemPath>();
+
+    public DbSet<DevelopmentPlanItemPathHelper> DevelopmentPlanItemPathHelpers => Set<DevelopmentPlanItemPathHelper>();
+
+    public DbSet<DevelopmentPlanImpactSnapshot> DevelopmentPlanImpactSnapshots => Set<DevelopmentPlanImpactSnapshot>();
+
     public DbSet<MarketplaceOpportunity> MarketplaceOpportunities => Set<MarketplaceOpportunity>();
 
     public DbSet<OpportunityApplication> OpportunityApplications => Set<OpportunityApplication>();

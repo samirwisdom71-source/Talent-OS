@@ -12,10 +12,35 @@ namespace TalentSystem.Api.Controllers;
 public sealed class DevelopmentPlansController : ControllerBase
 {
     private readonly IDevelopmentPlanService _service;
+    private readonly IDevelopmentPlanSuggestionService _suggestions;
+    private readonly IDevelopmentPlanImpactService _impact;
 
-    public DevelopmentPlansController(IDevelopmentPlanService service)
+    public DevelopmentPlansController(
+        IDevelopmentPlanService service,
+        IDevelopmentPlanSuggestionService suggestions,
+        IDevelopmentPlanImpactService impact)
     {
         _service = service;
+        _suggestions = suggestions;
+        _impact = impact;
+    }
+
+    [HttpPost("suggest")]
+    public async Task<IActionResult> Suggest(
+        [FromBody] SuggestDevelopmentPlanRequest request,
+        CancellationToken cancellationToken)
+    {
+        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var result = await _suggestions.SuggestAsync(request, cancellationToken);
+        return result.ToApiActionResult(this, traceId);
+    }
+
+    [HttpGet("{id:guid}/impact")]
+    public async Task<IActionResult> ListImpact(Guid id, CancellationToken cancellationToken)
+    {
+        var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var result = await _impact.ListAsync(id, cancellationToken);
+        return result.ToApiActionResult(this, traceId);
     }
 
     [HttpPost]

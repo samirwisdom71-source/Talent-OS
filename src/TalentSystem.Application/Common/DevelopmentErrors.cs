@@ -17,4 +17,8 @@ public static class DevelopmentErrors
     public const string InvalidDevelopmentPlanStatusTransition = "Development.InvalidDevelopmentPlanStatusTransition";
 
     public const string InvalidItemStatusForOperation = "Development.InvalidItemStatusForOperation";
+
+    public const string DevelopmentPlanItemPathNotFound = "Development.DevelopmentPlanItemPathNotFound";
+
+    public const string ItemPathsIncomplete = "Development.ItemPathsIncomplete";
 }

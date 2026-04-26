@@ -17,6 +17,7 @@ public sealed class DevelopmentPlanConfiguration : IEntityTypeConfiguration<Deve
 
         builder.Property(x => x.PlanTitle).HasMaxLength(256).IsRequired();
         builder.Property(x => x.SourceType).HasConversion<byte>().IsRequired();
+        builder.Property(x => x.IsSystemSuggested).IsRequired();
         builder.Property(x => x.Status).HasConversion<byte>().IsRequired();
         builder.Property(x => x.TargetCompletionDate);
         builder.Property(x => x.Notes).HasMaxLength(2000);

@@ -72,6 +72,9 @@ public static class ApplicationServiceCollectionExtensions
 
         services.AddScoped<IDevelopmentPlanService, DevelopmentPlanService>();
         services.AddScoped<IDevelopmentPlanItemService, DevelopmentPlanItemService>();
+        services.AddScoped<IDevelopmentPlanItemPathService, DevelopmentPlanItemPathService>();
+        services.AddScoped<IDevelopmentPlanImpactService, DevelopmentPlanImpactService>();
+        services.AddScoped<IDevelopmentPlanSuggestionService, DevelopmentPlanSuggestionService>();
 
         services.AddScoped<IMarketplaceOpportunityService, MarketplaceOpportunityService>();
         services.AddScoped<IOpportunityApplicationService, OpportunityApplicationService>();

@@ -85,7 +85,7 @@ public sealed class DevelopmentPlanItemService : IDevelopmentPlanItemService
         _db.DevelopmentPlanItems.Add(entity);
         await _db.SaveChangesAsync(cancellationToken);
 
-        return Result<DevelopmentPlanItemDto>.Ok(MapToDto(entity));
+        return Result<DevelopmentPlanItemDto>.Ok(await MapToDtoAsync(entity.Id, cancellationToken));
     }
 
     public async Task<Result<DevelopmentPlanItemDto>> UpdateAsync(
@@ -143,22 +143,19 @@ public sealed class DevelopmentPlanItemService : IDevelopmentPlanItemService
 
         await _db.SaveChangesAsync(cancellationToken);
 
-        return Result<DevelopmentPlanItemDto>.Ok(MapToDto(entity));
+        return Result<DevelopmentPlanItemDto>.Ok(await MapToDtoAsync(entity.Id, cancellationToken));
     }
 
     public async Task<Result<DevelopmentPlanItemDto>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await _db.DevelopmentPlanItems.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-
-        if (entity is null)
+        if (!await _db.DevelopmentPlanItems.AsNoTracking().AnyAsync(x => x.Id == id, cancellationToken))
         {
             return Result<DevelopmentPlanItemDto>.Fail(
                 "The development plan item was not found.",
                 DevelopmentErrors.DevelopmentPlanItemNotFound);
         }
 
-        return Result<DevelopmentPlanItemDto>.Ok(MapToDto(entity));
+        return Result<DevelopmentPlanItemDto>.Ok(await MapToDtoAsync(id, cancellationToken));
     }
 
     public async Task<Result<PagedResult<DevelopmentPlanItemDto>>> GetPagedAsync(
@@ -203,6 +200,8 @@ public sealed class DevelopmentPlanItemService : IDevelopmentPlanItemService
                 Notes = x.Notes
             })
             .ToListAsync(cancellationToken);
+
+        await HydratePathsForItemsAsync(items, cancellationToken);
 
         return Result<PagedResult<DevelopmentPlanItemDto>>.Ok(new PagedResult<DevelopmentPlanItemDto>
         {
@@ -278,7 +277,7 @@ public sealed class DevelopmentPlanItemService : IDevelopmentPlanItemService
         entity.ProgressPercentage = request.ProgressPercentage;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return Result<DevelopmentPlanItemDto>.Ok(MapToDto(entity));
+        return Result<DevelopmentPlanItemDto>.Ok(await MapToDtoAsync(entity.Id, cancellationToken));
     }
 
     public async Task<Result<DevelopmentPlanItemDto>> MarkCompletedAsync(Guid id, CancellationToken cancellationToken = default)
@@ -303,7 +302,7 @@ public sealed class DevelopmentPlanItemService : IDevelopmentPlanItemService
 
         if (entity.Status == DevelopmentItemStatus.Completed)
         {
-            return Result<DevelopmentPlanItemDto>.Ok(MapToDto(entity));
+            return Result<DevelopmentPlanItemDto>.Ok(await MapToDtoAsync(entity.Id, cancellationToken));
         }
 
         if (entity.Status == DevelopmentItemStatus.Cancelled)
@@ -313,11 +312,28 @@ public sealed class DevelopmentPlanItemService : IDevelopmentPlanItemService
                 DevelopmentErrors.InvalidItemStatusForOperation);
         }
 
+        var hasPaths = await _db.DevelopmentPlanItemPaths.AsNoTracking()
+            .AnyAsync(
+                x => x.DevelopmentPlanItemId == entity.Id && x.RecordStatus != RecordStatus.Deleted,
+                cancellationToken);
+        if (hasPaths)
+        {
+            var allPathsCompleted = await _db.DevelopmentPlanItemPaths.AsNoTracking()
+                .Where(x => x.DevelopmentPlanItemId == entity.Id && x.RecordStatus != RecordStatus.Deleted)
+                .AllAsync(x => x.Status == DevelopmentItemStatus.Completed, cancellationToken);
+            if (!allPathsCompleted)
+            {
+                return Result<DevelopmentPlanItemDto>.Fail(
+                    "Complete all item paths before marking the item completed.",
+                    DevelopmentErrors.ItemPathsIncomplete);
+            }
+        }
+
         entity.Status = DevelopmentItemStatus.Completed;
         entity.ProgressPercentage = 100m;
         await _db.SaveChangesAsync(cancellationToken);
 
-        return Result<DevelopmentPlanItemDto>.Ok(MapToDto(entity));
+        return Result<DevelopmentPlanItemDto>.Ok(await MapToDtoAsync(entity.Id, cancellationToken));
     }
 
     private static bool PlanAllowsItemMutations(DevelopmentPlanStatus status) =>
@@ -326,8 +342,111 @@ public sealed class DevelopmentPlanItemService : IDevelopmentPlanItemService
     private static bool ItemContentIsReadOnly(DevelopmentItemStatus status) =>
         status is DevelopmentItemStatus.Completed or DevelopmentItemStatus.Cancelled;
 
-    private static DevelopmentPlanItemDto MapToDto(DevelopmentPlanItem entity) =>
-        new()
+    private async Task HydratePathsForItemsAsync(
+        List<DevelopmentPlanItemDto> items,
+        CancellationToken cancellationToken)
+    {
+        if (items.Count == 0)
+        {
+            return;
+        }
+
+        var itemIds = items.Select(x => x.Id).ToList();
+        var pathRows = await _db.DevelopmentPlanItemPaths.AsNoTracking()
+            .Where(p => itemIds.Contains(p.DevelopmentPlanItemId) && p.RecordStatus != RecordStatus.Deleted)
+            .OrderBy(p => p.SortOrder)
+            .ThenBy(p => p.CreatedOnUtc)
+            .ToListAsync(cancellationToken);
+
+        if (pathRows.Count == 0)
+        {
+            return;
+        }
+
+        var pathIds = pathRows.Select(p => p.Id).ToList();
+        var helperRows = await _db.DevelopmentPlanItemPathHelpers.AsNoTracking()
+            .Where(h => pathIds.Contains(h.DevelopmentPlanItemPathId))
+            .OrderBy(h => h.HelperKind)
+            .ToListAsync(cancellationToken);
+
+        foreach (var item in items)
+        {
+            var forItem = pathRows.Where(p => p.DevelopmentPlanItemId == item.Id).ToList();
+            if (forItem.Count == 0)
+            {
+                continue;
+            }
+
+            item.Paths = forItem.Select(p => new DevelopmentPlanItemPathDto
+            {
+                Id = p.Id,
+                DevelopmentPlanItemId = p.DevelopmentPlanItemId,
+                SortOrder = p.SortOrder,
+                Title = p.Title,
+                Description = p.Description,
+                PlannedStartUtc = p.PlannedStartUtc,
+                PlannedEndUtc = p.PlannedEndUtc,
+                Status = p.Status,
+                AchievedImpactValue = p.AchievedImpactValue,
+                Helpers = helperRows
+                    .Where(h => h.DevelopmentPlanItemPathId == p.Id)
+                    .Select(h => new DevelopmentPlanItemPathHelperDto
+                    {
+                        Id = h.Id,
+                        DevelopmentPlanItemPathId = h.DevelopmentPlanItemPathId,
+                        HelperKind = h.HelperKind,
+                        HelperEntityId = h.HelperEntityId,
+                    })
+                    .ToList(),
+            }).ToList();
+        }
+    }
+
+    private async Task<DevelopmentPlanItemDto> MapToDtoAsync(Guid itemId, CancellationToken cancellationToken)
+    {
+        var entity = await _db.DevelopmentPlanItems.AsNoTracking()
+            .FirstAsync(x => x.Id == itemId, cancellationToken);
+
+        var pathRows = await _db.DevelopmentPlanItemPaths.AsNoTracking()
+            .Where(x => x.DevelopmentPlanItemId == itemId && x.RecordStatus != RecordStatus.Deleted)
+            .OrderBy(x => x.SortOrder)
+            .ThenBy(x => x.CreatedOnUtc)
+            .ToListAsync(cancellationToken);
+
+        IReadOnlyList<DevelopmentPlanItemPathDto> paths = Array.Empty<DevelopmentPlanItemPathDto>();
+        if (pathRows.Count > 0)
+        {
+            var pathIds = pathRows.Select(p => p.Id).ToList();
+            var helperRows = await _db.DevelopmentPlanItemPathHelpers.AsNoTracking()
+                .Where(x => pathIds.Contains(x.DevelopmentPlanItemPathId))
+                .OrderBy(x => x.HelperKind)
+                .ToListAsync(cancellationToken);
+
+            paths = pathRows.Select(p => new DevelopmentPlanItemPathDto
+            {
+                Id = p.Id,
+                DevelopmentPlanItemId = p.DevelopmentPlanItemId,
+                SortOrder = p.SortOrder,
+                Title = p.Title,
+                Description = p.Description,
+                PlannedStartUtc = p.PlannedStartUtc,
+                PlannedEndUtc = p.PlannedEndUtc,
+                Status = p.Status,
+                AchievedImpactValue = p.AchievedImpactValue,
+                Helpers = helperRows
+                    .Where(h => h.DevelopmentPlanItemPathId == p.Id)
+                    .Select(h => new DevelopmentPlanItemPathHelperDto
+                    {
+                        Id = h.Id,
+                        DevelopmentPlanItemPathId = h.DevelopmentPlanItemPathId,
+                        HelperKind = h.HelperKind,
+                        HelperEntityId = h.HelperEntityId,
+                    })
+                    .ToList(),
+            }).ToList();
+        }
+
+        return new DevelopmentPlanItemDto
         {
             Id = entity.Id,
             DevelopmentPlanId = entity.DevelopmentPlanId,
@@ -338,6 +457,8 @@ public sealed class DevelopmentPlanItemService : IDevelopmentPlanItemService
             TargetDate = entity.TargetDate,
             Status = entity.Status,
             ProgressPercentage = entity.ProgressPercentage,
-            Notes = entity.Notes
+            Notes = entity.Notes,
+            Paths = paths,
         };
+    }
 }

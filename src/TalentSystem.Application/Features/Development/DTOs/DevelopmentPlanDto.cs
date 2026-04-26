@@ -14,6 +14,8 @@ public sealed class DevelopmentPlanDto
 
     public DevelopmentPlanSourceType SourceType { get; set; }
 
+    public bool IsSystemSuggested { get; set; }
+
     public DevelopmentPlanStatus Status { get; set; }
 
     public DateTime? TargetCompletionDate { get; set; }
@@ -25,4 +27,6 @@ public sealed class DevelopmentPlanDto
     public DateTime? ApprovedOnUtc { get; set; }
 
     public IReadOnlyList<DevelopmentPlanLinkDto>? Links { get; set; }
+
+    public IReadOnlyList<DevelopmentPlanImpactSnapshotDto>? ImpactSnapshots { get; set; }
 }

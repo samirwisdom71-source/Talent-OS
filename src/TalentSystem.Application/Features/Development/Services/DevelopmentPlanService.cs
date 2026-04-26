@@ -23,6 +23,7 @@ public sealed class DevelopmentPlanService : IDevelopmentPlanService
     private readonly IValidator<DevelopmentPlanFilterRequest> _filterValidator;
     private readonly IValidator<ActivateDevelopmentPlanRequest> _activateValidator;
     private readonly INotificationService _notifications;
+    private readonly IDevelopmentPlanImpactService _impact;
 
     public DevelopmentPlanService(
         TalentDbContext db,
@@ -30,7 +31,8 @@ public sealed class DevelopmentPlanService : IDevelopmentPlanService
         IValidator<UpdateDevelopmentPlanRequest> updateValidator,
         IValidator<DevelopmentPlanFilterRequest> filterValidator,
         IValidator<ActivateDevelopmentPlanRequest> activateValidator,
-        INotificationService notifications)
+        INotificationService notifications,
+        IDevelopmentPlanImpactService impact)
     {
         _db = db;
         _createValidator = createValidator;
@@ -38,6 +40,7 @@ public sealed class DevelopmentPlanService : IDevelopmentPlanService
         _filterValidator = filterValidator;
         _activateValidator = activateValidator;
         _notifications = notifications;
+        _impact = impact;
     }
 
     public async Task<Result<DevelopmentPlanDto>> CreateAsync(
@@ -80,12 +83,15 @@ public sealed class DevelopmentPlanService : IDevelopmentPlanService
                 DevelopmentErrors.CycleArchivedCannotCreatePlan);
         }
 
+        var planId = Guid.CreateVersion7();
         var entity = new DevelopmentPlan
         {
+            Id = planId,
             EmployeeId = request.EmployeeId,
             PerformanceCycleId = request.PerformanceCycleId,
             PlanTitle = request.PlanTitle.Trim(),
             SourceType = request.SourceType,
+            IsSystemSuggested = request.IsSystemSuggested,
             Status = DevelopmentPlanStatus.Draft,
             TargetCompletionDate = request.TargetCompletionDate,
             Notes = string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim()
@@ -101,6 +107,56 @@ public sealed class DevelopmentPlanService : IDevelopmentPlanService
                     LinkedEntityId = link.LinkedEntityId,
                     Notes = string.IsNullOrWhiteSpace(link.Notes) ? null : link.Notes.Trim()
                 });
+            }
+        }
+
+        if (request.StructuredItems is { Count: > 0 })
+        {
+            foreach (var it in request.StructuredItems)
+            {
+                var item = new DevelopmentPlanItem
+                {
+                    DevelopmentPlanId = planId,
+                    Title = it.Title.Trim(),
+                    Description = string.IsNullOrWhiteSpace(it.Description) ? null : it.Description.Trim(),
+                    ItemType = it.ItemType,
+                    RelatedCompetencyId = it.RelatedCompetencyId,
+                    TargetDate = it.TargetDate,
+                    Status = DevelopmentItemStatus.NotStarted,
+                    ProgressPercentage = 0,
+                };
+
+                if (it.Paths is { Count: > 0 })
+                {
+                    foreach (var p in it.Paths)
+                    {
+                        var path = new DevelopmentPlanItemPath
+                        {
+                            SortOrder = p.SortOrder,
+                            Title = p.Title.Trim(),
+                            Description = string.IsNullOrWhiteSpace(p.Description) ? null : p.Description.Trim(),
+                            PlannedStartUtc = p.PlannedStartUtc,
+                            PlannedEndUtc = p.PlannedEndUtc,
+                            Status = DevelopmentItemStatus.NotStarted,
+                        };
+
+                        if (p.Helpers is { Count: > 0 })
+                        {
+                            foreach (var h in p.Helpers)
+                            {
+                                path.Helpers.Add(new DevelopmentPlanItemPathHelper
+                                {
+                                    HelperKind = h.HelperKind,
+                                    HelperEntityId = h.HelperEntityId,
+                                });
+                            }
+                        }
+
+                        item.Paths.Add(path);
+                    }
+                }
+
+                entity.Items.Add(item);
             }
         }
 
@@ -213,6 +269,7 @@ public sealed class DevelopmentPlanService : IDevelopmentPlanService
                 PerformanceCycleId = x.PerformanceCycleId,
                 PlanTitle = x.PlanTitle,
                 SourceType = x.SourceType,
+                IsSystemSuggested = x.IsSystemSuggested,
                 Status = x.Status,
                 TargetCompletionDate = x.TargetCompletionDate,
                 Notes = x.Notes,
@@ -276,6 +333,9 @@ public sealed class DevelopmentPlanService : IDevelopmentPlanService
 
         await _db.SaveChangesAsync(cancellationToken);
 
+        await _impact.ComputeAndPersistAsync(entity.Id, DevelopmentImpactPhase.Before, cancellationToken)
+            .ConfigureAwait(false);
+
         await NotifyEmployeePlanAsync(
                 entity.Id,
                 entity.EmployeeId,
@@ -311,6 +371,9 @@ public sealed class DevelopmentPlanService : IDevelopmentPlanService
 
         entity.Status = DevelopmentPlanStatus.Completed;
         await _db.SaveChangesAsync(cancellationToken);
+
+        await _impact.ComputeAndPersistAsync(entity.Id, DevelopmentImpactPhase.After, cancellationToken)
+            .ConfigureAwait(false);
 
         await NotifyEmployeePlanAsync(
                 entity.Id,
@@ -437,6 +500,7 @@ public sealed class DevelopmentPlanService : IDevelopmentPlanService
             PerformanceCycleId = entity.PerformanceCycleId,
             PlanTitle = entity.PlanTitle,
             SourceType = entity.SourceType,
+            IsSystemSuggested = entity.IsSystemSuggested,
             Status = entity.Status,
             TargetCompletionDate = entity.TargetCompletionDate,
             Notes = entity.Notes,
@@ -457,6 +521,20 @@ public sealed class DevelopmentPlanService : IDevelopmentPlanService
                     LinkType = x.LinkType,
                     LinkedEntityId = x.LinkedEntityId,
                     Notes = x.Notes
+                })
+                .ToListAsync(cancellationToken);
+
+            dto.ImpactSnapshots = await _db.DevelopmentPlanImpactSnapshots.AsNoTracking()
+                .Where(x => x.DevelopmentPlanId == planId)
+                .OrderBy(x => x.Phase)
+                .Select(x => new DevelopmentPlanImpactSnapshotDto
+                {
+                    Id = x.Id,
+                    DevelopmentPlanId = x.DevelopmentPlanId,
+                    Phase = x.Phase,
+                    RecordedOnUtc = x.RecordedOnUtc,
+                    SummaryNotes = x.SummaryNotes,
+                    MetricScore = x.MetricScore,
                 })
                 .ToListAsync(cancellationToken);
         }

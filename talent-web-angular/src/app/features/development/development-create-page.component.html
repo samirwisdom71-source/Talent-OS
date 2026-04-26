@@ -103,6 +103,58 @@
             <input type="date" [(ngModel)]="model.targetCompletionDate" name="td" />
           </label>
         </div>
+
+        <section class="suggest-card" aria-labelledby="dev-suggest-title">
+          <div class="suggest-card__head">
+            <div class="suggest-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9"/><path d="M19 3v4h4"/>
+              </svg>
+            </div>
+            <div class="suggest-card__intro">
+              <h3 id="dev-suggest-title" class="suggest-card__title">{{ 'development.create.suggestSectionTitle' | t }}</h3>
+              <p class="suggest-card__subtitle">{{ 'development.create.suggestSectionSubtitle' | t }}</p>
+            </div>
+          </div>
+
+          <div class="suggest-card__actions">
+            <button type="button" class="btn-suggest" [disabled]="suggestBusy() || busy()" (click)="suggestFromSystem()">
+              @if (suggestBusy()) {
+                <span class="spin spin--on-teal" aria-hidden="true"></span>
+              }
+              {{ suggestBusy() ? ('development.create.suggestBusy' | t) : ('development.create.suggestCta' | t) }}
+            </button>
+            @if (model.structuredItems?.length) {
+              <button type="button" class="btn-suggest-clear" (click)="clearStructuredDraft()">
+                {{ 'development.create.clearDraft' | t }}
+              </button>
+            }
+          </div>
+
+          @if (model.structuredItems?.length) {
+            <div class="suggest-card__draft" role="status">
+              <span class="draft-label">{{ 'development.create.draftLoaded' | t }}</span>
+              <div class="draft-pills">
+                <span class="draft-pill draft-pill--items">
+                  <strong>{{ structuredPreview().items }}</strong>
+                  {{ 'development.create.summaryItems' | t }}
+                </span>
+                <span class="draft-pill draft-pill--paths">
+                  <strong>{{ structuredPreview().paths }}</strong>
+                  {{ 'development.create.summaryPaths' | t }}
+                </span>
+              </div>
+              <p class="draft-hint">{{ 'development.create.draftHint' | t }}</p>
+            </div>
+          }
+
+          <div class="suggest-card__footer">
+            <label class="suggest-flag">
+              <input type="checkbox" [(ngModel)]="model.isSystemSuggested" name="issys" />
+              <span>{{ 'development.create.flagSystemSuggested' | t }}</span>
+            </label>
+          </div>
+        </section>
       </fieldset>
 
       <fieldset class="form-block">

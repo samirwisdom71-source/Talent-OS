@@ -166,7 +166,12 @@
                     <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-6"/>
                   </svg>
                 </span>
-                <span>{{ row.planTitle }}</span>
+                <span class="td-title__text">
+                  {{ row.planTitle }}
+                  @if (row.isSystemSuggested) {
+                    <span class="chip chip--suggested">{{ 'development.badge.systemSuggested' | t }}</span>
+                  }
+                </span>
               </td>
               <td>{{ employeeName(row.employeeId) }}</td>
               <td>{{ cycleName(row.performanceCycleId) }}</td>
@@ -193,7 +198,12 @@
           <header class="plan-card__head">
             <div class="plan-card__titles">
               <span class="plan-card__eyebrow">{{ sourceType(row.sourceType) }}</span>
-              <h3>{{ row.planTitle }}</h3>
+              <h3>
+                {{ row.planTitle }}
+                @if (row.isSystemSuggested) {
+                  <span class="chip chip--suggested">{{ 'development.badge.systemSuggested' | t }}</span>
+                }
+              </h3>
             </div>
             <span class="chip" [class]="'chip--s' + row.status">{{ planStatus(row.status) }}</span>
           </header>

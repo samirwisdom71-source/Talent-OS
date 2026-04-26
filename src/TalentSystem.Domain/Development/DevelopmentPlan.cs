@@ -15,6 +15,9 @@ public sealed class DevelopmentPlan : AuditableDomainEntity
 
     public DevelopmentPlanSourceType SourceType { get; set; }
 
+    /// <summary>تم إنشاء المقترح آلياً من بيانات النظام (اقتراح ذكي).</summary>
+    public bool IsSystemSuggested { get; set; }
+
     public DevelopmentPlanStatus Status { get; set; } = DevelopmentPlanStatus.Draft;
 
     public DateTime? TargetCompletionDate { get; set; }
@@ -34,4 +37,6 @@ public sealed class DevelopmentPlan : AuditableDomainEntity
     public ICollection<DevelopmentPlanItem> Items { get; set; } = new List<DevelopmentPlanItem>();
 
     public ICollection<DevelopmentPlanLink> Links { get; set; } = new List<DevelopmentPlanLink>();
+
+    public ICollection<DevelopmentPlanImpactSnapshot> ImpactSnapshots { get; set; } = new List<DevelopmentPlanImpactSnapshot>();
 }

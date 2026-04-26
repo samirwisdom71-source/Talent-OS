@@ -13,12 +13,17 @@
   <section class="plan-hero" [attr.data-status]="plan()!.status">
     <div class="plan-hero__glow"></div>
     <div class="plan-hero__main">
-      <span class="plan-hero__chip">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/>
-        </svg>
-        {{ sourceType(plan()!.sourceType) }}
-      </span>
+      <div class="plan-hero__chips">
+        <span class="plan-hero__chip">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/>
+          </svg>
+          {{ sourceType(plan()!.sourceType) }}
+        </span>
+        @if (plan()!.isSystemSuggested) {
+          <span class="plan-hero__chip plan-hero__chip--muted">{{ 'development.badge.systemSuggested' | t }}</span>
+        }
+      </div>
       <h1>{{ plan()!.planTitle }}</h1>
       <div class="plan-hero__meta">
         <span class="meta-item">
@@ -72,15 +77,27 @@
       </h2>
       <ul class="links">
         @for (l of plan()!.links!; track l.id) {
-          <li>
-            <span class="mono">{{ l.linkType }}</span>
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            <span class="link-id">{{ l.linkedEntityId }}</span>
+          <li class="plan-link-row">
+            <span class="plan-link-row__type">{{ planLinkTypeLabel(l.linkType) }}</span>
+            <div class="plan-link-row__body">
+              <p class="plan-link-row__desc">{{ planLinkTargetDescription(l) }}</p>
+              @if (l.notes?.trim()) {
+                <p class="plan-link-row__notes">{{ l.notes }}</p>
+              }
+            </div>
           </li>
         }
       </ul>
     </section>
   }
+
+  <section class="section-card impact-section impact-section--chart-only">
+    <h2 class="section-title">
+      <span class="section-title__bar"></span>
+      {{ 'development.impact.title' | t }}
+    </h2>
+    <app-development-path-impact-chart [items]="items()" />
+  </section>
 
   <section class="section-card items-section">
     <header class="section-head">
@@ -91,24 +108,14 @@
         </h2>
         <p class="section-sub">{{ items().length }} {{ 'development.items.count' | t }}</p>
       </div>
-      <div class="section-head__actions">
-        <div class="seg">
-          <button type="button" [class.seg--on]="viewMode==='table'" (click)="viewMode='table'">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 16h18"/></svg>
-            {{ 'جدول' | t }}
-          </button>
-          <button type="button" [class.seg--on]="viewMode==='cards'" (click)="viewMode='cards'">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
-            {{ 'كارد' | t }}
-          </button>
-        </div>
-        @if (auth.hasPermission(PermissionCodes.DevelopmentManage)) {
+      @if (auth.hasPermission(PermissionCodes.DevelopmentManage)) {
+        <div class="section-head__actions">
           <button type="button" class="btn-add" (click)="openCreateItem()">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
             {{ 'development.items.create' | t }}
           </button>
-        }
-      </div>
+        </div>
+      }
     </header>
 
     @if (!items().length) {
@@ -118,108 +125,147 @@
         </svg>
         <p>{{ 'development.items.empty' | t }}</p>
       </div>
-    } @else if (viewMode === 'table') {
-      <div class="items-table-wrap">
-        <table class="items-table">
-          <thead>
-            <tr>
-              <th>{{ 'development.items.item' | t }}</th>
-              <th>{{ 'development.items.type' | t }}</th>
-              <th>{{ 'الحالة' | t }}</th>
-              <th class="progress-col">{{ 'development.items.progress' | t }}</th>
-              @if (auth.hasPermission(PermissionCodes.DevelopmentManage)) {
-                <th></th>
-              }
-            </tr>
-          </thead>
-          <tbody>
-            @for (it of items(); track it.id) {
-              <tr>
-                <td>
-                  <div class="item-title">{{ it.title }}</div>
-                  @if (it.description) { <div class="item-desc">{{ it.description }}</div> }
-                </td>
-                <td><span class="chip chip--type">{{ itemType(it.itemType) }}</span></td>
-                <td><span class="chip" [class]="'chip--i' + it.status">{{ itemStatus(it.status) }}</span></td>
-                <td>
-                  @if (auth.hasPermission(PermissionCodes.DevelopmentManage) && it.status !== 3 && it.status !== 4) {
-                    <div class="progress-edit">
-                      <div class="bar"><div class="bar__fill" [style.width.%]="progressFor(it)"></div></div>
-                      <input
-                        class="prog-input"
-                        type="number"
-                        min="0"
-                        max="100"
-                        [ngModel]="progressFor(it)"
-                        (ngModelChange)="setProgress(it, +$event)"
-                        [name]="'p' + it.id"
-                      />
-                      <span class="pct">%</span>
-                    </div>
-                  } @else {
-                    <div class="progress-edit">
-                      <div class="bar"><div class="bar__fill" [style.width.%]="it.progressPercentage"></div></div>
-                      <span class="pct-static">{{ it.progressPercentage }}%</span>
-                    </div>
-                  }
-                </td>
-                @if (auth.hasPermission(PermissionCodes.DevelopmentManage)) {
-                  <td class="cell-actions">
-                    @if (it.status !== 3 && it.status !== 4) {
-                      <button type="button" class="icon-btn icon-btn--save" title="{{ 'development.items.saveProgress' | t }}" [disabled]="busyRowId() === it.id" (click)="saveProgress(it)">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
-                      </button>
-                      <button type="button" class="icon-btn icon-btn--done" title="{{ 'development.items.markCompleted' | t }}" [disabled]="busyRowId() === it.id" (click)="markDone(it)">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                      </button>
-                      <button type="button" class="icon-btn icon-btn--edit" title="{{ 'تعديل' | t }}" [disabled]="busyRowId() === it.id" (click)="openEditItem(it)">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                      </button>
-                      <button type="button" class="icon-btn icon-btn--delete" title="{{ 'حذف' | t }}" [disabled]="busyRowId() === it.id" (click)="remove(it)">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-                      </button>
-                    }
-                  </td>
-                }
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
     } @else {
-      <div class="items-grid">
+      <div class="items-stack">
         @for (it of items(); track it.id) {
-          <article class="item-card" [attr.data-status]="it.status">
-            <header class="item-card__head">
-              <span class="chip chip--type">{{ itemType(it.itemType) }}</span>
-              <span class="chip" [class]="'chip--i' + it.status">{{ itemStatus(it.status) }}</span>
-            </header>
-            <h3>{{ it.title }}</h3>
-            @if (it.description) { <p class="item-desc">{{ it.description }}</p> }
-
-            <div class="item-progress">
-              <div class="item-progress__top">
-                <span class="item-progress__label">{{ 'development.items.progress' | t }}</span>
-                <span class="item-progress__value">{{ it.progressPercentage }}%</span>
+          <article class="item-panel" [attr.data-status]="it.status">
+            <div class="item-panel__top">
+              <div class="item-panel__identity">
+                <h3 class="item-panel__title">{{ it.title }}</h3>
+                @if (it.description) {
+                  <p class="item-panel__desc">{{ it.description }}</p>
+                }
               </div>
-              <div class="bar"><div class="bar__fill" [style.width.%]="it.progressPercentage"></div></div>
+              <div class="item-panel__chips">
+                <span class="chip chip--type">{{ itemType(it.itemType) }}</span>
+                <span class="chip" [class]="'chip--i' + it.status">{{ itemStatus(it.status) }}</span>
+              </div>
             </div>
 
+            <div class="item-panel__progress-row">
+              @if (auth.hasPermission(PermissionCodes.DevelopmentManage) && it.status !== 3 && it.status !== 4) {
+                <div class="progress-edit progress-edit--panel">
+                  <div class="bar"><div class="bar__fill" [style.width.%]="progressFor(it)"></div></div>
+                  <input
+                    class="prog-input"
+                    type="number"
+                    min="0"
+                    max="100"
+                    [ngModel]="progressFor(it)"
+                    (ngModelChange)="setProgress(it, +$event)"
+                    [name]="'p' + it.id"
+                  />
+                  <span class="pct">%</span>
+                </div>
+              } @else {
+                <div class="item-panel__progress-read">
+                  <span class="item-panel__progress-label">{{ 'development.items.progress' | t }}</span>
+                  <div class="bar bar--panel"><div class="bar__fill" [style.width.%]="it.progressPercentage"></div></div>
+                  <strong class="item-panel__progress-pct">{{ it.progressPercentage }}%</strong>
+                </div>
+              }
+
+              @if (auth.hasPermission(PermissionCodes.DevelopmentManage) && it.status !== 3 && it.status !== 4) {
+                <div class="item-panel__toolbar">
+                  <button type="button" class="icon-btn icon-btn--save" title="{{ 'development.items.saveProgress' | t }}" [disabled]="busyRowId() === it.id" (click)="saveProgress(it)">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-btn icon-btn--done"
+                    title="{{ 'development.items.markCompleted' | t }}"
+                    [disabled]="busyRowId() === it.id || itemHasIncompletePaths(it)"
+                    (click)="markDone(it)"
+                  >
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                  </button>
+                  <button type="button" class="icon-btn icon-btn--edit" title="{{ 'تعديل' | t }}" [disabled]="busyRowId() === it.id" (click)="openEditItem(it)">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                  </button>
+                  <button type="button" class="icon-btn icon-btn--delete" title="{{ 'حذف' | t }}" [disabled]="busyRowId() === it.id" (click)="remove(it)">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+                  </button>
+                </div>
+              }
+            </div>
+
+            @if (sortedPaths(it).length) {
+              <div class="path-track" [class.path-track--expanded]="pathsSectionOpen(it.id)">
+                <button
+                  type="button"
+                  class="path-track__toggle"
+                  (click)="togglePathsSection(it.id)"
+                  [attr.aria-expanded]="pathsSectionOpen(it.id)"
+                  [attr.aria-label]="'development.paths.toggleSection' | t"
+                >
+                  <span class="path-track__chev" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </span>
+                  <span class="path-track__label">{{ 'development.paths.title' | t }}</span>
+                  <span class="path-track__count">{{ sortedPaths(it).length }}</span>
+                </button>
+                @if (pathsSectionOpen(it.id)) {
+                  <ol class="path-steps">
+                    @for (path of sortedPaths(it); track path.id; let i = $index) {
+                      <li class="path-step" [attr.data-path-status]="path.status">
+                        <div class="path-step__rail">
+                          <span class="path-step__idx">{{ i + 1 }}</span>
+                        </div>
+                        <div class="path-step__body">
+                          <div class="path-step__headline">
+                            <span class="path-step__title">{{ path.title }}</span>
+                            <div class="path-step__badges">
+                              <span class="chip chip--path" [class]="'chip--i' + path.status">{{ itemStatus(path.status) }}</span>
+                              @if (path.status === 3 && path.achievedImpactValue != null) {
+                                <span class="path-step__impact"
+                                  >{{ 'development.paths.achievedImpact' | t }}:
+                                  <strong>{{ path.achievedImpactValue }}</strong></span
+                                >
+                              }
+                            </div>
+                          </div>
+                          @if (path.description) {
+                            <p class="path-step__desc">{{ path.description }}</p>
+                          }
+                          <div class="path-step__meta">
+                            <span class="path-step__dates"
+                              >{{ formatPlanDate(path.plannedStartUtc) }} — {{ formatPlanDate(path.plannedEndUtc) }}</span
+                            >
+                          </div>
+                          @if (path.helpers && path.helpers.length) {
+                            <ul class="path-step__helpers">
+                              @for (h of path.helpers; track h.id) {
+                                <li>
+                                  <span class="mono-soft">{{ pathHelperKindLabel(h.helperKind) }}</span>
+                                  {{ helperEntityLabel(h.helperKind, h.helperEntityId) }}
+                                </li>
+                              }
+                            </ul>
+                          }
+                          @if (auth.hasPermission(PermissionCodes.DevelopmentManage) && path.status !== 3 && path.status !== 4 && it.status !== 3 && it.status !== 4) {
+                            <button
+                              type="button"
+                              class="mini-btn mini-btn--done path-step__cta"
+                              [disabled]="busyRowId() === path.id"
+                              (click)="completePath(it, path)"
+                            >
+                              {{ 'development.paths.markPathDone' | t }}
+                            </button>
+                          }
+                        </div>
+                      </li>
+                    }
+                  </ol>
+                }
+              </div>
+            }
+
             @if (auth.hasPermission(PermissionCodes.DevelopmentManage) && it.status !== 3 && it.status !== 4) {
-              <footer class="item-card__foot">
-                <button type="button" class="mini-btn mini-btn--edit" [disabled]="busyRowId() === it.id" (click)="openEditItem(it)">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                  {{ 'تعديل' | t }}
-                </button>
-                <button type="button" class="mini-btn mini-btn--done" [disabled]="busyRowId() === it.id" (click)="markDone(it)">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                  {{ 'development.items.markCompleted' | t }}
-                </button>
-                <button type="button" class="mini-btn mini-btn--danger" [disabled]="busyRowId() === it.id" (click)="remove(it)">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-                  {{ 'حذف' | t }}
-                </button>
-              </footer>
+              <button type="button" class="link-add-path" (click)="openAddPath(it)">
+                {{ 'development.paths.addPath' | t }}
+              </button>
             }
           </article>
         }
@@ -294,6 +340,66 @@
     <footer class="dev-modal__foot">
       <button type="button" class="btn-ghost" (click)="editItemOpen.set(false)" [disabled]="actionBusy()">{{ 'إلغاء' | t }}</button>
       <button type="button" class="btn-primary" (click)="saveEditItem()" [disabled]="actionBusy()">{{ 'حفظ التعديل' | t }}</button>
+    </footer>
+  </section>
+}
+
+@if (addPathOpen() && pathParentItem()) {
+  <div class="modal-backdrop" (click)="addPathOpen.set(false)"></div>
+  <section class="dev-modal dev-modal--wide" role="dialog" aria-modal="true">
+    <header class="dev-modal__head">
+      <div>
+        <span class="dev-modal__eyebrow">{{ 'development.paths.title' | t }}</span>
+        <h2>{{ 'development.paths.addPath' | t }}</h2>
+        <p class="dev-modal__sub">{{ pathParentItem()!.title }}</p>
+      </div>
+      <button type="button" class="icon-close" (click)="addPathOpen.set(false)" aria-label="close">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </header>
+    <div class="form-grid">
+      <label class="field">
+        <span>{{ 'development.paths.sortOrder' | t }}</span>
+        <input type="number" [(ngModel)]="addPathForm.sortOrder" name="apos" />
+      </label>
+      <label class="field full">
+        <span>{{ 'development.paths.pathTitle' | t }} <em>*</em></span>
+        <input [(ngModel)]="addPathForm.title" name="aptit" />
+      </label>
+      <label class="field">
+        <span>{{ 'development.paths.start' | t }}</span>
+        <input type="date" [(ngModel)]="addPathForm.plannedStartUtc" name="apst" />
+      </label>
+      <label class="field">
+        <span>{{ 'development.paths.end' | t }}</span>
+        <input type="date" [(ngModel)]="addPathForm.plannedEndUtc" name="apen" />
+      </label>
+      <label class="field full">
+        <span>{{ 'الوصف' | t }}</span>
+        <textarea rows="2" [(ngModel)]="addPathForm.description" name="apdesc"></textarea>
+      </label>
+      <label class="field">
+        <span>{{ 'development.paths.helperEmployee' | t }}</span>
+        <select [(ngModel)]="addPathForm.helperEmployeeId" name="apemp">
+          <option value="">{{ '—' | t }}</option>
+          @for (e of employees(); track e.id) {
+            <option [value]="e.id">{{ e.name }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span>{{ 'development.paths.helperOrgUnit' | t }}</span>
+        <select [(ngModel)]="addPathForm.helperOrgUnitId" name="apou">
+          <option value="">{{ '—' | t }}</option>
+          @for (u of orgUnits(); track u.id) {
+            <option [value]="u.id">{{ u.name }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    <footer class="dev-modal__foot">
+      <button type="button" class="btn-ghost" (click)="addPathOpen.set(false)" [disabled]="pathActionBusy()">{{ 'إلغاء' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveAddPath()" [disabled]="pathActionBusy()">{{ 'حفظ' | t }}</button>
     </footer>
   </section>
 }

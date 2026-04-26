@@ -595,6 +595,9 @@ namespace TalentSystem.Persistence.Migrations
                     b.Property<Guid>("EmployeeId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsSystemSuggested")
+                        .HasColumnType("bit");
+
                     b.Property<Guid?>("ModifiedByUserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -638,6 +641,62 @@ namespace TalentSystem.Persistence.Migrations
                     b.HasIndex("Status");
 
                     b.ToTable("DevelopmentPlans", (string)null);
+                });
+
+            modelBuilder.Entity("TalentSystem.Domain.Development.DevelopmentPlanImpactSnapshot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DevelopmentPlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("MetricScore")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<Guid?>("ModifiedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModifiedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte>("Phase")
+                        .HasColumnType("tinyint");
+
+                    b.Property<byte>("RecordStatus")
+                        .HasColumnType("tinyint");
+
+                    b.Property<DateTime>("RecordedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SummaryNotes")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DevelopmentPlanId");
+
+                    b.HasIndex("DevelopmentPlanId", "Phase")
+                        .IsUnique()
+                        .HasDatabaseName("IX_DevelopmentPlanImpactSnapshots_Plan_Phase")
+                        .HasFilter("[RecordStatus] <> 3");
+
+                    b.ToTable("DevelopmentPlanImpactSnapshots", (string)null);
                 });
 
             modelBuilder.Entity("TalentSystem.Domain.Development.DevelopmentPlanItem", b =>
@@ -708,6 +767,115 @@ namespace TalentSystem.Persistence.Migrations
                     b.HasIndex("Status");
 
                     b.ToTable("DevelopmentPlanItems", (string)null);
+                });
+
+            modelBuilder.Entity("TalentSystem.Domain.Development.DevelopmentPlanItemPath", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("AchievedImpactValue")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<Guid>("DevelopmentPlanItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ModifiedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModifiedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("PlannedEndUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("PlannedStartUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte>("RecordStatus")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DevelopmentPlanItemId");
+
+                    b.HasIndex("DevelopmentPlanItemId", "SortOrder");
+
+                    b.ToTable("DevelopmentPlanItemPaths", (string)null);
+                });
+
+            modelBuilder.Entity("TalentSystem.Domain.Development.DevelopmentPlanItemPathHelper", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeletedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DevelopmentPlanItemPathId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("HelperEntityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte>("HelperKind")
+                        .HasColumnType("tinyint");
+
+                    b.Property<Guid?>("ModifiedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModifiedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte>("RecordStatus")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DevelopmentPlanItemPathId");
+
+                    b.HasIndex("DevelopmentPlanItemPathId", "HelperKind", "HelperEntityId");
+
+                    b.ToTable("DevelopmentPlanItemPathHelpers", (string)null);
                 });
 
             modelBuilder.Entity("TalentSystem.Domain.Development.DevelopmentPlanLink", b =>
@@ -2757,6 +2925,17 @@ namespace TalentSystem.Persistence.Migrations
                     b.Navigation("PerformanceCycle");
                 });
 
+            modelBuilder.Entity("TalentSystem.Domain.Development.DevelopmentPlanImpactSnapshot", b =>
+                {
+                    b.HasOne("TalentSystem.Domain.Development.DevelopmentPlan", "DevelopmentPlan")
+                        .WithMany("ImpactSnapshots")
+                        .HasForeignKey("DevelopmentPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DevelopmentPlan");
+                });
+
             modelBuilder.Entity("TalentSystem.Domain.Development.DevelopmentPlanItem", b =>
                 {
                     b.HasOne("TalentSystem.Domain.Development.DevelopmentPlan", "DevelopmentPlan")
@@ -2773,6 +2952,28 @@ namespace TalentSystem.Persistence.Migrations
                     b.Navigation("DevelopmentPlan");
 
                     b.Navigation("RelatedCompetency");
+                });
+
+            modelBuilder.Entity("TalentSystem.Domain.Development.DevelopmentPlanItemPath", b =>
+                {
+                    b.HasOne("TalentSystem.Domain.Development.DevelopmentPlanItem", "DevelopmentPlanItem")
+                        .WithMany("Paths")
+                        .HasForeignKey("DevelopmentPlanItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DevelopmentPlanItem");
+                });
+
+            modelBuilder.Entity("TalentSystem.Domain.Development.DevelopmentPlanItemPathHelper", b =>
+                {
+                    b.HasOne("TalentSystem.Domain.Development.DevelopmentPlanItemPath", "Path")
+                        .WithMany("Helpers")
+                        .HasForeignKey("DevelopmentPlanItemPathId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Path");
                 });
 
             modelBuilder.Entity("TalentSystem.Domain.Development.DevelopmentPlanLink", b =>
@@ -3202,9 +3403,21 @@ namespace TalentSystem.Persistence.Migrations
 
             modelBuilder.Entity("TalentSystem.Domain.Development.DevelopmentPlan", b =>
                 {
+                    b.Navigation("ImpactSnapshots");
+
                     b.Navigation("Items");
 
                     b.Navigation("Links");
+                });
+
+            modelBuilder.Entity("TalentSystem.Domain.Development.DevelopmentPlanItem", b =>
+                {
+                    b.Navigation("Paths");
+                });
+
+            modelBuilder.Entity("TalentSystem.Domain.Development.DevelopmentPlanItemPath", b =>
+                {
+                    b.Navigation("Helpers");
                 });
 
             modelBuilder.Entity("TalentSystem.Domain.Employees.Employee", b =>

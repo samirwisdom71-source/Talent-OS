@@ -1,3 +1,5 @@
+import type { DevelopmentPlanItemPathDto } from './development.models';
+
 export interface DevelopmentPlanItemDto {
   id: string;
   developmentPlanId: string;
@@ -9,6 +11,7 @@ export interface DevelopmentPlanItemDto {
   status: number;
   progressPercentage: number;
   notes?: string | null;
+  paths?: readonly DevelopmentPlanItemPathDto[] | null;
 }
 
 export interface DevelopmentPlanItemFilterRequest {
@@ -37,5 +40,8 @@ export interface UpdateDevelopmentPlanItemRequest {
   itemType: number;
   relatedCompetencyId?: string | null;
   targetDate?: string | null;
+  /** يجب أن يطابق قيم الـ API: 1=NotStarted، 2=InProgress، 3=Completed، 4=Cancelled */
+  status: number;
+  progressPercentage: number;
   notes?: string | null;
 }

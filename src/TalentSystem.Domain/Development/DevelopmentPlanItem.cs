@@ -27,4 +27,6 @@ public sealed class DevelopmentPlanItem : AuditableDomainEntity
     public DevelopmentPlan DevelopmentPlan { get; set; } = null!;
 
     public Competency? RelatedCompetency { get; set; }
+
+    public ICollection<DevelopmentPlanItemPath> Paths { get; set; } = new List<DevelopmentPlanItemPath>();
 }

@@ -12,9 +12,15 @@ public sealed class CreateDevelopmentPlanRequest
 
     public DevelopmentPlanSourceType SourceType { get; set; }
 
+    /// <summary>تم توليد المقترح آلياً (اقتراح من النظام).</summary>
+    public bool IsSystemSuggested { get; set; }
+
     public DateTime? TargetCompletionDate { get; set; }
 
     public string? Notes { get; set; }
 
     public IReadOnlyList<DevelopmentPlanLinkInputDto>? Links { get; set; }
+
+    /// <summary>بنود ومسارات أولية عند الإنشاء (اختياري).</summary>
+    public IReadOnlyList<DevelopmentPlanStructuredItemInputDto>? StructuredItems { get; set; }
 }

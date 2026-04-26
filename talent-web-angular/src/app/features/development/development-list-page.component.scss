@@ -333,6 +333,12 @@
     flex-shrink: 0;
   }
   .td-actions { text-align: end; }
+  .td-title__text {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
 }
 
 .link-pill {
@@ -363,6 +369,15 @@
   color: var(--dev-ink-soft);
 
   &--soft { background: rgba(6, 182, 212, .12); color: #0891b2; }
+  &--suggested {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    background: rgba(245, 158, 11, .18);
+    color: #b45309;
+    border-color: rgba(245, 158, 11, .35);
+  }
 
   /* plan status: 1=Draft, 2=Active, 3=Completed, 4=Cancelled */
   &--s1 { background: rgba(100, 116, 139, .15); color: #475569; }
@@ -425,6 +440,10 @@
     color: var(--dev-ink);
     line-height: 1.4;
     word-break: break-word;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
   }
 
   &__body { display: flex; flex-direction: column; gap: 8px; }
