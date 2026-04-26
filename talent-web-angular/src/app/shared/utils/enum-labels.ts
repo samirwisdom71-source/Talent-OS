@@ -94,10 +94,12 @@ const SUCCESSION_PLAN_STATUS: Record<number, { ar: string; en: string }> = {
   4: { ar: 'مؤرشف', en: 'Archived' },
 };
 
+/** يطابق TalentSystem.Domain.Enums.PotentialAssessmentStatus */
 const POTENTIAL_ASSESSMENT_STATUS: Record<number, { ar: string; en: string }> = {
   1: { ar: 'مسودة', en: 'Draft' },
-  2: { ar: 'مُعتمد', en: 'Finalized' },
-  3: { ar: 'ملغى', en: 'Cancelled' },
+  2: { ar: 'مُرسل', en: 'Submitted' },
+  3: { ar: 'قيد المراجعة', en: 'Reviewed' },
+  4: { ar: 'معتمد', en: 'Finalized' },
 };
 
 const POTENTIAL_LEVEL: Record<number, { ar: string; en: string }> = {

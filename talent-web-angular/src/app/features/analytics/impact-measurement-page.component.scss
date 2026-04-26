@@ -1,0 +1,18 @@
+.impact-page { display: flex; flex-direction: column; gap: 1rem; }
+.impact-page__hero { padding: 1rem 1.2rem; border: 1px solid var(--color-border); border-radius: 16px; background: var(--color-card); }
+.impact-page__hero h1 { margin: 0 0 0.2rem; font-size: 1.3rem; }
+.impact-page__hero p { margin: 0; color: var(--color-muted); }
+.impact-page__cross-title { margin: 0.5rem 0 0.15rem; font-size: 1rem; font-weight: 650; }
+.impact-page__cross-hint { margin: 0 0 0.35rem; font-size: 0.8rem; color: var(--color-muted); }
+.impact-page__filters { display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: end; border: 1px solid var(--color-border); border-radius: 14px; padding: 0.8rem; background: var(--color-card); }
+.impact-page__filters label { display: flex; flex-direction: column; gap: 0.25rem; }
+.impact-page__filters span { font-size: 0.75rem; color: var(--color-muted); }
+.impact-page__filters input { height: 36px; border: 1px solid var(--color-border); border-radius: 9px; padding: 0 0.6rem; }
+.impact-page__filters button { height: 36px; padding: 0 0.75rem; border: 0; border-radius: 9px; background: linear-gradient(135deg,#4f46e5,#0ea5e9); color: #fff; font-weight: 650; }
+.impact-kpis { display: grid; grid-template-columns: repeat(auto-fit,minmax(170px,1fr)); gap: 0.7rem; }
+.impact-kpis article { border: 1px solid var(--color-border); border-radius: 14px; padding: 0.8rem; background: var(--color-card); display: flex; flex-direction: column; gap: 0.3rem; }
+.impact-kpis span { color: var(--color-muted); font-size: 0.8rem; }
+.impact-kpis strong { font-size: 1.4rem; }
+.impact-charts { display: grid; grid-template-columns: repeat(auto-fit,minmax(270px,1fr)); gap: 0.75rem; }
+.impact-charts .card { border: 1px solid var(--color-border); border-radius: 14px; padding: 0.8rem; background: var(--color-card); }
+.impact-charts h3 { margin: 0 0 0.6rem; font-size: 0.95rem; }

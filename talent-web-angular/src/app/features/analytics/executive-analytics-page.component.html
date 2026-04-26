@@ -14,6 +14,8 @@
     </a>
   </header>
 
+  <app-analytics-date-range-bar variant="executive" (rangeChange)="onDateRangeChange($event)" />
+
   @if (failed()) {
     <app-empty-state
       [chartIcon]="true"
@@ -22,103 +24,386 @@
       [retryLabel]="'common.retry' | t"
       (retryClick)="load()"
     />
-  } @else if (summary()) {
-    <section class="exec__section exec__section--enter">
-      <h2 class="exec__section-title">{{ 'analytics.executive.section.talent' | t }}</h2>
-      <div class="exec__kpi-grid">
-        <article class="exec__kpi exec__kpi--indigo">
-          <span class="exec__kpi-ico" aria-hidden="true"
-            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-              ><path d="M16 11a4 4 0 1 0-8 0 4 4 0 0 0 8 0Z" /><path d="M4 20a8 8 0 1 1 16 0" /></svg
-            ></span>
-          <div class="exec__kpi-meta">{{ 'analytics.kpi.employees' | t }}</div>
-          <div class="exec__kpi-value">{{ summary()!.totalEmployees | number }}</div>
-        </article>
-        <article class="exec__kpi exec__kpi--sky">
-          <span class="exec__kpi-ico" aria-hidden="true"
-            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-              ><path d="M4 5h16M4 12h16M4 19h16" /></svg
-            ></span>
-          <div class="exec__kpi-meta">{{ 'analytics.kpi.classifications' | t }}</div>
-          <div class="exec__kpi-value">{{ summary()!.totalTalentClassifications | number }}</div>
-        </article>
-        <article class="exec__kpi exec__kpi--teal">
-          <span class="exec__kpi-ico" aria-hidden="true"
-            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-              ><path d="M4 19V5m0 14h16M8 15l3-3 2 2 5-5" /></svg
-            ></span>
-          <div class="exec__kpi-meta">{{ 'analytics.kpi.highPotential' | t }}</div>
-          <div class="exec__kpi-value">{{ summary()!.highPotentialCount | number }}</div>
-        </article>
-        <article class="exec__kpi exec__kpi--violet">
-          <span class="exec__kpi-ico" aria-hidden="true"
-            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-              ><path d="m4 14 4-4 4 4 8-8" /></svg
-            ></span>
-          <div class="exec__kpi-meta">{{ 'analytics.kpi.highPerformer' | t }}</div>
-          <div class="exec__kpi-value">{{ summary()!.highPerformerCount | number }}</div>
-        </article>
-        <article class="exec__kpi exec__kpi--amber">
-          <span class="exec__kpi-ico" aria-hidden="true"
-            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-              ><path d="M12 3v18M3 12h18" /></svg
-            ></span>
-          <div class="exec__kpi-meta">{{ 'analytics.kpi.strategicLeader' | t }}</div>
-          <div class="exec__kpi-value">{{ summary()!.strategicLeaderCount | number }}</div>
-        </article>
-        <article class="exec__kpi exec__kpi--rose">
-          <span class="exec__kpi-ico" aria-hidden="true"
-            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-              ><path d="M3 3v18h18" /><path d="M7 16l4-4 3 3 5-6" /></svg
-            ></span>
-          <div class="exec__kpi-meta">{{ 'analytics.kpi.talentScores' | t }}</div>
-          <div class="exec__kpi-value">{{ summary()!.totalTalentScores | number }}</div>
-        </article>
-      </div>
-    </section>
-
-    <section class="exec__section exec__section--enter exec__section--delay">
-      <h2 class="exec__section-title">{{ 'analytics.executive.section.ops' | t }}</h2>
-      <div class="exec__kpi-grid exec__kpi-grid--dense">
-        <article class="exec__kpi exec__kpi--slate">
-          <span class="exec__kpi-ico" aria-hidden="true"
-            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-              ><path d="M7 3v4M17 3v4M4 9h16M5 5h14v16H5z" /></svg
-            ></span>
-          <div class="exec__kpi-meta">{{ 'analytics.kpi.activeCycles' | t }}</div>
-          <div class="exec__kpi-value">{{ summary()!.activePerformanceCycleCount | number }}</div>
-        </article>
-        <article class="exec__kpi exec__kpi--slate">
-          <span class="exec__kpi-ico" aria-hidden="true"
-            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-              ><path d="M4 6h16M4 12h10M4 18h7" /></svg
-            ></span>
-          <div class="exec__kpi-meta">{{ 'analytics.kpi.successionPlans' | t }}</div>
-          <div class="exec__kpi-value">{{ summary()!.activeSuccessionPlanCount | number }}</div>
-        </article>
-        <article class="exec__kpi exec__kpi--slate">
-          <span class="exec__kpi-ico" aria-hidden="true"
-            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-              ><path d="M3 7h18v12H3zM7 7V5h10v2" /></svg
-            ></span>
-          <div class="exec__kpi-meta">{{ 'analytics.kpi.marketplace' | t }}</div>
-          <div class="exec__kpi-value">{{ summary()!.openMarketplaceOpportunityCount | number }}</div>
-        </article>
-        <article class="exec__kpi exec__kpi--slate">
-          <span class="exec__kpi-ico" aria-hidden="true"
-            ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
-              ><path d="M4 19h16M6 5h12v10H6z" /></svg
-            ></span>
-          <div class="exec__kpi-meta">{{ 'analytics.kpi.developmentPlans' | t }}</div>
-          <div class="exec__kpi-value">{{ summary()!.activeDevelopmentPlanCount | number }}</div>
-        </article>
-      </div>
-    </section>
   } @else {
+    @if (summary(); as s) {
+    <div class="exec-dash">
+      <!-- Overview KPIs -->
+      <section class="exec-dash__section exec-dash__section--enter">
+        <h2 class="exec-dash__heading">{{ 'analytics.executive.section.overview' | t }}</h2>
+        <div class="exec-dash__groups">
+          <div class="exec-dash__group exec-dash__group--talent">
+            <h3 class="exec-dash__group-title">{{ 'analytics.executive.group.talent' | t }}</h3>
+            <div class="exec__kpi-grid exec__kpi-grid--talent">
+              <article class="exec__kpi exec__kpi--indigo">
+                <div class="exec__kpi-meta">{{ 'analytics.kpi.employees' | t }}</div>
+                <div class="exec__kpi-value">{{ s.totalEmployees | number }}</div>
+              </article>
+              <article class="exec__kpi exec__kpi--sky">
+                <div class="exec__kpi-meta">{{ 'analytics.kpi.classifications' | t }}</div>
+                <div class="exec__kpi-value">{{ s.totalTalentClassifications | number }}</div>
+              </article>
+              <article class="exec__kpi exec__kpi--rose">
+                <div class="exec__kpi-meta">{{ 'analytics.kpi.talentScores' | t }}</div>
+                <div class="exec__kpi-value">{{ s.totalTalentScores | number }}</div>
+              </article>
+              <article class="exec__kpi exec__kpi--teal">
+                <div class="exec__kpi-meta">{{ 'analytics.kpi.highPotential' | t }}</div>
+                <div class="exec__kpi-value">{{ s.highPotentialCount | number }}</div>
+              </article>
+              <article class="exec__kpi exec__kpi--violet">
+                <div class="exec__kpi-meta">{{ 'analytics.kpi.highPerformer' | t }}</div>
+                <div class="exec__kpi-value">{{ s.highPerformerCount | number }}</div>
+              </article>
+              <article class="exec__kpi exec__kpi--amber">
+                <div class="exec__kpi-meta">{{ 'analytics.kpi.strategicLeader' | t }}</div>
+                <div class="exec__kpi-value">{{ s.strategicLeaderCount | number }}</div>
+              </article>
+            </div>
+          </div>
+
+          <div class="exec-dash__group exec-dash__group--performance">
+            <h3 class="exec-dash__group-title">{{ 'analytics.executive.group.performance' | t }}</h3>
+            <div class="exec__kpi-grid exec__kpi-grid--panel">
+              <article class="exec__kpi exec__kpi--slate">
+                <div class="exec__kpi-meta">{{ 'analytics.kpi.activeCycles' | t }}</div>
+                <div class="exec__kpi-value">{{ s.activePerformanceCycleCount | number }}</div>
+              </article>
+              <article class="exec__kpi exec__kpi--slate">
+                <div class="exec__kpi-meta">{{ 'analytics.executive.kpi.goalsTotal' | t }}</div>
+                <div class="exec__kpi-value">{{ s.totalPerformanceGoals ?? 0 | number }}</div>
+              </article>
+              <article class="exec__kpi exec__kpi--slate">
+                <div class="exec__kpi-meta">{{ 'analytics.executive.kpi.goalsDone' | t }}</div>
+                <div class="exec__kpi-value">{{ s.completedPerformanceGoals ?? 0 | number }}</div>
+              </article>
+              <article class="exec__kpi exec__kpi--slate">
+                <div class="exec__kpi-meta">{{ 'analytics.executive.kpi.finalEvals' | t }}</div>
+                <div class="exec__kpi-value">{{ s.finalizedEvaluationCount ?? 0 | number }}</div>
+              </article>
+            </div>
+          </div>
+
+          <div class="exec-dash__group exec-dash__group--programs">
+            <h3 class="exec-dash__group-title">{{ 'analytics.executive.group.programs' | t }}</h3>
+            <div class="exec__kpi-grid exec__kpi-grid--panel">
+              <article class="exec__kpi exec__kpi--slate">
+                <div class="exec__kpi-meta">{{ 'analytics.kpi.successionPlans' | t }}</div>
+                <div class="exec__kpi-value">{{ s.activeSuccessionPlanCount | number }}</div>
+              </article>
+              <article class="exec__kpi exec__kpi--slate">
+                <div class="exec__kpi-meta">{{ 'analytics.kpi.developmentPlans' | t }}</div>
+                <div class="exec__kpi-value">{{ s.activeDevelopmentPlanCount | number }}</div>
+              </article>
+              <article class="exec__kpi exec__kpi--slate">
+                <div class="exec__kpi-meta">{{ 'analytics.kpi.marketplace' | t }}</div>
+                <div class="exec__kpi-value">{{ s.openMarketplaceOpportunityCount | number }}</div>
+              </article>
+              <article class="exec__kpi exec__kpi--slate">
+                <div class="exec__kpi-meta">{{ 'analytics.executive.kpi.mktApplications' | t }}</div>
+                <div class="exec__kpi-value">{{ s.totalMarketplaceApplicationCount ?? 0 | number }}</div>
+              </article>
+            </div>
+          </div>
+
+          <div class="exec-dash__group exec-dash__group--intelligence">
+            <h3 class="exec-dash__group-title">{{ 'analytics.executive.group.intelligence' | t }}</h3>
+            <div class="exec__kpi-grid exec__kpi-grid--panel exec__kpi-grid--panel-3">
+              <article class="exec__kpi exec__kpi--slate">
+                <div class="exec__kpi-meta">{{ 'analytics.executive.kpi.pendingApprovals' | t }}</div>
+                <div class="exec__kpi-value">{{ s.pendingApprovalCount ?? 0 | number }}</div>
+              </article>
+              <article class="exec__kpi exec__kpi--slate">
+                <div class="exec__kpi-meta">{{ 'analytics.executive.kpi.insights' | t }}</div>
+                <div class="exec__kpi-value">{{ s.talentInsightCount ?? 0 | number }}</div>
+              </article>
+              <article class="exec__kpi exec__kpi--slate">
+                <div class="exec__kpi-meta">{{ 'analytics.executive.kpi.recommendations' | t }}</div>
+                <div class="exec__kpi-value">{{ s.talentRecommendationCount ?? 0 | number }}</div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      @if (hasExtendedAnalytics(s)) {
+        <section class="exec-dash__section exec-dash__section--enter exec-dash__section--delay">
+          <h2 class="exec-dash__heading">{{ 'analytics.executive.section.charts' | t }}</h2>
+          <p class="exec-dash__sub">{{ 'analytics.executive.chartsHint' | t }}</p>
+
+          <div class="exec-bento">
+            @if (cycleChart().labels.length) {
+              <div class="exec-bento__cell exec-bento__cell--full">
+                <div class="exec-chart exec-chart--hero">
+                  <div class="exec-chart__head">
+                    <div class="exec-chart__titles">
+                      <h3 class="exec-chart__title">{{ 'analytics.executive.chart.byCycle' | t }}</h3>
+                      <p class="exec-chart__caption">{{ 'analytics.executive.chart.byCycleCaption' | t }}</p>
+                    </div>
+                    <div class="exec-chart__modes">
+                      @for (k of alternativesFor('cycles'); track k) {
+                        <button
+                          type="button"
+                          class="exec-chart__mode"
+                          [class.exec-chart__mode--on]="viz('cycles') === k"
+                          (click)="setViz('cycles', k)"
+                        >
+                          {{ ('analytics.executive.viz.' + k) | t }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+                  <div class="exec-chart__canvas exec-chart__canvas--tall">
+                    <app-chart-widget
+                      [kind]="viz('cycles')"
+                      [labels]="cycleChart().labels"
+                      [values]="cycleChart().values"
+                      [datasetLabel]="'analytics.performanceKpi.finalizedEvals' | t"
+                    />
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (nineBoxChart().labels.length) {
+              <div class="exec-bento__cell exec-bento__cell--third">
+                <div class="exec-chart">
+                  <div class="exec-chart__head">
+                    <div class="exec-chart__titles">
+                      <h3 class="exec-chart__title">{{ 'analytics.executive.chart.nineBox' | t }}</h3>
+                      <p class="exec-chart__caption">{{ 'analytics.executive.chart.nineBoxCaption' | t }}</p>
+                    </div>
+                    <div class="exec-chart__modes" role="toolbar">
+                      @for (k of alternativesFor('nine'); track k) {
+                        <button
+                          type="button"
+                          class="exec-chart__mode"
+                          [class.exec-chart__mode--on]="viz('nine') === k"
+                          (click)="setViz('nine', k)"
+                        >
+                          {{ ('analytics.executive.viz.' + k) | t }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+                  <div class="exec-chart__canvas">
+                    <app-chart-widget
+                      [kind]="viz('nine')"
+                      [labels]="nineBoxChart().labels"
+                      [values]="nineBoxChart().values"
+                      [datasetLabel]="'analytics.executive.chart.nineBox' | t"
+                    />
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (performanceBandChart().labels.length) {
+              <div class="exec-bento__cell exec-bento__cell--third">
+                <div class="exec-chart">
+                  <div class="exec-chart__head">
+                    <div class="exec-chart__titles">
+                      <h3 class="exec-chart__title">{{ 'analytics.executive.chart.performanceBand' | t }}</h3>
+                      <p class="exec-chart__caption">{{ 'analytics.executive.chart.orderedScaleCaption' | t }}</p>
+                    </div>
+                    <div class="exec-chart__modes">
+                      @for (k of alternativesFor('pBand'); track k) {
+                        <button
+                          type="button"
+                          class="exec-chart__mode"
+                          [class.exec-chart__mode--on]="viz('pBand') === k"
+                          (click)="setViz('pBand', k)"
+                        >
+                          {{ ('analytics.executive.viz.' + k) | t }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+                  <div class="exec-chart__canvas">
+                    <app-chart-widget
+                      [kind]="viz('pBand')"
+                      [labels]="performanceBandChart().labels"
+                      [values]="performanceBandChart().values"
+                      [datasetLabel]="'talentAnalytics.section.performanceBand' | t"
+                    />
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (potentialBandChart().labels.length) {
+              <div class="exec-bento__cell exec-bento__cell--third">
+                <div class="exec-chart">
+                  <div class="exec-chart__head">
+                    <div class="exec-chart__titles">
+                      <h3 class="exec-chart__title">{{ 'analytics.executive.chart.potentialBand' | t }}</h3>
+                      <p class="exec-chart__caption">{{ 'analytics.executive.chart.potentialBandCaption' | t }}</p>
+                    </div>
+                    <div class="exec-chart__modes">
+                      @for (k of alternativesFor('potBand'); track k) {
+                        <button
+                          type="button"
+                          class="exec-chart__mode"
+                          [class.exec-chart__mode--on]="viz('potBand') === k"
+                          (click)="setViz('potBand', k)"
+                        >
+                          {{ ('analytics.executive.viz.' + k) | t }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+                  <div class="exec-chart__canvas">
+                    <app-chart-widget
+                      [kind]="viz('potBand')"
+                      [labels]="potentialBandChart().labels"
+                      [values]="potentialBandChart().values"
+                      [datasetLabel]="'talentAnalytics.section.potentialBand' | t"
+                    />
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (categoriesChart().labels.length) {
+              <div class="exec-bento__cell exec-bento__cell--half">
+                <div class="exec-chart">
+                  <div class="exec-chart__head">
+                    <div class="exec-chart__titles">
+                      <h3 class="exec-chart__title">{{ 'analytics.executive.chart.topCategories' | t }}</h3>
+                      <p class="exec-chart__caption">{{ 'analytics.executive.chart.topCategoriesCaption' | t }}</p>
+                    </div>
+                    <div class="exec-chart__modes">
+                      @for (k of alternativesFor('cat'); track k) {
+                        <button
+                          type="button"
+                          class="exec-chart__mode"
+                          [class.exec-chart__mode--on]="viz('cat') === k"
+                          (click)="setViz('cat', k)"
+                        >
+                          {{ ('analytics.executive.viz.' + k) | t }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+                  <div class="exec-chart__canvas">
+                    <app-chart-widget
+                      [kind]="viz('cat')"
+                      [labels]="categoriesChart().labels"
+                      [values]="categoriesChart().values"
+                      [datasetLabel]="'analytics.executive.chart.topCategories' | t"
+                    />
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (developmentTypeChart().labels.length) {
+              <div class="exec-bento__cell exec-bento__cell--half">
+                <div class="exec-chart">
+                  <div class="exec-chart__head">
+                    <div class="exec-chart__titles">
+                      <h3 class="exec-chart__title">{{ 'analytics.executive.chart.devTypes' | t }}</h3>
+                      <p class="exec-chart__caption">{{ 'analytics.executive.chart.devTypesCaption' | t }}</p>
+                    </div>
+                    <div class="exec-chart__modes">
+                      @for (k of alternativesFor('dev'); track k) {
+                        <button
+                          type="button"
+                          class="exec-chart__mode"
+                          [class.exec-chart__mode--on]="viz('dev') === k"
+                          (click)="setViz('dev', k)"
+                        >
+                          {{ ('analytics.executive.viz.' + k) | t }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+                  <div class="exec-chart__canvas">
+                    <app-chart-widget
+                      [kind]="viz('dev')"
+                      [labels]="developmentTypeChart().labels"
+                      [values]="developmentTypeChart().values"
+                      [datasetLabel]="'analytics.performanceKpi.devByTypeChart' | t"
+                    />
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (marketplaceTypeChart().labels.length) {
+              <div class="exec-bento__cell exec-bento__cell--half">
+                <div class="exec-chart">
+                  <div class="exec-chart__head">
+                    <div class="exec-chart__titles">
+                      <h3 class="exec-chart__title">{{ 'analytics.executive.chart.oppTypes' | t }}</h3>
+                      <p class="exec-chart__caption">{{ 'analytics.executive.chart.oppTypesCaption' | t }}</p>
+                    </div>
+                    <div class="exec-chart__modes">
+                      @for (k of alternativesFor('mkt'); track k) {
+                        <button
+                          type="button"
+                          class="exec-chart__mode"
+                          [class.exec-chart__mode--on]="viz('mkt') === k"
+                          (click)="setViz('mkt', k)"
+                        >
+                          {{ ('analytics.executive.viz.' + k) | t }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+                  <div class="exec-chart__canvas">
+                    <app-chart-widget
+                      [kind]="viz('mkt')"
+                      [labels]="marketplaceTypeChart().labels"
+                      [values]="marketplaceTypeChart().values"
+                      [datasetLabel]="'analytics.performanceKpi.marketByTypeChart' | t"
+                    />
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (readinessChart().labels.length) {
+              <div class="exec-bento__cell exec-bento__cell--half">
+                <div class="exec-chart">
+                  <div class="exec-chart__head">
+                    <div class="exec-chart__titles">
+                      <h3 class="exec-chart__title">{{ 'analytics.executive.chart.readiness' | t }}</h3>
+                      <p class="exec-chart__caption">{{ 'analytics.executive.chart.successionFlowCaption' | t }}</p>
+                    </div>
+                    <div class="exec-chart__modes">
+                      @for (k of alternativesFor('ready'); track k) {
+                        <button
+                          type="button"
+                          class="exec-chart__mode"
+                          [class.exec-chart__mode--on]="viz('ready') === k"
+                          (click)="setViz('ready', k)"
+                        >
+                          {{ ('analytics.executive.viz.' + k) | t }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+                  <div class="exec-chart__canvas">
+                    <app-chart-widget
+                      [kind]="viz('ready')"
+                      [labels]="readinessChart().labels"
+                      [values]="readinessChart().values"
+                      [datasetLabel]="'successionAnalytics.section.readiness' | t"
+                    />
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+    </div>
+    } @else {
     <div class="exec__skeleton-grid">
       @for (x of [1, 2, 3, 4, 5, 6]; track x) {
         <div class="exec__skel"></div>
       }
     </div>
+    }
   }
 </div>

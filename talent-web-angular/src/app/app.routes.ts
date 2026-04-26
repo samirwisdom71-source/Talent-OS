@@ -329,6 +329,21 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'analytics/performance-kpis',
+        loadComponent: () =>
+          import('./features/analytics/performance-kpis-page.component').then((m) => m.PerformanceKpisPageComponent),
+      },
+      {
+        path: 'analytics/impact',
+        loadComponent: () =>
+          import('./features/analytics/impact-measurement-page.component').then((m) => m.ImpactMeasurementPageComponent),
+      },
+      {
+        path: 'reports/system',
+        loadComponent: () =>
+          import('./features/reports/system-reports-page.component').then((m) => m.SystemReportsPageComponent),
+      },
+      {
         path: 'approvals',
         canActivate: [permissionGuard],
         data: { permissions: ['APPROVAL_REQUEST_VIEW'] },

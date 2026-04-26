@@ -1,0 +1,257 @@
+<section class="analytics-page">
+  <header class="analytics-page__hero">
+    <div class="analytics-page__hero-accent" aria-hidden="true"></div>
+    <div class="analytics-page__hero-inner">
+      <h1>{{ 'analytics.performanceKpi.title' | t }}</h1>
+      <p>{{ 'analytics.performanceKpi.subtitle' | t }}</p>
+    </div>
+  </header>
+
+  <app-analytics-date-range-bar variant="kpis" (rangeChange)="onDateRangeChange($event)" />
+
+  @if (loading()) {
+    <div class="analytics-page__loading">{{ 'common.loading' | t }}</div>
+  } @else if (failed()) {
+    <app-empty-state
+      [chartIcon]="true"
+      [title]="'analytics.performanceKpi.loadFailed' | t"
+      [message]="'analytics.performanceKpi.loadHint' | t"
+      [retryLabel]="'common.retry' | t"
+      (retryClick)="refresh()"
+    />
+  } @else {
+    @if (bundle(); as b) {
+      <div class="kpis-dashboard">
+        @if (b.performance; as perf) {
+          <section class="panel panel--hero panel--accent-violet">
+            <div class="panel__head">
+              <span class="panel__dot"></span>
+              <h2 class="panel__title">{{ 'analytics.performanceKpi.section.performance' | t }}</h2>
+            </div>
+            <div class="panel__body panel__body--split">
+              <div class="kpi-strip">
+                <article class="kpi-tile">
+                  <span class="kpi-tile__label">{{ 'analytics.performanceKpi.totalCycles' | t }}</span>
+                  <strong class="kpi-tile__value">{{ perf.totalPerformanceCycles }}</strong>
+                </article>
+                <article class="kpi-tile">
+                  <span class="kpi-tile__label">{{ 'analytics.performanceKpi.activeCycles' | t }}</span>
+                  <strong class="kpi-tile__value">{{ perf.activePerformanceCycles }}</strong>
+                </article>
+                <article class="kpi-tile">
+                  <span class="kpi-tile__label">{{ 'analytics.performanceKpi.totalGoals' | t }}</span>
+                  <strong class="kpi-tile__value">{{ perf.totalGoals }}</strong>
+                </article>
+                <article class="kpi-tile">
+                  <span class="kpi-tile__label">{{ 'analytics.performanceKpi.completedGoals' | t }}</span>
+                  <strong class="kpi-tile__value">{{ perf.completedGoals }}</strong>
+                </article>
+                <article class="kpi-tile">
+                  <span class="kpi-tile__label">{{ 'analytics.performanceKpi.totalEvals' | t }}</span>
+                  <strong class="kpi-tile__value">{{ perf.totalEvaluations }}</strong>
+                </article>
+                <article class="kpi-tile">
+                  <span class="kpi-tile__label">{{ 'analytics.performanceKpi.finalizedEvals' | t }}</span>
+                  <strong class="kpi-tile__value">{{ perf.finalizedEvaluations }}</strong>
+                </article>
+                @if (perf.averageOverallEvaluationScoreFinalized != null) {
+                  <article class="kpi-tile kpi-tile--highlight">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.avgScore' | t }}</span>
+                    <strong class="kpi-tile__value">{{ perf.averageOverallEvaluationScoreFinalized | number: '1.0-2' }}</strong>
+                  </article>
+                }
+              </div>
+              @if (cycleChart().labels.length) {
+                <div class="chart-shell">
+                  <h3 class="chart-shell__title">{{ 'analytics.performanceKpi.chartByCycle' | t }}</h3>
+                  <div class="chart-shell__canvas">
+                    <app-chart-widget
+                      kind="line"
+                      [labels]="cycleChart().labels"
+                      [values]="cycleChart().values"
+                      [datasetLabel]="'analytics.performanceKpi.finalizedEvals' | t"
+                    />
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        <div class="kpis-dashboard__row">
+          @if (b.development; as dev) {
+            <section class="panel panel--accent-teal">
+              <div class="panel__head">
+                <span class="panel__dot"></span>
+                <h2 class="panel__title">{{ 'analytics.performanceKpi.section.development' | t }}</h2>
+              </div>
+              <div class="panel__body panel__body--stack">
+                <div class="kpi-strip kpi-strip--dense">
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.devPlansTotal' | t }}</span>
+                    <strong class="kpi-tile__value">{{ dev.totalDevelopmentPlans }}</strong>
+                  </article>
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.devPlansActive' | t }}</span>
+                    <strong class="kpi-tile__value">{{ dev.activeDevelopmentPlans }}</strong>
+                  </article>
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.devPlansCompleted' | t }}</span>
+                    <strong class="kpi-tile__value">{{ dev.completedDevelopmentPlans }}</strong>
+                  </article>
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.devItemsTotal' | t }}</span>
+                    <strong class="kpi-tile__value">{{ dev.totalDevelopmentPlanItems }}</strong>
+                  </article>
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.devItemsCompleted' | t }}</span>
+                    <strong class="kpi-tile__value">{{ dev.completedDevelopmentPlanItems }}</strong>
+                  </article>
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.devItemsInProgress' | t }}</span>
+                    <strong class="kpi-tile__value">{{ dev.inProgressDevelopmentPlanItems }}</strong>
+                  </article>
+                  @if (dev.averageProgressPercentageActiveItems != null) {
+                    <article class="kpi-tile kpi-tile--highlight">
+                      <span class="kpi-tile__label">{{ 'analytics.performanceKpi.devAvgProgress' | t }}</span>
+                      <strong class="kpi-tile__value">{{ dev.averageProgressPercentageActiveItems | number: '1.0-1' }}%</strong>
+                    </article>
+                  }
+                </div>
+                @if (developmentByTypeChart(); as c) {
+                  <div class="chart-shell chart-shell--grow">
+                    <h3 class="chart-shell__title">{{ 'analytics.performanceKpi.devByTypeChart' | t }}</h3>
+                    <div class="chart-shell__canvas">
+                      <app-chart-widget
+                        kind="doughnut"
+                        [labels]="c.labels"
+                        [values]="c.values"
+                        [datasetLabel]="'analytics.performanceKpi.devItemsTotal' | t"
+                      />
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
+          }
+
+          @if (b.marketplace; as m) {
+            <section class="panel panel--accent-sky">
+              <div class="panel__head">
+                <span class="panel__dot"></span>
+                <h2 class="panel__title">{{ 'analytics.performanceKpi.section.marketplace' | t }}</h2>
+              </div>
+              <div class="panel__body panel__body--stack">
+                <div class="kpi-strip kpi-strip--dense">
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.marketTotalOpp' | t }}</span>
+                    <strong class="kpi-tile__value">{{ m.totalMarketplaceOpportunities }}</strong>
+                  </article>
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.marketOpen' | t }}</span>
+                    <strong class="kpi-tile__value">{{ m.openOpportunities }}</strong>
+                  </article>
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.marketApplications' | t }}</span>
+                    <strong class="kpi-tile__value">{{ m.totalApplications }}</strong>
+                  </article>
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.marketSubmitted' | t }}</span>
+                    <strong class="kpi-tile__value">{{ m.submittedApplications }}</strong>
+                  </article>
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.marketAccepted' | t }}</span>
+                    <strong class="kpi-tile__value">{{ m.acceptedApplications }}</strong>
+                  </article>
+                  @if (m.averageMatchScore != null) {
+                    <article class="kpi-tile kpi-tile--highlight">
+                      <span class="kpi-tile__label">{{ 'analytics.performanceKpi.marketAvgMatch' | t }}</span>
+                      <strong class="kpi-tile__value">{{ m.averageMatchScore | number: '1.0-2' }}</strong>
+                    </article>
+                  }
+                </div>
+                @if (marketplaceByTypeChart(); as c) {
+                  <div class="chart-shell chart-shell--grow">
+                    <h3 class="chart-shell__title">{{ 'analytics.performanceKpi.marketByTypeChart' | t }}</h3>
+                    <div class="chart-shell__canvas">
+                      <app-chart-widget
+                        kind="pie"
+                        [labels]="c.labels"
+                        [values]="c.values"
+                        [datasetLabel]="'analytics.performanceKpi.marketTotalOpp' | t"
+                      />
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
+          }
+        </div>
+
+        <div class="kpis-dashboard__row">
+          @if (b.succession; as su) {
+            <section class="panel panel--accent-amber">
+              <div class="panel__head">
+                <span class="panel__dot"></span>
+                <h2 class="panel__title">{{ 'analytics.performanceKpi.section.succession' | t }}</h2>
+              </div>
+              <div class="panel__body">
+                <div class="kpi-strip kpi-strip--dense kpi-strip--fill">
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.criticalPositionsTotal' | t }}</span>
+                    <strong class="kpi-tile__value">{{ su.totalCriticalPositions }}</strong>
+                  </article>
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.criticalPositionsActive' | t }}</span>
+                    <strong class="kpi-tile__value">{{ su.activeCriticalPositions }}</strong>
+                  </article>
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.successionPlansTotal' | t }}</span>
+                    <strong class="kpi-tile__value">{{ su.totalSuccessionPlans }}</strong>
+                  </article>
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.successionPlansActive' | t }}</span>
+                    <strong class="kpi-tile__value">{{ su.activeSuccessionPlans }}</strong>
+                  </article>
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.readyNowPlans' | t }}</span>
+                    <strong class="kpi-tile__value">{{ su.plansWithReadyNowSuccessor }}</strong>
+                  </article>
+                  <article class="kpi-tile">
+                    <span class="kpi-tile__label">{{ 'analytics.performanceKpi.primarySuccessorPlans' | t }}</span>
+                    <strong class="kpi-tile__value">{{ su.plansWithPrimarySuccessor }}</strong>
+                  </article>
+                  @if (su.averageCoverageScore != null) {
+                    <article class="kpi-tile kpi-tile--highlight">
+                      <span class="kpi-tile__label">{{ 'analytics.performanceKpi.coverageScore' | t }}</span>
+                      <strong class="kpi-tile__value">{{ su.averageCoverageScore | number: '1.0-2' }}</strong>
+                    </article>
+                  }
+                </div>
+              </div>
+            </section>
+          }
+
+          @if (b.talent) {
+            <section class="panel panel--accent-rose">
+              <div class="panel__head">
+                <span class="panel__dot"></span>
+                <h2 class="panel__title">{{ 'analytics.performanceKpi.section.talent' | t }}</h2>
+              </div>
+              <div class="panel__body panel__body--chart-only">
+                @if (talentNineBoxChart(); as c) {
+                  <div class="chart-shell chart-shell--grow chart-shell--solo">
+                    <h3 class="chart-shell__title">{{ 'analytics.performanceKpi.talentNineBoxChart' | t }}</h3>
+                    <div class="chart-shell__canvas">
+                      <app-chart-widget kind="bar" [labels]="c.labels" [values]="c.values" [datasetLabel]="'nav.talentAnalytics' | t" />
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
+          }
+        </div>
+      </div>
+    }
+  }
+</section>

@@ -72,14 +72,46 @@ a.exec__back {
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
 
+/* موحّد داخل كل عمود: صفّان × عمودان للأرقام الأقل */
+.exec__kpi-grid--panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  flex: 1;
+  align-content: start;
+}
+
+/* مواهب: 3 أعمدة من اللوحي فما فوق = صفّان فقط، يتوازن مع باقي المجموعات */
+.exec__kpi-grid--talent {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  flex: 1;
+}
+@media (min-width: 640px) {
+  .exec__kpi-grid--talent {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* لوحة الذكاء: 3 مؤشرات في صف واحد على العرض الكافي */
+.exec__kpi-grid--panel-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 520px) {
+  .exec__kpi-grid--panel-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .exec__kpi {
   position: relative;
   overflow: hidden;
-  padding: 1rem 1.05rem;
-  border-radius: var(--radius-lg, 18px);
-  border: 1px solid var(--color-border);
-  background: var(--color-card);
-  box-shadow: var(--shadow-sm);
+  padding: 0.85rem 0.9rem;
+  border-radius: 14px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.92) 100%);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
@@ -174,4 +206,213 @@ a.exec__back {
   100% {
     background-position: 0 50%;
   }
+}
+
+/* —— Full dashboard —— */
+.exec-dash {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.exec-dash__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.exec-dash__heading {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.exec-dash__sub {
+  margin: -0.35rem 0 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  line-height: 1.45;
+  max-width: 48rem;
+}
+
+.exec-dash__groups {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+}
+
+@media (min-width: 768px) {
+  .exec-dash__groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* أربع مجموعات في صف واحد من اللابتوب المعتاد فما فوق */
+@media (min-width: 992px) {
+  .exec-dash__groups {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.exec-dash__group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100%;
+  padding: 1rem 1.1rem 1.1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(241, 245, 249, 0.55) 100%);
+  box-shadow:
+    0 4px 20px rgba(15, 23, 42, 0.05),
+    0 1px 0 rgba(255, 255, 255, 0.8) inset;
+}
+
+.exec-dash__group--talent {
+  border-top: 3px solid #6366f1;
+}
+.exec-dash__group--performance {
+  border-top: 3px solid #0ea5e9;
+}
+.exec-dash__group--programs {
+  border-top: 3px solid #14b8a6;
+}
+.exec-dash__group--intelligence {
+  border-top: 3px solid #a855f7;
+}
+
+.exec-dash__group-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+  opacity: 0.88;
+}
+
+.exec-bento {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.exec-bento__cell {
+  min-width: 0;
+}
+
+.exec-bento__cell--full {
+  grid-column: span 12;
+}
+
+.exec-bento__cell--third {
+  grid-column: span 4;
+}
+
+.exec-bento__cell--half {
+  grid-column: span 6;
+}
+
+@media (max-width: 1024px) {
+  .exec-bento__cell--third {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 720px) {
+  .exec-bento__cell--third,
+  .exec-bento__cell--half {
+    grid-column: span 12;
+  }
+}
+
+.exec-chart {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 280px;
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 250, 252, 0.94) 55%, rgba(238, 242, 255, 0.35) 100%);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+}
+
+.exec-chart--hero {
+  min-height: 320px;
+  border-top: 3px solid #4f46e5;
+}
+
+.exec-chart__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.55rem;
+}
+
+.exec-chart__titles {
+  flex: 1;
+  min-width: min(100%, 220px);
+}
+
+.exec-chart__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 750;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.exec-chart__caption {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--color-muted);
+  max-width: 36rem;
+}
+
+.exec-chart__modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.exec-chart__mode {
+  border: 1px solid var(--color-border);
+  background: rgba(248, 250, 252, 0.9);
+  color: var(--color-text);
+  font-size: 0.72rem;
+  font-weight: 650;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.exec-chart__mode:hover {
+  border-color: rgba(99, 102, 241, 0.35);
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.exec-chart__mode--on {
+  border-color: rgba(79, 70, 229, 0.45);
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(14, 165, 233, 0.08));
+  color: #3730a3;
+}
+
+.exec-chart__canvas {
+  flex: 1;
+  min-height: 220px;
+  position: relative;
+}
+
+.exec-chart__canvas--tall {
+  min-height: 260px;
 }

@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.OpenApi;
+using QuestPDF.Infrastructure;
 using TalentSystem.Shared.Api;
 using TalentSystem.Api.Middleware;
 using TalentSystem.Application.DependencyInjection;
@@ -16,6 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration);
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 var trimmedOrigins = corsOrigins

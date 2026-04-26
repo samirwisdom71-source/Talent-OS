@@ -7,6 +7,11 @@ public sealed class TalentAnalyticsFilterRequest
     public Guid? PerformanceCycleId { get; set; }
 
     public Guid? OrganizationUnitId { get; set; }
+
+    /// <summary>Optional inclusive UTC bounds for classifications (ClassifiedOnUtc).</summary>
+    public DateTime? FromUtc { get; set; }
+
+    public DateTime? ToUtc { get; set; }
 }
 
 public sealed class TalentDistributionSummaryDto

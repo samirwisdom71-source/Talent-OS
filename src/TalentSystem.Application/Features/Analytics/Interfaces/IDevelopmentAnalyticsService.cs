@@ -5,5 +5,7 @@ namespace TalentSystem.Application.Features.Analytics.Interfaces;
 
 public interface IDevelopmentAnalyticsService
 {
-    Task<Result<DevelopmentAnalyticsSummaryDto>> GetSummaryAsync(CancellationToken cancellationToken = default);
+    Task<Result<DevelopmentAnalyticsSummaryDto>> GetSummaryAsync(
+        AnalyticsDateRangeFilter? dateRange = null,
+        CancellationToken cancellationToken = default);
 }

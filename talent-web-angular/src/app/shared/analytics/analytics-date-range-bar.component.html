@@ -1,0 +1,44 @@
+<div
+  class="date-range-bar"
+  [class.date-range-bar--executive]="variant() === 'executive'"
+  [class.date-range-bar--kpis]="variant() === 'kpis'"
+  role="search"
+>
+  <div class="date-range-bar__head">
+    <span class="date-range-bar__eyebrow">{{ 'analytics.dateRange.eyebrow' | t }}</span>
+    <p class="date-range-bar__hint">{{ hintKey() | t }}</p>
+  </div>
+  <div class="date-range-bar__row">
+    <label class="date-range-bar__field">
+      <span class="date-range-bar__label">{{ 'analytics.dateRange.from' | t }}</span>
+      <input
+        class="date-range-bar__input"
+        type="date"
+        [value]="draftFrom()"
+        (change)="setFrom($event)"
+        autocomplete="off"
+      />
+    </label>
+    <label class="date-range-bar__field">
+      <span class="date-range-bar__label">{{ 'analytics.dateRange.to' | t }}</span>
+      <input
+        class="date-range-bar__input"
+        type="date"
+        [value]="draftTo()"
+        (change)="setTo($event)"
+        autocomplete="off"
+      />
+    </label>
+    <div class="date-range-bar__actions">
+      <button type="button" class="date-range-bar__btn date-range-bar__btn--primary" (click)="apply()">
+        {{ 'analytics.dateRange.apply' | t }}
+      </button>
+      <button type="button" class="date-range-bar__btn" (click)="clear()">
+        {{ 'analytics.dateRange.clear' | t }}
+      </button>
+    </div>
+  </div>
+  @if (invalidOrder()) {
+    <p class="date-range-bar__error">{{ 'analytics.dateRange.invalidOrder' | t }}</p>
+  }
+</div>

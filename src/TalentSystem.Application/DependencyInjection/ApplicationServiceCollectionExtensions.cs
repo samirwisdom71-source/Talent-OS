@@ -33,6 +33,8 @@ using TalentSystem.Application.Features.Notifications.Interfaces;
 using TalentSystem.Application.Features.Notifications.Services;
 using TalentSystem.Application.Features.Intelligence.Interfaces;
 using TalentSystem.Application.Features.Intelligence.Services;
+using TalentSystem.Application.Features.Reports.Interfaces;
+using TalentSystem.Application.Features.Reports.Services;
 
 namespace TalentSystem.Application.DependencyInjection;
 
@@ -92,8 +94,11 @@ public static class ApplicationServiceCollectionExtensions
 
         services.AddScoped<INotificationService, NotificationService>();
 
+
         services.AddScoped<IIntelligenceProvider, RulesBasedIntelligenceProvider>();
         services.AddScoped<IIntelligenceService, IntelligenceService>();
+        services.AddScoped<ISystemReportService, SystemReportService>();
+        services.AddScoped<ISystemReportExportService, SystemReportExportService>();
 
         return services;
     }

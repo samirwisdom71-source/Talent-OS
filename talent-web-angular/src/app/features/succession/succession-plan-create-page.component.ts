@@ -17,7 +17,7 @@ import { EnumLabels, UiLang } from '../../shared/utils/enum-labels';
   standalone: true,
   imports: [RouterLink, FormsModule, TranslatePipe],
   templateUrl: './succession-plan-create-page.component.html',
-  styleUrl: '../development/development-create-page.component.scss',
+  styleUrl: './succession-plan-create-page.component.scss',
 })
 export class SuccessionPlanCreatePageComponent implements OnInit {
   private readonly api = inject(SuccessionApiService);

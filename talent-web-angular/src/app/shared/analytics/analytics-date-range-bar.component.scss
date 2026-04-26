@@ -1,0 +1,183 @@
+.date-range-bar {
+  position: relative;
+  padding: 1rem 1.15rem 1.1rem;
+  border-radius: 18px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.date-range-bar__head {
+  margin-bottom: 0.75rem;
+}
+
+.date-range-bar__eyebrow {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 0.35rem;
+  opacity: 0.9;
+}
+
+.date-range-bar__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  line-height: 1.5;
+  max-width: 52rem;
+}
+
+.date-range-bar__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem 1.25rem;
+}
+
+.date-range-bar__field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem 0.65rem;
+  min-width: 0;
+}
+
+.date-range-bar__label {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--color-muted);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.date-range-bar--kpis .date-range-bar__label {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.date-range-bar__input {
+  min-width: 11rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  background: rgba(255, 255, 255, 0.98);
+  color: var(--color-text);
+  font-size: 0.88rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.date-range-bar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-inline-start: auto;
+  align-items: center;
+}
+
+.date-range-bar__btn {
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--color-text);
+  font-size: 0.8rem;
+  font-weight: 650;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.12s ease;
+}
+
+.date-range-bar__btn:hover {
+  border-color: rgba(99, 102, 241, 0.35);
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.date-range-bar__btn--primary {
+  border-color: rgba(79, 70, 229, 0.42);
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.16), rgba(14, 165, 233, 0.1));
+  color: #312e81;
+}
+
+.date-range-bar__btn--primary:hover {
+  transform: translateY(-1px);
+}
+
+.date-range-bar__error {
+  margin: 0.55rem 0 0;
+  font-size: 0.78rem;
+  color: #b91c1c;
+}
+
+/* —— KPIs page: same family as analytics-page hero / panels —— */
+.date-range-bar--kpis {
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(248, 250, 252, 0.94) 100%);
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.date-range-bar--kpis::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 4px;
+  border-radius: 18px 18px 0 0;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6 40%, #0ea5e9 85%, #22d3ee);
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+.date-range-bar--kpis .date-range-bar__head {
+  padding-top: 0.2rem;
+}
+
+/* —— Executive page: align with exec hero / dash groups —— */
+.date-range-bar--executive {
+  border: 1px solid rgba(99, 102, 241, 0.22);
+  background: linear-gradient(115deg, rgba(79, 70, 229, 0.08) 0%, rgba(14, 165, 233, 0.07) 50%, rgba(20, 184, 166, 0.05) 100%);
+  box-shadow: var(--shadow-md, 0 4px 18px rgba(15, 23, 42, 0.07));
+}
+
+.date-range-bar--executive::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 4px;
+  border-radius: 18px 18px 0 0;
+  background: linear-gradient(90deg, #4f46e5, #6366f1 45%, #0ea5e9);
+  pointer-events: none;
+}
+
+.date-range-bar--executive .date-range-bar__eyebrow {
+  color: #4338ca;
+  opacity: 1;
+}
+
+.date-range-bar--executive .date-range-bar__input {
+  border-color: rgba(99, 102, 241, 0.2);
+  background: rgba(255, 255, 255, 0.94);
+}
+
+@media (max-width: 640px) {
+  .date-range-bar__actions {
+    margin-inline-start: 0;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .date-range-bar__field {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+  }
+
+  .date-range-bar__input {
+    flex: 1;
+    min-width: 0;
+  }
+}

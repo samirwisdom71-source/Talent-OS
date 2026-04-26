@@ -80,15 +80,14 @@
 
 <section class="filter-bar">
   <div class="filter-bar__group">
-    <label class="field">
-      <span>{{ 'الموظف' | t }}</span>
-      <select [(ngModel)]="employeeId">
-        <option value="">{{ 'development.filter.allEmployees' | t }}</option>
-        @for (item of employees(); track item.id) {
-          <option [value]="item.id">{{ item.name }}</option>
-        }
-      </select>
-    </label>
+    <div class="filter-bar__employee">
+      <app-lookup-search-combo
+        kind="employee"
+        [(value)]="employeeId"
+        [label]="('الموظف' | t)"
+        [placeholder]="('development.filter.searchEmployee' | t)"
+      />
+    </div>
     <label class="field">
       <span>{{ 'الدورة' | t }}</span>
       <select [(ngModel)]="performanceCycleId">

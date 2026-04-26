@@ -1,0 +1,21 @@
+@use '../development/development-create-page.component.scss';
+
+:host {
+  --succ-primary: #7c3aed;
+  --succ-primary-2: #d97706;
+  --succ-accent: #0ea5e9;
+}
+
+.create-aside .aside-card {
+  background: radial-gradient(140% 140% at 0% 0%, #d97706, #7c3aed 55%, #1e1b4b 110%);
+  box-shadow: 0 20px 40px -20px rgba(124, 58, 237, 0.45);
+
+  &::after {
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.35), transparent 60%);
+  }
+}
+
+.create-head__eyebrow {
+  color: var(--succ-primary);
+  background: rgba(124, 58, 237, 0.1);
+}

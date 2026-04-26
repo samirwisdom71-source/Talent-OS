@@ -5,5 +5,7 @@ namespace TalentSystem.Application.Features.Analytics.Interfaces;
 
 public interface IMarketplaceAnalyticsService
 {
-    Task<Result<MarketplaceAnalyticsSummaryDto>> GetSummaryAsync(CancellationToken cancellationToken = default);
+    Task<Result<MarketplaceAnalyticsSummaryDto>> GetSummaryAsync(
+        AnalyticsDateRangeFilter? dateRange = null,
+        CancellationToken cancellationToken = default);
 }

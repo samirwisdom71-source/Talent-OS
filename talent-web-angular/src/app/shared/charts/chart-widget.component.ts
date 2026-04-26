@@ -7,9 +7,13 @@ import {
   OnDestroy,
   SimpleChanges,
   ViewChild,
+  effect,
+  inject,
 } from '@angular/core';
+import type { ChartOptions } from 'chart.js';
+import { I18nService } from '../services/i18n.service';
 
-export type ChartWidgetKind = 'doughnut' | 'bar';
+export type ChartWidgetKind = 'doughnut' | 'bar' | 'line' | 'pie';
 
 @Component({
   selector: 'app-chart-widget',
@@ -30,6 +34,8 @@ export type ChartWidgetKind = 'doughnut' | 'bar';
 export class ChartWidgetComponent implements AfterViewInit, OnChanges, OnDestroy {
   private static chartRegistered = false;
 
+  private readonly i18n = inject(I18nService);
+
   @ViewChild('cv') canvasRef?: ElementRef<HTMLCanvasElement>;
 
   @Input({ required: true }) kind!: ChartWidgetKind;
@@ -41,6 +47,15 @@ export class ChartWidgetComponent implements AfterViewInit, OnChanges, OnDestroy
 
   private chart: import('chart.js').Chart | null = null;
   private viewReady = false;
+
+  constructor() {
+    effect(() => {
+      this.i18n.lang();
+      if (!this.viewReady || !this.canvasRef?.nativeElement) return;
+      if (!this.labels?.length || !this.values?.length) return;
+      void this.render();
+    });
+  }
 
   ngAfterViewInit(): void {
     this.viewReady = true;
@@ -63,6 +78,27 @@ export class ChartWidgetComponent implements AfterViewInit, OnChanges, OnDestroy
     this.chart = null;
   }
 
+  private layoutOptions(): ChartOptions {
+    const rtl = this.i18n.isRtl();
+    const locale = this.i18n.lang() === 'ar' ? 'ar' : 'en-US';
+    return {
+      locale,
+      animation: { duration: 900, easing: 'easeOutQuart' },
+      plugins: {
+        tooltip: {
+          rtl,
+          textDirection: rtl ? 'rtl' : 'ltr',
+        },
+        legend: {
+          rtl,
+          labels: {
+            textAlign: rtl ? 'right' : 'left',
+          },
+        },
+      },
+    } as ChartOptions;
+  }
+
   private async render(): Promise<void> {
     const el = this.canvasRef?.nativeElement;
     if (!el || !this.labels?.length || !this.values?.length) return;
@@ -81,6 +117,10 @@ export class ChartWidgetComponent implements AfterViewInit, OnChanges, OnDestroy
       Filler,
       DoughnutController,
       BarController,
+      LineController,
+      PointElement,
+      LineElement,
+      PieController,
     } = mod;
 
     if (!ChartWidgetComponent.chartRegistered) {
@@ -95,19 +135,25 @@ export class ChartWidgetComponent implements AfterViewInit, OnChanges, OnDestroy
         Filler,
         DoughnutController,
         BarController,
+        LineController,
+        PointElement,
+        LineElement,
+        PieController,
       );
       ChartWidgetComponent.chartRegistered = true;
     }
 
     const defaultColors =
       this.colors ??
-      (this.kind === 'doughnut'
+      (this.kind === 'doughnut' || this.kind === 'pie'
         ? ['#6366f1', '#0ea5e9', '#14b8a6', '#8b5cf6', '#f59e0b', '#ec4899', '#64748b', '#22c55e', '#3b82f6']
         : ['#4f46e5', '#0d9488', '#7c3aed', '#ea580c']);
 
-    if (this.kind === 'doughnut') {
+    const layout = this.layoutOptions();
+
+    if (this.kind === 'doughnut' || this.kind === 'pie') {
       this.chart = new Chart(el, {
-        type: 'doughnut',
+        type: this.kind === 'pie' ? 'pie' : 'doughnut',
         data: {
           labels: this.labels,
           datasets: [
@@ -121,13 +167,68 @@ export class ChartWidgetComponent implements AfterViewInit, OnChanges, OnDestroy
           ],
         },
         options: {
+          ...layout,
           responsive: true,
           maintainAspectRatio: false,
-          animation: { duration: 900, easing: 'easeOutQuart' },
           plugins: {
+            ...layout.plugins,
             legend: {
+              ...layout.plugins?.legend,
               position: 'bottom',
-              labels: { usePointStyle: true, padding: 14, font: { size: 11 } },
+              labels: {
+                ...layout.plugins?.legend?.labels,
+                usePointStyle: true,
+                padding: 14,
+                font: { size: 11 },
+              },
+            },
+          },
+        },
+      });
+      return;
+    }
+
+    if (this.kind === 'line') {
+      this.chart = new Chart(el, {
+        type: 'line',
+        data: {
+          labels: this.labels,
+          datasets: [
+            {
+              label: this.datasetLabel || '—',
+              data: this.values,
+              borderColor: defaultColors[0] ?? '#4f46e5',
+              backgroundColor: `${defaultColors[0] ?? '#4f46e5'}22`,
+              fill: true,
+              tension: 0.35,
+              pointRadius: 3,
+              pointHoverRadius: 5,
+            },
+          ],
+        },
+        options: {
+          ...layout,
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { font: { size: 11 } },
+            },
+            y: { beginAtZero: true, grid: { color: 'rgba(148, 163, 184, 0.2)' }, ticks: { precision: 0 } },
+          },
+          plugins: {
+            ...layout.plugins,
+            legend: {
+              ...layout.plugins?.legend,
+              display: true,
+              position: 'bottom',
+              labels: {
+                ...layout.plugins?.legend?.labels,
+                usePointStyle: true,
+                padding: 10,
+                font: { size: 10 },
+              },
             },
           },
         },
@@ -151,9 +252,9 @@ export class ChartWidgetComponent implements AfterViewInit, OnChanges, OnDestroy
         ],
       },
       options: {
+        ...layout,
         responsive: true,
         maintainAspectRatio: false,
-        animation: { duration: 900, easing: 'easeOutQuart' },
         scales: {
           x: {
             grid: { display: false },
@@ -166,6 +267,7 @@ export class ChartWidgetComponent implements AfterViewInit, OnChanges, OnDestroy
           },
         },
         plugins: {
+          ...layout.plugins,
           legend: { display: false },
         },
       },

@@ -20,9 +20,18 @@ export interface TalentDistributionSummaryDto {
   byCategoryName: readonly NamedCountDto[];
 }
 
+/** Optional inclusive UTC bounds for analytics summary endpoints (query: fromUtc, toUtc). */
+export interface AnalyticsDateRangeQuery {
+  fromUtc?: string;
+  toUtc?: string;
+}
+
 export interface TalentAnalyticsFilterRequest {
   performanceCycleId?: string | null;
   organizationUnitId?: string | null;
+  /** Filter classifications where ClassifiedOnUtc is in this UTC range (both required if used). */
+  fromUtc?: string | null;
+  toUtc?: string | null;
 }
 
 export interface TalentClassificationByCycleSummaryDto {
@@ -88,6 +97,7 @@ export interface MarketplaceAnalyticsSummaryDto {
 export interface PerformanceCycleAnalyticsBreakdownDto {
   performanceCycleId: string;
   performanceCycleNameEn: string;
+  performanceCycleNameAr?: string;
   totalGoals: number;
   completedGoals: number;
   totalEvaluations: number;
@@ -104,4 +114,35 @@ export interface PerformanceAnalyticsSummaryDto {
   finalizedEvaluations: number;
   averageOverallEvaluationScoreFinalized?: number | null;
   breakdownByCycle: readonly PerformanceCycleAnalyticsBreakdownDto[];
+}
+
+export interface PerformanceImpactFilterRequest {
+  beforeFromUtc?: string | null;
+  beforeToUtc?: string | null;
+  afterFromUtc?: string | null;
+  afterToUtc?: string | null;
+}
+
+export interface PerformanceImpactSummaryDto {
+  beforeFromUtc: string;
+  beforeToUtc: string;
+  afterFromUtc: string;
+  afterToUtc: string;
+  beforeFinalizedEvaluations: number;
+  afterFinalizedEvaluations: number;
+  beforeAverageScore?: number | null;
+  afterAverageScore?: number | null;
+  scoreDelta?: number | null;
+  beforeGoalCompletionRate: number;
+  afterGoalCompletionRate: number;
+  goalCompletionRateDelta: number;
+  /** Present when API returns extended impact payload. */
+  beforeDevelopmentPlansCreated?: number;
+  afterDevelopmentPlansCreated?: number;
+  beforeSuccessionPlansCreated?: number;
+  afterSuccessionPlansCreated?: number;
+  beforeMarketplaceApplications?: number;
+  afterMarketplaceApplications?: number;
+  beforeTalentClassifications?: number;
+  afterTalentClassifications?: number;
 }

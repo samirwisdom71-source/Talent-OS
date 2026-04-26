@@ -20,10 +20,14 @@ public sealed class SuccessionAnalyticsController : ControllerBase
 
     [HttpGet("summary")]
     [ProducesResponseType(typeof(ApiResponse<SuccessionAnalyticsSummaryDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetSummary(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetSummary(
+        [FromQuery] DateTime? fromUtc,
+        [FromQuery] DateTime? toUtc,
+        CancellationToken cancellationToken)
     {
         var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-        var result = await _analytics.GetSummaryAsync(cancellationToken);
+        var dateRange = AnalyticsDateRangeFilter.FromOptional(fromUtc, toUtc);
+        var result = await _analytics.GetSummaryAsync(dateRange, cancellationToken);
         return result.ToApiActionResult(this, traceId);
     }
 }

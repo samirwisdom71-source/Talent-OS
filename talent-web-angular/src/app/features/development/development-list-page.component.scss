@@ -198,6 +198,15 @@
   box-shadow: var(--dev-shadow-sm);
 
   &__group { display: flex; flex-wrap: wrap; gap: 12px; flex: 1; min-width: 240px; }
+  &__employee {
+    flex: 1.15;
+    min-width: min(100%, 260px);
+    max-width: 440px;
+    app-lookup-search-combo {
+      display: block;
+      width: 100%;
+    }
+  }
   &__actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 }
 

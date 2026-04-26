@@ -1,0 +1,102 @@
+<div class="report-page">
+  <header class="report-page__hero">
+    <div>
+      <h1 class="report-page__title">{{ 'reports.system.title' | t }}</h1>
+      <p class="report-page__lead">{{ 'reports.system.subtitle' | t }}</p>
+    </div>
+    @if (report(); as data) {
+      <div class="report-page__hero-meta">
+        <span>{{ 'reports.system.meta.tables' | t }}: {{ data.totalTables }}</span>
+        <span>{{ 'reports.system.meta.records' | t }}: {{ data.totalRecords }}</span>
+        <span>{{ 'reports.system.meta.generated' | t }}: {{ data.generatedOnUtc | date: 'yyyy-MM-dd HH:mm' }}</span>
+      </div>
+    }
+  </header>
+
+  <section class="report-page__toolbar">
+    <div class="report-page__filters">
+      <label class="report-page__field">
+        <span>{{ 'reports.system.filters.from' | t }}</span>
+        <input
+          type="date"
+          [ngModel]="filter().fromUtc"
+          (ngModelChange)="updateFromDate($event)"
+        />
+      </label>
+
+      <label class="report-page__field">
+        <span>{{ 'reports.system.filters.to' | t }}</span>
+        <input
+          type="date"
+          [ngModel]="filter().toUtc"
+          (ngModelChange)="updateToDate($event)"
+        />
+      </label>
+
+      <label class="report-page__field report-page__field--small">
+        <span>{{ 'reports.system.filters.months' | t }}</span>
+        <input
+          type="number"
+          min="1"
+          max="24"
+          [ngModel]="filter().chartMonths"
+          (ngModelChange)="updateChartMonths($event)"
+        />
+      </label>
+    </div>
+
+    <div class="report-page__actions">
+      <button type="button" class="btn btn--ghost" (click)="clearFilter()">
+        {{ 'reports.system.actions.reset' | t }}
+      </button>
+      <button type="button" class="btn btn--primary" [disabled]="loading()" (click)="applyFilter()">
+        {{ 'reports.system.actions.apply' | t }}
+      </button>
+      <button type="button" class="btn btn--dark" [disabled]="exportingPdf()" (click)="exportPdf()">
+        {{ exportingPdf() ? ('reports.system.actions.exportingPdf' | t) : ('reports.system.actions.exportPdf' | t) }}
+      </button>
+      <button type="button" class="btn btn--dark" [disabled]="exportingExcel()" (click)="exportExcel()">
+        {{
+          exportingExcel() ? ('reports.system.actions.exportingExcel' | t) : ('reports.system.actions.exportExcel' | t)
+        }}
+      </button>
+    </div>
+  </section>
+
+  @if (failed()) {
+    <app-empty-state
+      [chartIcon]="true"
+      [title]="'reports.system.loadFailed' | t"
+      [message]="'reports.system.loadFailedHint' | t"
+      [retryLabel]="'common.retry' | t"
+      (retryClick)="applyFilter()"
+    />
+  } @else if (loading()) {
+    <div class="report-page__skeleton-grid">
+      @for (x of [1, 2, 3, 4, 5, 6]; track x) {
+        <div class="report-page__skeleton"></div>
+      }
+    </div>
+  } @else if (chartCards().length === 0) {
+    <app-empty-state
+      [chartIcon]="true"
+      [title]="'reports.system.noData.title' | t"
+      [message]="'reports.system.noData.hint' | t"
+    />
+  } @else {
+    <section class="report-page__charts">
+      @for (card of chartCards(); track card.title + card.subtitle) {
+        <article class="chart-card">
+          <div class="chart-card__head">
+            <div>
+              <h3>{{ card.title }}</h3>
+              <p>{{ card.subtitle }}</p>
+            </div>
+            <span class="chart-card__total">{{ card.total }}</span>
+          </div>
+          <app-chart-widget [kind]="card.kind" [labels]="card.labels" [values]="card.values" [datasetLabel]="card.title" />
+        </article>
+      }
+    </section>
+  }
+</div>

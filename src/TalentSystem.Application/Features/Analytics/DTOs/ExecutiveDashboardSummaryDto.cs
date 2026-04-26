@@ -1,3 +1,5 @@
+using TalentSystem.Domain.Enums;
+
 namespace TalentSystem.Application.Features.Analytics.DTOs;
 
 public sealed class ExecutiveDashboardSummaryDto
@@ -24,4 +26,59 @@ public sealed class ExecutiveDashboardSummaryDto
     public int OpenMarketplaceOpportunityCount { get; init; }
 
     public int ActiveDevelopmentPlanCount { get; init; }
+
+    public int TotalPerformanceGoals { get; init; }
+
+    public int CompletedPerformanceGoals { get; init; }
+
+    public int FinalizedEvaluationCount { get; init; }
+
+    public int PendingApprovalCount { get; init; }
+
+    public int TalentInsightCount { get; init; }
+
+    public int TalentRecommendationCount { get; init; }
+
+    public int TotalMarketplaceApplicationCount { get; init; }
+
+    public IReadOnlyList<NineBoxDistributionItemDto> NineBoxDistribution { get; init; } =
+        Array.Empty<NineBoxDistributionItemDto>();
+
+    public IReadOnlyList<EnumCountDto<PerformanceBand>> ByPerformanceBand { get; init; } =
+        Array.Empty<EnumCountDto<PerformanceBand>>();
+
+    public IReadOnlyList<EnumCountDto<PotentialBand>> ByPotentialBand { get; init; } =
+        Array.Empty<EnumCountDto<PotentialBand>>();
+
+    public IReadOnlyList<NamedCountDto> TopTalentCategories { get; init; } = Array.Empty<NamedCountDto>();
+
+    public IReadOnlyList<ExecutiveCycleSnapshotDto> PerformanceByCycle { get; init; } =
+        Array.Empty<ExecutiveCycleSnapshotDto>();
+
+    public IReadOnlyList<ExecutiveCodeCountDto> DevelopmentItemsByType { get; init; } =
+        Array.Empty<ExecutiveCodeCountDto>();
+
+    public IReadOnlyList<ExecutiveCodeCountDto> MarketplaceOpportunitiesByType { get; init; } =
+        Array.Empty<ExecutiveCodeCountDto>();
+
+    public IReadOnlyList<EnumCountDto<ReadinessLevel>> SuccessorReadiness { get; init; } =
+        Array.Empty<EnumCountDto<ReadinessLevel>>();
+}
+
+public sealed class ExecutiveCycleSnapshotDto
+{
+    public Guid PerformanceCycleId { get; init; }
+
+    public string PerformanceCycleNameEn { get; init; } = string.Empty;
+
+    public string PerformanceCycleNameAr { get; init; } = string.Empty;
+
+    public int FinalizedEvaluations { get; init; }
+}
+
+public sealed class ExecutiveCodeCountDto
+{
+    public int Code { get; init; }
+
+    public int Count { get; init; }
 }

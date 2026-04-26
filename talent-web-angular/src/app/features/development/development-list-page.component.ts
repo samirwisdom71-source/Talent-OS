@@ -3,9 +3,11 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { DevelopmentPlansApiService } from '../../services/development-plans-api.service';
 import { DomainAnalyticsApiService } from '../../services/domain-analytics-api.service';
+import { EmployeesApiService } from '../../services/employees-api.service';
 import { IdentityLookupsApiService } from '../../services/identity-lookups-api.service';
 import { PerformanceCyclesApiService } from '../../services/performance-cycles-api.service';
 import { PagedResult } from '../../shared/models/api.types';
@@ -16,13 +18,14 @@ import { PermissionCodes } from '../../shared/models/permission-codes';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { I18nService } from '../../shared/services/i18n.service';
 import { EnumLabels, UiLang } from '../../shared/utils/enum-labels';
+import { LookupSearchComboComponent } from '../../shared/ui/lookup-search-combo.component';
 
 type ViewMode = 'table' | 'cards';
 
 @Component({
   selector: 'app-development-list-page',
   standalone: true,
-  imports: [RouterLink, DecimalPipe, FormsModule, TranslatePipe],
+  imports: [RouterLink, DecimalPipe, FormsModule, TranslatePipe, LookupSearchComboComponent],
   templateUrl: './development-list-page.component.html',
   styleUrl: './development-list-page.component.scss',
 })
@@ -30,6 +33,7 @@ export class DevelopmentListPageComponent implements OnInit {
   private readonly api = inject(DevelopmentPlansApiService);
   private readonly analytics = inject(DomainAnalyticsApiService);
   private readonly lookups = inject(IdentityLookupsApiService);
+  private readonly employeesApi = inject(EmployeesApiService);
   private readonly cyclesApi = inject(PerformanceCyclesApiService);
   readonly auth = inject(AuthService);
   readonly i18n = inject(I18nService);
@@ -39,7 +43,8 @@ export class DevelopmentListPageComponent implements OnInit {
   readonly summary = signal<DevelopmentAnalyticsSummaryDto | null>(null);
   readonly failed = signal(false);
   readonly summaryFailed = signal(false);
-  readonly employees = signal<LookupItemDto[]>([]);
+  /** أسماء موظفين معروفة (لوكاب أولية + تعبئة من الصفحة) */
+  readonly employeeNames = signal<Map<string, string>>(new Map());
   readonly cycles = signal<LookupItemDto[]>([]);
   readonly busy = signal(false);
 
@@ -56,13 +61,45 @@ export class DevelopmentListPageComponent implements OnInit {
   }
 
   loadLookups(): void {
-    this.lookups.getEmployees('', 200).subscribe({
-      next: (items) => this.employees.set(items),
-      error: () => this.employees.set([]),
+    this.lookups.getEmployees('', 400).subscribe({
+      next: (items) => this.mergeEmployeeNames(items.map((x) => [x.id, x.name] as const)),
+      error: () => {},
     });
     this.cyclesApi.getLookup({ take: 200, lang: this.i18n.lang() }).subscribe({
       next: (items) => this.cycles.set(items),
       error: () => this.cycles.set([]),
+    });
+  }
+
+  private mergeEmployeeNames(entries: ReadonlyArray<readonly [string, string]>): void {
+    if (!entries.length) return;
+    const m = new Map(this.employeeNames());
+    for (const [id, name] of entries) {
+      if (id && name) m.set(id, name);
+    }
+    this.employeeNames.set(m);
+  }
+
+  private hydrateEmployeeNamesFromPlans(plans: readonly DevelopmentPlanDto[]): void {
+    const ids = [...new Set(plans.map((p) => p.employeeId).filter(Boolean))];
+    const m = this.employeeNames();
+    const missing = ids.filter((id) => !m.has(id));
+    if (!missing.length) return;
+    forkJoin(
+      missing.map((id) => this.employeesApi.getById(id).pipe(catchError(() => of(null)))),
+    ).subscribe((rows) => {
+      const next = new Map(this.employeeNames());
+      missing.forEach((id, i) => {
+        const r = rows[i];
+        if (r) {
+          const label =
+            this.i18n.lang() === 'ar'
+              ? r.fullNameAr?.trim() || r.fullNameEn?.trim()
+              : r.fullNameEn?.trim() || r.fullNameAr?.trim();
+          if (label) next.set(id, label);
+        }
+      });
+      this.employeeNames.set(next);
     });
   }
 
@@ -92,6 +129,7 @@ export class DevelopmentListPageComponent implements OnInit {
       .subscribe({
         next: (plans) => {
           this.data.set(plans);
+          this.hydrateEmployeeNamesFromPlans(plans.items);
           this.busy.set(false);
           this.failed.set(false);
         },
@@ -121,7 +159,7 @@ export class DevelopmentListPageComponent implements OnInit {
   }
 
   employeeName(id: string): string {
-    return this.employees().find((e) => e.id === id)?.name || id;
+    return this.employeeNames().get(id) || id;
   }
 
   sourceType(v: number): string {
@@ -144,6 +182,7 @@ export class DevelopmentListPageComponent implements OnInit {
     }).subscribe({
       next: ({ plans, dev }) => {
         this.data.set(plans);
+        this.hydrateEmployeeNamesFromPlans(plans.items);
         this.summary.set(dev);
         this.busy.set(false);
         this.failed.set(false);

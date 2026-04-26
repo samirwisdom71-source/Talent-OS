@@ -1,4 +1,6 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using TalentSystem.Application.Features.Analytics;
 using TalentSystem.Application.Features.Analytics.DTOs;
 using TalentSystem.Application.Features.Analytics.Interfaces;
 using TalentSystem.Domain.Enums;
@@ -10,16 +12,38 @@ namespace TalentSystem.Application.Features.Analytics.Services;
 public sealed class DevelopmentAnalyticsService : IDevelopmentAnalyticsService
 {
     private readonly TalentDbContext _db;
+    private readonly IValidator<AnalyticsDateRangeFilter> _dateRangeValidator;
 
-    public DevelopmentAnalyticsService(TalentDbContext db)
+    public DevelopmentAnalyticsService(
+        TalentDbContext db,
+        IValidator<AnalyticsDateRangeFilter> dateRangeValidator)
     {
         _db = db;
+        _dateRangeValidator = dateRangeValidator;
     }
 
-    public async Task<Result<DevelopmentAnalyticsSummaryDto>> GetSummaryAsync(CancellationToken cancellationToken = default)
+    public async Task<Result<DevelopmentAnalyticsSummaryDto>> GetSummaryAsync(
+        AnalyticsDateRangeFilter? dateRange = null,
+        CancellationToken cancellationToken = default)
     {
+        var guard = await AnalyticsDateRangeGuard.ValidateAsync(_dateRangeValidator, dateRange, cancellationToken)
+            .ConfigureAwait(false);
+        if (guard.IsFailure)
+        {
+            return Result<DevelopmentAnalyticsSummaryDto>.Fail(guard.Errors, guard.FailureCode);
+        }
+
+        var useRange = dateRange?.FromUtc is not null && dateRange.ToUtc is not null;
+        var fromUtc = dateRange?.FromUtc ?? DateTime.MinValue;
+        var toUtc = dateRange?.ToUtc ?? DateTime.MaxValue;
+
         var plans = _db.DevelopmentPlans.AsNoTracking();
         var items = _db.DevelopmentPlanItems.AsNoTracking();
+        if (useRange)
+        {
+            plans = plans.Where(p => p.CreatedOnUtc >= fromUtc && p.CreatedOnUtc <= toUtc);
+            items = items.Where(i => i.CreatedOnUtc >= fromUtc && i.CreatedOnUtc <= toUtc);
+        }
 
         var totalPlans = await plans.CountAsync(cancellationToken).ConfigureAwait(false);
         var activePlans = await plans.CountAsync(p => p.Status == DevelopmentPlanStatus.Active, cancellationToken)
@@ -54,7 +78,7 @@ public sealed class DevelopmentAnalyticsService : IDevelopmentAnalyticsService
                 ItemType = g.Key,
                 ItemCount = g.Count(),
                 CompletedCount = g.Count(i => i.Status == DevelopmentItemStatus.Completed),
-                InProgressCount = g.Count(i => i.Status == DevelopmentItemStatus.InProgress)
+                InProgressCount = g.Count(i => i.Status == DevelopmentItemStatus.InProgress),
             })
             .OrderBy(x => x.ItemType)
             .ToListAsync(cancellationToken)
@@ -70,7 +94,7 @@ public sealed class DevelopmentAnalyticsService : IDevelopmentAnalyticsService
             CompletedDevelopmentPlanItems = completedItems,
             InProgressDevelopmentPlanItems = inProgressItems,
             AverageProgressPercentageActiveItems = avgProgress,
-            ItemsByType = byType
+            ItemsByType = byType,
         });
     }
 }

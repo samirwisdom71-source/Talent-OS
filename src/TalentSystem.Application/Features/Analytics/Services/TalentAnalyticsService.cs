@@ -175,6 +175,11 @@ public sealed class TalentAnalyticsService : ITalentAnalyticsService
                 _db.Employees.Any(e => e.Id == tc.EmployeeId && e.OrganizationUnitId == ouId));
         }
 
+        if (filter.FromUtc is { } fromUtc && filter.ToUtc is { } toUtc)
+        {
+            q = q.Where(tc => tc.ClassifiedOnUtc >= fromUtc && tc.ClassifiedOnUtc <= toUtc);
+        }
+
         return q;
     }
 }

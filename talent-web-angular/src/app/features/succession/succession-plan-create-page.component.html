@@ -1,39 +1,97 @@
 <a routerLink="/succession" class="back-link">
-  <span class="back-link__ico" aria-hidden="true">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <span aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M15 18l-6-6 6-6" />
     </svg>
   </span>
-  <span class="back-link__label">{{ 'التعاقب' | t }}</span>
+  <span>{{ 'التعاقب' | t }}</span>
 </a>
-<section class="page-head">
-  <h1>{{ 'خطة تعاقب جديدة' | t }}</h1>
-</section>
-<div class="card form-card">
-  <div class="form-grid">
-    <label
-      >{{ 'منصب حرج' | t }}
-      <select class="select" [(ngModel)]="model.criticalPositionId" name="cp">
-        <option value="">{{ '— اختر —' | t }}</option>
-        @for (p of positions(); track p.id) {
-          <option [value]="p.id">{{ criticalPositionOptionLabel(p) }}</option>
-        }
-      </select>
-    </label>
-    <label
-      >{{ 'دورة الأداء' | t }}
-      <select class="select" [(ngModel)]="model.performanceCycleId" name="cy">
-        <option value="">{{ '— اختر —' | t }}</option>
-        @for (c of cycles(); track c.id) {
-          <option [value]="c.id">{{ cycleLabel(c) }}</option>
-        }
-      </select>
-    </label>
-    <label class="full">{{ 'اسم الخطة' | t }}<input [(ngModel)]="model.planName" name="pn" /></label>
-    <label class="full">{{ 'ملاحظات' | t }}<textarea rows="2" [(ngModel)]="model.notes" name="nt"></textarea></label>
-  </div>
-  <div class="form-actions">
-    <button type="button" class="btn-primary" [disabled]="busy()" (click)="save()">{{ busy() ? '…' : ('حفظ' | t) }}</button>
-    <a routerLink="/succession" class="btn-ghost">{{ 'إلغاء' | t }}</a>
-  </div>
+
+<div class="create-layout">
+  <aside class="create-aside">
+    <div class="aside-card">
+      <div class="aside-card__icon">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      </div>
+      <h2>{{ 'successionPlansList.createModal.title' | t }}</h2>
+      <p>{{ 'successionPlansList.createModal.subtitle' | t }}</p>
+    </div>
+  </aside>
+
+  <section class="create-main">
+    <header class="create-head">
+      <span class="create-head__eyebrow">{{ 'خطة تعاقب' | t }}</span>
+      <h1>{{ 'خطة تعاقب جديدة' | t }}</h1>
+      <p>{{ 'successionPlansList.createModal.subtitle' | t }}</p>
+    </header>
+
+    <form class="form-card" (submit)="$event.preventDefault(); save()">
+      <fieldset class="form-block">
+        <legend>
+          <span class="legend-num">1</span>
+          {{ 'successionPlansList.createModal.title' | t }}
+        </legend>
+        <div class="form-grid">
+          <label class="field">
+            <span>{{ 'منصب حرج' | t }} <em>*</em></span>
+            <div class="select-wrap">
+              <select [(ngModel)]="model.criticalPositionId" name="cp">
+                <option value="">{{ '— اختر —' | t }}</option>
+                @for (p of positions(); track p.id) {
+                  <option [value]="p.id">{{ criticalPositionOptionLabel(p) }}</option>
+                }
+              </select>
+              <svg class="select-caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+          </label>
+
+          <label class="field">
+            <span>{{ 'دورة الأداء' | t }}</span>
+            <div class="select-wrap">
+              <select [(ngModel)]="model.performanceCycleId" name="cy">
+                <option value="">{{ '— اختر —' | t }}</option>
+                @for (c of cycles(); track c.id) {
+                  <option [value]="c.id">{{ cycleLabel(c) }}</option>
+                }
+              </select>
+              <svg class="select-caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+          </label>
+
+          <label class="field full">
+            <span>{{ 'اسم الخطة' | t }} <em>*</em></span>
+            <input [(ngModel)]="model.planName" name="pn" type="text" autocomplete="off" />
+          </label>
+
+          <label class="field full">
+            <span>{{ 'ملاحظات' | t }}</span>
+            <textarea rows="3" [(ngModel)]="model.notes" name="nt"></textarea>
+          </label>
+        </div>
+      </fieldset>
+
+      <footer class="form-actions">
+        <a routerLink="/succession" class="btn-ghost">{{ 'إلغاء' | t }}</a>
+        <button type="submit" class="btn-save" [disabled]="busy()">
+          @if (busy()) {
+            <span class="spin"></span>
+          } @else {
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+              <path d="M17 21v-8H7v8M7 3v5h8" />
+            </svg>
+          }
+          {{ busy() ? ('جاري الحفظ' | t) : ('حفظ' | t) }}
+        </button>
+      </footer>
+    </form>
+  </section>
 </div>

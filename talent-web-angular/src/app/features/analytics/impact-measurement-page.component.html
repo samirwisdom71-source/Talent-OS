@@ -1,0 +1,86 @@
+<section class="impact-page">
+  <header class="impact-page__hero">
+    <h1>{{ 'analytics.impact.title' | t }}</h1>
+    <p>{{ 'analytics.impact.subtitle' | t }}</p>
+  </header>
+
+  <section class="impact-page__filters">
+    <label><span>{{ 'analytics.impact.beforeFrom' | t }}</span><input type="date" [ngModel]="filter().beforeFromUtc" (ngModelChange)="updateFilter('beforeFromUtc',$event)" /></label>
+    <label><span>{{ 'analytics.impact.beforeTo' | t }}</span><input type="date" [ngModel]="filter().beforeToUtc" (ngModelChange)="updateFilter('beforeToUtc',$event)" /></label>
+    <label><span>{{ 'analytics.impact.afterFrom' | t }}</span><input type="date" [ngModel]="filter().afterFromUtc" (ngModelChange)="updateFilter('afterFromUtc',$event)" /></label>
+    <label><span>{{ 'analytics.impact.afterTo' | t }}</span><input type="date" [ngModel]="filter().afterToUtc" (ngModelChange)="updateFilter('afterToUtc',$event)" /></label>
+    <button type="button" (click)="refresh()">{{ 'analytics.impact.apply' | t }}</button>
+  </section>
+
+  @if (loading()) {
+    <div class="impact-page__loading">{{ 'common.loading' | t }}</div>
+  } @else if (failed()) {
+    <app-empty-state
+      [chartIcon]="true"
+      [title]="'analytics.impact.loadFailed' | t"
+      [message]="'analytics.impact.loadHint' | t"
+      [retryLabel]="'common.retry' | t"
+      (retryClick)="refresh()"
+    />
+  } @else {
+    @if (impact(); as d) {
+      <div class="impact-kpis">
+        <article><span>{{ 'analytics.impact.scoreDelta' | t }}</span><strong>{{ d.scoreDelta ?? 0 | number: '1.0-2' }}</strong></article>
+        <article><span>{{ 'analytics.impact.goalDelta' | t }}</span><strong>{{ d.goalCompletionRateDelta | number: '1.0-2' }}%</strong></article>
+        <article><span>{{ 'analytics.impact.beforeScore' | t }}</span><strong>{{ d.beforeAverageScore ?? 0 | number: '1.0-2' }}</strong></article>
+        <article><span>{{ 'analytics.impact.afterScore' | t }}</span><strong>{{ d.afterAverageScore ?? 0 | number: '1.0-2' }}</strong></article>
+      </div>
+
+      <h3 class="impact-page__cross-title">{{ 'analytics.impact.crossModuleTitle' | t }}</h3>
+      <p class="impact-page__cross-hint">{{ 'analytics.impact.crossModuleHint' | t }}</p>
+      <div class="impact-kpis">
+        <article>
+          <span>{{ 'analytics.impact.devPlansInRange' | t }}</span
+          ><strong>{{ d.beforeDevelopmentPlansCreated ?? 0 }} · {{ d.afterDevelopmentPlansCreated ?? 0 }}</strong>
+        </article>
+        <article>
+          <span>{{ 'analytics.impact.successionPlansInRange' | t }}</span
+          ><strong>{{ d.beforeSuccessionPlansCreated ?? 0 }} · {{ d.afterSuccessionPlansCreated ?? 0 }}</strong>
+        </article>
+        <article>
+          <span>{{ 'analytics.impact.applicationsInRange' | t }}</span
+          ><strong>{{ d.beforeMarketplaceApplications ?? 0 }} · {{ d.afterMarketplaceApplications ?? 0 }}</strong>
+        </article>
+        <article>
+          <span>{{ 'analytics.impact.classificationsInRange' | t }}</span
+          ><strong>{{ d.beforeTalentClassifications ?? 0 }} · {{ d.afterTalentClassifications ?? 0 }}</strong>
+        </article>
+      </div>
+
+      <div class="impact-charts">
+        <section class="card">
+          <h3>{{ 'analytics.impact.chartScores' | t }}</h3>
+          <app-chart-widget
+            kind="line"
+            [labels]="impactChartLabels()"
+            [values]="[d.beforeAverageScore ?? 0, d.afterAverageScore ?? 0]"
+            [datasetLabel]="'analytics.impact.chartDatasetScore' | t"
+          />
+        </section>
+        <section class="card">
+          <h3>{{ 'analytics.impact.chartCompletion' | t }}</h3>
+          <app-chart-widget
+            kind="bar"
+            [labels]="impactChartLabels()"
+            [values]="[d.beforeGoalCompletionRate, d.afterGoalCompletionRate]"
+            [datasetLabel]="'analytics.impact.chartDatasetCompletion' | t"
+          />
+        </section>
+        <section class="card">
+          <h3>{{ 'analytics.impact.chartEvaluations' | t }}</h3>
+          <app-chart-widget
+            kind="pie"
+            [labels]="impactChartLabels()"
+            [values]="[d.beforeFinalizedEvaluations, d.afterFinalizedEvaluations]"
+            [datasetLabel]="'analytics.impact.chartDatasetEvaluations' | t"
+          />
+        </section>
+      </div>
+    }
+  }
+</section>
