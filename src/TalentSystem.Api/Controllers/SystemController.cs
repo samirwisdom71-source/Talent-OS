@@ -143,18 +143,19 @@ public sealed class SystemController : ControllerBase
 
     [HttpPost("excel-import")]
     [RequestSizeLimit(20_000_000)]
+    [Consumes("multipart/form-data")]
     public async Task<IActionResult> ImportExcel(
-        [FromForm] IFormFile file,
-        [FromQuery] string? table = "all",
+        [FromForm] ImportExcelRequest request,
         CancellationToken cancellationToken = default)
     {
         var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        var file = request.File;
         if (file is null || file.Length == 0)
         {
             return BadRequest(ApiResponse<object>.FromFailure(new[] { "Excel file is required." }, traceId));
         }
 
-        var normalized = NormalizeTableSelection(table);
+        var normalized = NormalizeTableSelection(request.Table);
         if (!IsValidTableSelection(normalized))
         {
             return BadRequest(ApiResponse<object>.FromFailure(
@@ -2177,4 +2178,11 @@ public sealed class SystemController : ControllerBase
         int Inserted,
         int Skipped,
         IReadOnlyList<string> Errors);
+
+    public sealed class ImportExcelRequest
+    {
+        public IFormFile? File { get; set; }
+
+        public string? Table { get; set; } = "all";
+    }
 }

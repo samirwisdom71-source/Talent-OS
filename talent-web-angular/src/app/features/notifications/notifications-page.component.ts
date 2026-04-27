@@ -1,11 +1,12 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { NotificationsApiService } from '../../services/notifications-api.service';
 import { PagedResult } from '../../shared/models/api.types';
 import { NotificationListItemDto } from '../../shared/models/notification.models';
 import { PermissionCodes } from '../../shared/models/permission-codes';
+import { resolveNotificationNavigation } from '../../shared/utils/notification-navigation';
 
 @Component({
   selector: 'app-notifications-page',
@@ -16,6 +17,7 @@ import { PermissionCodes } from '../../shared/models/permission-codes';
 })
 export class NotificationsPageComponent implements OnInit {
   private readonly api = inject(NotificationsApiService);
+  private readonly router = inject(Router);
   readonly auth = inject(AuthService);
   readonly PermissionCodes = PermissionCodes;
 
@@ -45,5 +47,36 @@ export class NotificationsPageComponent implements OnInit {
 
   markAll(): void {
     this.api.markAllRead().subscribe({ next: () => this.load() });
+  }
+
+  canOpen(row: NotificationListItemDto): boolean {
+    return resolveNotificationNavigation(row) !== null;
+  }
+
+  open(row: NotificationListItemDto): void {
+    const target = resolveNotificationNavigation(row);
+    if (!target) {
+      return;
+    }
+
+    const navigate = () =>
+      this.router.navigate(target.commands, {
+        queryParams: target.queryParams,
+      });
+
+    if (row.isRead) {
+      void navigate();
+      return;
+    }
+
+    this.api.markRead(row.id).subscribe({
+      next: () => {
+        row.isRead = true;
+        void navigate();
+      },
+      error: () => {
+        void navigate();
+      },
+    });
   }
 }

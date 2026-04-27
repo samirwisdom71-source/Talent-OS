@@ -1,9 +1,10 @@
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, HostListener, OnInit, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { NotificationsApiService } from '../../services/notifications-api.service';
 import { NotificationListItemDto } from '../../shared/models/notification.models';
+import { resolveNotificationNavigation } from '../../shared/utils/notification-navigation';
 import { I18nService } from '../../shared/services/i18n.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { LayoutStateService } from '../layout-state.service';
@@ -18,6 +19,7 @@ import { LayoutStateService } from '../layout-state.service';
 export class TopbarComponent implements OnInit {
   readonly auth = inject(AuthService);
   private readonly notificationsApi = inject(NotificationsApiService);
+  private readonly router = inject(Router);
   private readonly host = inject(ElementRef<HTMLElement>);
   readonly layout = inject(LayoutStateService);
   readonly i18n = inject(I18nService);
@@ -82,6 +84,36 @@ export class TopbarComponent implements OnInit {
         this.notifications.set([]);
         this.unread.set(0);
       },
+    });
+  }
+
+  canOpen(item: NotificationListItemDto): boolean {
+    return resolveNotificationNavigation(item) !== null;
+  }
+
+  openNotification(item: NotificationListItemDto): void {
+    const target = resolveNotificationNavigation(item);
+    if (!target) {
+      return;
+    }
+
+    const go = () => {
+      this.notificationsOpen.set(false);
+      void this.router.navigate(target.commands, { queryParams: target.queryParams });
+    };
+
+    if (item.isRead) {
+      go();
+      return;
+    }
+
+    this.notificationsApi.markRead(item.id).subscribe({
+      next: () => {
+        this.notifications.update((rows) => rows.filter((x) => x.id !== item.id));
+        this.loadUnread();
+        go();
+      },
+      error: () => go(),
     });
   }
 

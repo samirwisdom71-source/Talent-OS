@@ -50,7 +50,11 @@ export class SidebarComponent {
       id: 'people',
       titleKey: 'nav.group.people',
       items: [
-        { path: '/employees', labelKey: 'nav.employees', permissions: [] },
+        {
+          path: '/employees',
+          labelKey: 'nav.employees',
+          permissions: [PermissionCodes.EmployeeView, PermissionCodes.EmployeeEdit],
+        },
         { path: '/organization-units', labelKey: 'nav.organizationUnits', permissions: [PermissionCodes.EmployeeEdit] },
         { path: '/positions', labelKey: 'nav.positions', permissions: [PermissionCodes.EmployeeEdit] },
         {
@@ -91,14 +95,38 @@ export class SidebarComponent {
       id: 'talent',
       titleKey: 'nav.group.talent',
       items: [
-        { path: '/talent/performance', labelKey: 'nav.performance', permissions: [] },
-        { path: '/talent/potential', labelKey: 'nav.potential', permissions: [] },
-        { path: '/talent/nine-box', labelKey: 'nav.nineBox', permissions: [] },
+        {
+          path: '/talent/performance',
+          labelKey: 'nav.performance',
+          permissions: [PermissionCodes.PerformanceView, PermissionCodes.PerformanceManage],
+        },
+        {
+          path: '/talent/potential',
+          labelKey: 'nav.potential',
+          permissions: [PermissionCodes.PotentialView, PermissionCodes.PotentialManage],
+        },
+        {
+          path: '/talent/nine-box',
+          labelKey: 'nav.nineBox',
+          permissions: [PermissionCodes.PotentialView, PermissionCodes.PotentialManage],
+        },
         { path: '/scoring-policies', labelKey: 'nav.scoringPolicies', permissions: [PermissionCodes.ScoringView, PermissionCodes.ScoringManage] },
-        { path: '/talent/analytics', labelKey: 'nav.talentAnalytics', permissions: [] },
-        { path: '/succession', labelKey: 'nav.succession', permissions: [] },
-        { path: '/development', labelKey: 'nav.development', permissions: [] },
-        { path: '/marketplace', labelKey: 'nav.marketplace', permissions: [] },
+        { path: '/talent/analytics', labelKey: 'nav.talentAnalytics', permissions: [PermissionCodes.AnalyticsView] },
+        {
+          path: '/succession',
+          labelKey: 'nav.succession',
+          permissions: [PermissionCodes.SuccessionView, PermissionCodes.SuccessionManage],
+        },
+        {
+          path: '/development',
+          labelKey: 'nav.development',
+          permissions: [PermissionCodes.DevelopmentView, PermissionCodes.DevelopmentManage],
+        },
+        {
+          path: '/marketplace',
+          labelKey: 'nav.marketplace',
+          permissions: [PermissionCodes.MarketplaceView, PermissionCodes.MarketplaceManage, PermissionCodes.MarketplaceApply],
+        },
         { path: '/marketplace/opportunities', labelKey: 'nav.marketplaceOpenOpportunities', permissions: [PermissionCodes.MarketplaceApply] },
       ],
     },
@@ -106,7 +134,7 @@ export class SidebarComponent {
       id: 'analytics',
       titleKey: 'nav.group.analytics',
       items: [
-        { path: '/analytics/executive', labelKey: 'nav.analytics', permissions: [] },
+        { path: '/analytics/executive', labelKey: 'nav.analytics', permissions: [PermissionCodes.AnalyticsView] },
         {
           path: '/analytics/intelligence',
           labelKey: 'nav.intelligence',
@@ -118,9 +146,9 @@ export class SidebarComponent {
           labelKey: 'nav.recommendations',
           permissions: [PermissionCodes.IntelligenceView],
         },
-        { path: '/analytics/performance-kpis', labelKey: 'nav.performanceKpis', permissions: [] },
-        { path: '/analytics/impact', labelKey: 'nav.impactMeasurement', permissions: [] },
-        { path: '/reports/system', labelKey: 'nav.systemReports', permissions: [] },
+        { path: '/analytics/performance-kpis', labelKey: 'nav.performanceKpis', permissions: [PermissionCodes.AnalyticsView] },
+        { path: '/analytics/impact', labelKey: 'nav.impactMeasurement', permissions: [PermissionCodes.AnalyticsView] },
+        { path: '/reports/system', labelKey: 'nav.systemReports', permissions: [PermissionCodes.AnalyticsView] },
       ],
     },
     {
@@ -138,7 +166,7 @@ export class SidebarComponent {
       id: 'notifications',
       titleKey: 'nav.group.notifications',
       items: [
-        { path: '/notifications', labelKey: 'nav.notifications', permissions: [] },
+        { path: '/notifications', labelKey: 'nav.notifications', permissions: [PermissionCodes.NotificationView] },
         {
           path: '/notification-templates',
           labelKey: 'nav.notificationTemplates',
@@ -149,7 +177,13 @@ export class SidebarComponent {
     {
       id: 'system',
       titleKey: 'nav.group.system',
-      items: [{ path: '/settings', labelKey: 'nav.settings', permissions: [] }],
+      items: [
+        {
+          path: '/settings',
+          labelKey: 'nav.settings',
+          permissions: [PermissionCodes.RoleManage, PermissionCodes.NotificationManage, PermissionCodes.ClassificationManage],
+        },
+      ],
     },
   ];
 

@@ -222,6 +222,8 @@ public sealed class NotificationService : INotificationService
                 Message = n.Message,
                 Channel = n.Channel,
                 IsRead = n.IsRead,
+                RelatedEntityId = n.RelatedEntityId,
+                RelatedEntityType = n.RelatedEntityType,
                 CreatedOnUtc = n.CreatedOnUtc
             })
             .ToListAsync(cancellationToken)

@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using TalentSystem.Domain.Common;
 using TalentSystem.Domain.Competencies;
 using TalentSystem.Domain.Employees;
@@ -26,6 +27,7 @@ namespace TalentSystem.Persistence;
 public sealed class TalentDbContext : DbContext
 {
     private readonly ICurrentUserService _currentUser;
+    private bool _isCreatingSystemNotifications;
 
     public TalentDbContext(DbContextOptions<TalentDbContext> options, ICurrentUserService currentUser)
         : base(options)
@@ -168,8 +170,227 @@ public sealed class TalentDbContext : DbContext
             }
         }
 
-        return await base.SaveChangesAsync(cancellationToken);
+        var pendingEvents = CollectNotificationEvents();
+        var affected = await base.SaveChangesAsync(cancellationToken);
+
+        if (!_isCreatingSystemNotifications)
+        {
+            await CreateSystemNotificationsAsync(pendingEvents, userId, utcNow, cancellationToken).ConfigureAwait(false);
+        }
+
+        return affected;
     }
+
+    private IReadOnlyList<PendingNotificationEvent> CollectNotificationEvents()
+    {
+        if (_isCreatingSystemNotifications)
+        {
+            return [];
+        }
+
+        var list = new List<PendingNotificationEvent>();
+
+        foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
+        {
+            if (entry.Entity is Notification or NotificationTemplate or NotificationDispatchLog)
+            {
+                continue;
+            }
+
+            var state = entry.State;
+            if (state is not (EntityState.Added or EntityState.Modified))
+            {
+                continue;
+            }
+
+            var action = ResolveAction(entry, state);
+            if (action is null)
+            {
+                continue;
+            }
+
+            var relatedEmployeeId = TryGetGuidProperty(entry.Entity, "EmployeeId");
+            var candidateUserIds = CollectCandidateUserIds(entry.Entity);
+            list.Add(new PendingNotificationEvent(
+                entry.Entity.Id,
+                entry.Entity.GetType().Name,
+                action.Value.title,
+                action.Value.message,
+                relatedEmployeeId,
+                candidateUserIds));
+        }
+
+        return list;
+    }
+
+    private async Task CreateSystemNotificationsAsync(
+        IReadOnlyList<PendingNotificationEvent> pendingEvents,
+        Guid? actorUserId,
+        DateTime utcNow,
+        CancellationToken cancellationToken)
+    {
+        if (pendingEvents.Count == 0)
+        {
+            return;
+        }
+
+        var employeeIds = pendingEvents
+            .Where(e => e.RelatedEmployeeId is not null && e.RelatedEmployeeId != Guid.Empty)
+            .Select(e => e.RelatedEmployeeId!.Value)
+            .Distinct()
+            .ToList();
+
+        var employeeToUserMap = employeeIds.Count == 0
+            ? new Dictionary<Guid, Guid>()
+            : await Users.AsNoTracking()
+                .Where(u => u.IsActive && u.EmployeeId.HasValue && employeeIds.Contains(u.EmployeeId.Value))
+                .OrderBy(u => u.CreatedOnUtc)
+                .GroupBy(u => u.EmployeeId!.Value)
+                .Select(g => new { EmployeeId = g.Key, UserId = g.Select(x => x.Id).FirstOrDefault() })
+                .ToDictionaryAsync(x => x.EmployeeId, x => x.UserId, cancellationToken)
+                .ConfigureAwait(false);
+
+        var toInsert = new List<Notification>();
+        foreach (var evt in pendingEvents)
+        {
+            var recipientIds = new HashSet<Guid>();
+            if (actorUserId is { } actor && actor != Guid.Empty)
+            {
+                recipientIds.Add(actor);
+            }
+
+            if (evt.RelatedEmployeeId is { } employeeId &&
+                employeeToUserMap.TryGetValue(employeeId, out var employeeUserId) &&
+                employeeUserId != Guid.Empty)
+            {
+                recipientIds.Add(employeeUserId);
+            }
+
+            foreach (var candidateUserId in evt.CandidateUserIds)
+            {
+                if (candidateUserId != Guid.Empty)
+                {
+                    recipientIds.Add(candidateUserId);
+                }
+            }
+
+            foreach (var recipientId in recipientIds)
+            {
+                var notification = new Notification
+                {
+                    UserId = recipientId,
+                    NotificationType = NotificationType.General,
+                    Title = evt.Title,
+                    Message = evt.Message,
+                    Channel = NotificationChannel.InApp,
+                    IsRead = false,
+                    RelatedEntityId = evt.RelatedEntityId,
+                    RelatedEntityType = evt.RelatedEntityType,
+                    RecordStatus = RecordStatus.Active
+                };
+
+                notification.DispatchLogs.Add(new NotificationDispatchLog
+                {
+                    Channel = NotificationChannel.InApp,
+                    DispatchStatus = NotificationDispatchStatus.Sent,
+                    AttemptedOnUtc = utcNow,
+                    RecordStatus = RecordStatus.Active
+                });
+
+                toInsert.Add(notification);
+            }
+        }
+
+        if (toInsert.Count == 0)
+        {
+            return;
+        }
+
+        _isCreatingSystemNotifications = true;
+        try
+        {
+            Notifications.AddRange(toInsert);
+            await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _isCreatingSystemNotifications = false;
+        }
+    }
+
+    private static (string title, string message)? ResolveAction(EntityEntry<AuditableEntity> entry, EntityState state)
+    {
+        var entityName = entry.Entity.GetType().Name;
+        if (state == EntityState.Added)
+        {
+            return ($"{entityName} created", $"{entityName} was created successfully.");
+        }
+
+        if (state != EntityState.Modified)
+        {
+            return null;
+        }
+
+        if (entry.Entity is AuditableDomainEntity auditableDomainEntity &&
+            auditableDomainEntity.RecordStatus == RecordStatus.Deleted)
+        {
+            return ($"{entityName} deleted", $"{entityName} was deleted.");
+        }
+
+        return ($"{entityName} updated", $"{entityName} was updated.");
+    }
+
+    private static Guid? TryGetGuidProperty(object entity, string propertyName)
+    {
+        var property = entity.GetType().GetProperty(propertyName);
+        if (property is null)
+        {
+            return null;
+        }
+
+        var value = property.GetValue(entity);
+        if (value is Guid g && g != Guid.Empty)
+        {
+            return g;
+        }
+
+        return null;
+    }
+
+    private static IReadOnlyList<Guid> CollectCandidateUserIds(object entity)
+    {
+        var names = new[]
+        {
+            "UserId",
+            "RequestedByUserId",
+            "CurrentApproverUserId",
+            "AssignedToUserId",
+            "AssignedByUserId",
+            "ActionByUserId",
+            "CreatedByUserId",
+            "ModifiedByUserId"
+        };
+
+        var values = new HashSet<Guid>();
+        foreach (var name in names)
+        {
+            var value = TryGetGuidProperty(entity, name);
+            if (value is { } id && id != Guid.Empty)
+            {
+                values.Add(id);
+            }
+        }
+
+        return values.ToList();
+    }
+
+    private sealed record PendingNotificationEvent(
+        Guid RelatedEntityId,
+        string RelatedEntityType,
+        string Title,
+        string Message,
+        Guid? RelatedEmployeeId,
+        IReadOnlyList<Guid> CandidateUserIds);
 
     private static void ApplySoftDeleteQueryFilters(ModelBuilder modelBuilder)
     {

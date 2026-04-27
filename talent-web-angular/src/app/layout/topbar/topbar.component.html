@@ -41,9 +41,14 @@
                     <p class="topbar__notif-msg">{{ item.message }}</p>
                     <time>{{ item.createdOnUtc | date: 'short' }}</time>
                   </div>
-                  <button type="button" class="topbar__mini-btn" (click)="markRead(item.id)">
-                    {{ 'topbar.markRead' | t }}
-                  </button>
+                  <div>
+                    @if (canOpen(item)) {
+                      <button type="button" class="topbar__mini-btn" (click)="openNotification(item)">فتح</button>
+                    }
+                    <button type="button" class="topbar__mini-btn" (click)="markRead(item.id)">
+                      {{ 'topbar.markRead' | t }}
+                    </button>
+                  </div>
                 </article>
               }
             </div>

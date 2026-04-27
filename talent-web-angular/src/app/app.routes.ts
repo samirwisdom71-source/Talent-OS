@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { permissionGuard } from './core/guards/permission.guard';
+import { PermissionCodes } from './shared/models/permission-codes';
 
 export const routes: Routes = [
   {
@@ -22,6 +23,8 @@ export const routes: Routes = [
       },
       {
         path: 'employees',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.EmployeeView, PermissionCodes.EmployeeEdit] },
         loadComponent: () =>
           import('./features/employees/employees-list-page.component').then((m) => m.EmployeesListPageComponent),
       },
@@ -55,6 +58,8 @@ export const routes: Routes = [
       },
       {
         path: 'employees/:id',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.EmployeeView, PermissionCodes.EmployeeEdit] },
         loadComponent: () =>
           import('./features/employees/employee-detail-page.component').then((m) => m.EmployeeDetailPageComponent),
       },
@@ -110,16 +115,22 @@ export const routes: Routes = [
       },
       {
         path: 'talent/performance',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.PerformanceView, PermissionCodes.PerformanceManage] },
         loadComponent: () =>
           import('./features/talent/performance-page.component').then((m) => m.PerformancePageComponent),
       },
       {
         path: 'talent/performance/cycles',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.PerformanceView, PermissionCodes.PerformanceManage] },
         loadComponent: () =>
           import('./features/talent/performance-cycles-page.component').then((m) => m.PerformanceCyclesPageComponent),
       },
       {
         path: 'talent/performance/evaluations',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.PerformanceView, PermissionCodes.PerformanceManage] },
         loadComponent: () =>
           import('./features/talent/performance-evaluations-page.component').then(
             (m) => m.PerformanceEvaluationsPageComponent,
@@ -127,21 +138,29 @@ export const routes: Routes = [
       },
       {
         path: 'talent/performance/goals',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.PerformanceView, PermissionCodes.PerformanceManage] },
         loadComponent: () =>
           import('./features/talent/performance-goals-page.component').then((m) => m.PerformanceGoalsPageComponent),
       },
       {
         path: 'talent/potential',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.PotentialView, PermissionCodes.PotentialManage] },
         loadComponent: () =>
           import('./features/talent/potential-page.component').then((m) => m.PotentialPageComponent),
       },
       {
         path: 'talent/nine-box',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.PotentialView, PermissionCodes.PotentialManage] },
         loadComponent: () =>
           import('./features/talent/nine-box-page.component').then((m) => m.NineBoxPageComponent),
       },
       {
         path: 'talent/analytics',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.AnalyticsView] },
         loadComponent: () =>
           import('./features/talent/talent-analytics-page.component').then((m) => m.TalentAnalyticsPageComponent),
       },
@@ -170,6 +189,8 @@ export const routes: Routes = [
       },
       {
         path: 'succession',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.SuccessionView, PermissionCodes.SuccessionManage] },
         loadComponent: () =>
           import('./features/succession/succession-overview-page.component').then(
             (m) => m.SuccessionOverviewPageComponent,
@@ -222,6 +243,8 @@ export const routes: Routes = [
       },
       {
         path: 'succession/plans/:id',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.SuccessionView, PermissionCodes.SuccessionManage] },
         loadComponent: () =>
           import('./features/succession/succession-plan-detail-page.component').then(
             (m) => m.SuccessionPlanDetailPageComponent,
@@ -229,6 +252,8 @@ export const routes: Routes = [
       },
       {
         path: 'development',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.DevelopmentView, PermissionCodes.DevelopmentManage] },
         loadComponent: () =>
           import('./features/development/development-list-page.component').then((m) => m.DevelopmentListPageComponent),
       },
@@ -243,6 +268,8 @@ export const routes: Routes = [
       },
       {
         path: 'development/:id',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.DevelopmentView, PermissionCodes.DevelopmentManage] },
         loadComponent: () =>
           import('./features/development/development-detail-page.component').then(
             (m) => m.DevelopmentDetailPageComponent,
@@ -250,6 +277,8 @@ export const routes: Routes = [
       },
       {
         path: 'marketplace',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.MarketplaceView, PermissionCodes.MarketplaceManage, PermissionCodes.MarketplaceApply] },
         loadComponent: () =>
           import('./features/marketplace/marketplace-list-page.component').then((m) => m.MarketplaceListPageComponent),
       },
@@ -291,6 +320,8 @@ export const routes: Routes = [
       },
       {
         path: 'marketplace/:id',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.MarketplaceView, PermissionCodes.MarketplaceManage, PermissionCodes.MarketplaceApply] },
         loadComponent: () =>
           import('./features/marketplace/marketplace-detail-page.component').then(
             (m) => m.MarketplaceDetailPageComponent,
@@ -298,6 +329,8 @@ export const routes: Routes = [
       },
       {
         path: 'analytics/executive',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.AnalyticsView] },
         loadComponent: () =>
           import('./features/analytics/executive-analytics-page.component').then(
             (m) => m.ExecutiveAnalyticsPageComponent,
@@ -330,16 +363,22 @@ export const routes: Routes = [
       },
       {
         path: 'analytics/performance-kpis',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.AnalyticsView] },
         loadComponent: () =>
           import('./features/analytics/performance-kpis-page.component').then((m) => m.PerformanceKpisPageComponent),
       },
       {
         path: 'analytics/impact',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.AnalyticsView] },
         loadComponent: () =>
           import('./features/analytics/impact-measurement-page.component').then((m) => m.ImpactMeasurementPageComponent),
       },
       {
         path: 'reports/system',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.AnalyticsView] },
         loadComponent: () =>
           import('./features/reports/system-reports-page.component').then((m) => m.SystemReportsPageComponent),
       },
@@ -383,6 +422,8 @@ export const routes: Routes = [
       },
       {
         path: 'notifications',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.NotificationView] },
         loadComponent: () =>
           import('./features/notifications/notifications-page.component').then((m) => m.NotificationsPageComponent),
       },
@@ -397,16 +438,22 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.RoleManage, PermissionCodes.NotificationManage, PermissionCodes.ClassificationManage] },
         loadComponent: () =>
           import('./features/settings/settings-page.component').then((m) => m.SettingsPageComponent),
       },
       {
         path: 'settings/system',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.RoleManage, PermissionCodes.NotificationManage, PermissionCodes.ClassificationManage] },
         loadComponent: () =>
           import('./features/settings/settings-system-page.component').then((m) => m.SettingsSystemPageComponent),
       },
       {
         path: 'settings/classification-rule-sets',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.ClassificationManage] },
         loadComponent: () =>
           import('./features/settings/classification-rule-sets-page.component').then(
             (m) => m.ClassificationRuleSetsPageComponent,
@@ -414,6 +461,8 @@ export const routes: Routes = [
       },
       {
         path: 'settings/executive-analytics',
+        canActivate: [permissionGuard],
+        data: { permissions: [PermissionCodes.AnalyticsView] },
         loadComponent: () =>
           import('./features/settings/settings-executive-analytics-page.component').then(
             (m) => m.SettingsExecutiveAnalyticsPageComponent,

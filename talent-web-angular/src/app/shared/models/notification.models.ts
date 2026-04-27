@@ -5,6 +5,8 @@ export interface NotificationListItemDto {
   message: string;
   channel: number;
   isRead: boolean;
+  relatedEntityId?: string | null;
+  relatedEntityType?: string | null;
   createdOnUtc: string;
 }
 

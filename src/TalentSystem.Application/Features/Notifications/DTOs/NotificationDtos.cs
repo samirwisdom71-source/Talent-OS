@@ -76,6 +76,10 @@ public sealed class NotificationListItemDto
 
     public bool IsRead { get; init; }
 
+    public Guid? RelatedEntityId { get; init; }
+
+    public string? RelatedEntityType { get; init; }
+
     public DateTime CreatedOnUtc { get; init; }
 }
 

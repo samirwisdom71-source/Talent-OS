@@ -24,9 +24,14 @@
         <article class="card note card--interactive" [class.note--unread]="!row.isRead">
           <div class="note__head">
             <h3>{{ row.title }}</h3>
-            @if (!row.isRead) {
-              <button type="button" class="btn-ghost" (click)="mark(row.id)">مقروء</button>
-            }
+            <div>
+              @if (canOpen(row)) {
+                <button type="button" class="btn-ghost" (click)="open(row)">فتح</button>
+              }
+              @if (!row.isRead) {
+                <button type="button" class="btn-ghost" (click)="mark(row.id)">مقروء</button>
+              }
+            </div>
           </div>
           <p class="note__body">{{ row.message }}</p>
           <footer class="note__meta">{{ row.createdOnUtc | date: 'medium' }}</footer>
