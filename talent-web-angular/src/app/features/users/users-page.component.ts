@@ -51,6 +51,7 @@ export class UsersPageComponent implements OnInit {
   readonly createRoleIds = signal<string[]>([]);
   readonly createRoleDropdownOpen = signal(false);
   readonly createRoleSearch = signal('');
+  readonly showCreatePassword = signal(false);
   createModel: CreateUserRequest = {
     userName: '',
     nameAr: '',
@@ -68,6 +69,7 @@ export class UsersPageComponent implements OnInit {
   readonly editOpen = signal(false);
   readonly editBusy = signal(false);
   readonly editUserId = signal<string | null>(null);
+  readonly showEditPassword = signal(false);
   editModel: UpdateUserRequest = {
     userName: '',
     nameAr: '',
@@ -145,13 +147,19 @@ export class UsersPageComponent implements OnInit {
     this.createRoleIds.set([]);
     this.createRoleDropdownOpen.set(false);
     this.createRoleSearch.set('');
+    this.showCreatePassword.set(false);
     this.createOpen.set(true);
   }
 
   closeCreate(): void {
     if (this.createBusy()) return;
     this.createRoleDropdownOpen.set(false);
+    this.showCreatePassword.set(false);
     this.createOpen.set(false);
+  }
+
+  toggleCreatePasswordVisibility(): void {
+    this.showCreatePassword.update((v) => !v);
   }
 
   toggleCreateRoleDropdown(): void {
@@ -242,6 +250,7 @@ export class UsersPageComponent implements OnInit {
     this.detailsOpen.set(false);
     this.editOpen.set(true);
     this.editBusy.set(true);
+    this.showEditPassword.set(false);
     this.editUserId.set(id);
     this.api.getById(id).subscribe({
       next: (u) => {
@@ -266,7 +275,12 @@ export class UsersPageComponent implements OnInit {
   closeEdit(): void {
     if (this.editBusy()) return;
     this.editOpen.set(false);
+    this.showEditPassword.set(false);
     this.editUserId.set(null);
+  }
+
+  toggleEditPasswordVisibility(): void {
+    this.showEditPassword.update((v) => !v);
   }
 
   saveEdit(): void {

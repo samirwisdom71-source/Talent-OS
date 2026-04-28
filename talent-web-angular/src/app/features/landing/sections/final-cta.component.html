@@ -1,0 +1,8 @@
+<article class="cta">
+  <h2>{{ title }}</h2>
+  <p>{{ subtitle }}</p>
+  <div>
+    <button type="button" class="primary" (click)="navigateTo.emit('auth')">{{ primaryLabel }}</button>
+    <button type="button" class="secondary" (click)="navigateTo.emit('platform')">{{ secondaryLabel }}</button>
+  </div>
+</article>

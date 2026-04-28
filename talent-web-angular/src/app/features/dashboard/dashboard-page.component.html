@@ -12,6 +12,31 @@
     </div>
   </header>
 
+  <section class="dash-filter dash-section--enter">
+    <div class="dash-filter__title">
+      <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+    </div>
+    <div class="dash-filter__inputs">
+      <label class="dash-filter__inline-label">
+        <span>{{ 'dashboard.filter.from' | t }}</span>
+        <input type="date" [attr.aria-label]="'dashboard.filter.from' | t" [ngModel]="dateFrom()" (ngModelChange)="dateFrom.set($event)" />
+      </label>
+      <label class="dash-filter__inline-label">
+        <span>{{ 'dashboard.filter.to' | t }}</span>
+        <input type="date" [attr.aria-label]="'dashboard.filter.to' | t" [ngModel]="dateTo()" (ngModelChange)="dateTo.set($event)" />
+      </label>
+      <div class="dash-filter__actions">
+        <button type="button" class="btn-dash btn-dash--soft" (click)="reload()">{{ 'dashboard.filter.apply' | t }}</button>
+        <button type="button" class="btn-dash btn-dash--ghost" (click)="clearDateFilter()">{{ 'dashboard.filter.clear' | t }}</button>
+      </div>
+    </div>
+    <div class="dash-filter__quick">
+      <button type="button" (click)="applyQuickRange(7)">{{ 'dashboard.filter.last7Days' | t }}</button>
+      <button type="button" (click)="applyQuickRange(30)">{{ 'dashboard.filter.last30Days' | t }}</button>
+      <button type="button" (click)="applyQuickRange(90)">{{ 'dashboard.filter.last90Days' | t }}</button>
+    </div>
+  </section>
+
   @if (loadError()) {
     <app-empty-state
       icon="⚠️"
@@ -25,25 +50,25 @@
       <h2 class="dash-section__title">مؤشرات رئيسية</h2>
       <div class="kpi-deck">
         <article class="kpi-card kpi-card--indigo">
-          <div class="kpi-card__icon" aria-hidden="true">👥</div>
+          <div class="kpi-card__icon" aria-hidden="true"><i class="fa-solid fa-users"></i></div>
           <div class="kpi-card__meta">الموظفون</div>
           <div class="kpi-card__value">{{ display('totalEmployees', summary()!) | number }}</div>
           <div class="kpi-card__hint">إجمالي السجل البشري</div>
         </article>
         <article class="kpi-card kpi-card--teal">
-          <div class="kpi-card__icon" aria-hidden="true">✨</div>
+          <div class="kpi-card__icon" aria-hidden="true"><i class="fa-solid fa-star"></i></div>
           <div class="kpi-card__meta">إمكانات مرتفعة</div>
           <div class="kpi-card__value">{{ display('highPotentialCount', summary()!) | number }}</div>
           <div class="kpi-card__hint">من تصنيفات الصندوق التسعة</div>
         </article>
         <article class="kpi-card kpi-card--violet">
-          <div class="kpi-card__icon" aria-hidden="true">📈</div>
+          <div class="kpi-card__icon" aria-hidden="true"><i class="fa-solid fa-chart-line"></i></div>
           <div class="kpi-card__meta">دورات أداء نشطة</div>
           <div class="kpi-card__value">{{ display('activePerformanceCycleCount', summary()!) | number }}</div>
           <div class="kpi-card__hint">جاهزة للمتابعة</div>
         </article>
         <article class="kpi-card kpi-card--amber">
-          <div class="kpi-card__icon" aria-hidden="true">🏪</div>
+          <div class="kpi-card__icon" aria-hidden="true"><i class="fa-solid fa-store"></i></div>
           <div class="kpi-card__meta">فرص مفتوحة</div>
           <div class="kpi-card__value">{{ display('openMarketplaceOpportunityCount', summary()!) | number }}</div>
           <div class="kpi-card__hint">السوق الداخلي</div>
@@ -51,37 +76,88 @@
       </div>
     </section>
 
-    <section class="dash-grid dash-section--enter dash-section--delay-1">
-      <div class="panel panel--chart">
+    <section class="dash-grid dash-grid--bento dash-section--enter dash-section--delay-1">
+      <div class="panel panel--chart panel--mini">
         <div class="panel__head">
-          <h3>توزيع الصندوق التسعة</h3>
-          <span class="panel__tag">Talent analytics</span>
+          <h3>{{ 'dashboard.chart.nineBoxTitle' | t }}</h3>
+          <span class="panel__tag">{{ 'dashboard.chart.talentTag' | t }}</span>
         </div>
         @if (chartTalentLabels().length) {
           <app-chart-widget
             kind="doughnut"
             [labels]="chartTalentLabels()"
             [values]="chartTalentValues()"
+            [colors]="colorsNine"
             datasetLabel="الموظفون حسب الخانة"
           />
         } @else {
           <p class="panel__empty">لا تتوفر بيانات توزيع حالياً أو تعذر التحميل.</p>
         }
       </div>
-      <div class="panel panel--chart">
+      <div class="panel panel--chart panel--main">
         <div class="panel__head">
-          <h3>نشاط الوحدات</h3>
-          <span class="panel__tag">Executive pulse</span>
+          <h3>{{ 'dashboard.chart.unitsActivityTitle' | t }}</h3>
+          <span class="panel__tag">{{ 'dashboard.chart.executivePulseTag' | t }}</span>
         </div>
-        <app-chart-widget kind="bar" [labels]="chartOpsLabels()" [values]="chartOpsValues()" datasetLabel="عدد" />
+        <app-chart-widget kind="bar" [labels]="chartOpsLabels()" [values]="chartOpsValues()" [colors]="colorsOps" datasetLabel="عدد" />
       </div>
+      <div class="panel panel--chart panel--line-full">
+        <div class="panel__head">
+          <h3>اتجاه الأداء</h3>
+          <span class="panel__tag">{{ 'dashboard.chart.lineTag' | t }}</span>
+        </div>
+        <app-chart-widget kind="line" [labels]="chartPerformanceLabels()" [values]="chartPerformanceValues()" [colors]="colorsPerformance" datasetLabel="إجمالي القياس" />
+      </div>
+      <div class="panel panel--chart panel--third">
+        <div class="panel__head">
+          <h3>حالة التعاقب</h3>
+          <span class="panel__tag">{{ 'dashboard.chart.pieTag' | t }}</span>
+        </div>
+        <app-chart-widget kind="pie" [labels]="chartSuccessionLabels()" [values]="chartSuccessionValues()" [colors]="colorsSuccession" datasetLabel="حجم الحالة" />
+      </div>
+      @if (chartPerfBandLabels().length) {
+        <div class="panel panel--chart panel--third">
+          <div class="panel__head">
+            <h3>التوزيع حسب مستوى الأداء</h3>
+            <span class="panel__tag">{{ 'dashboard.chart.executiveTag' | t }}</span>
+          </div>
+          <app-chart-widget kind="line" [labels]="chartPerfBandLabels()" [values]="chartPerfBandValues()" [colors]="colorsPerfBand" datasetLabel="الموظفون" />
+        </div>
+      }
+      @if (chartMarketTypeLabels().length) {
+        <div class="panel panel--chart panel--third">
+          <div class="panel__head">
+            <h3>أنواع فرص السوق الداخلي</h3>
+            <span class="panel__tag">{{ 'dashboard.chart.executiveTag' | t }}</span>
+          </div>
+          <app-chart-widget kind="bar" [labels]="chartMarketTypeLabels()" [values]="chartMarketTypeValues()" [colors]="colorsMarketType" datasetLabel="عدد الفرص" />
+        </div>
+      }
+      @if (chartPotentialBandLabels().length) {
+        <div class="panel panel--chart panel--mini">
+          <div class="panel__head">
+            <h3>التوزيع حسب الإمكانات</h3>
+            <span class="panel__tag">{{ 'dashboard.chart.executiveTag' | t }}</span>
+          </div>
+          <app-chart-widget kind="bar" [labels]="chartPotentialBandLabels()" [values]="chartPotentialBandValues()" [colors]="colorsPotentialBand" datasetLabel="الموظفون" />
+        </div>
+      }
+      @if (chartReadinessLabels().length) {
+        <div class="panel panel--chart panel--main">
+          <div class="panel__head">
+            <h3>جاهزية المرشحين</h3>
+            <span class="panel__tag">{{ 'dashboard.chart.executiveTag' | t }}</span>
+          </div>
+          <app-chart-widget kind="line" [labels]="chartReadinessLabels()" [values]="chartReadinessValues()" [colors]="colorsReadiness" datasetLabel="العدد" />
+        </div>
+      }
     </section>
 
     <section class="dash-section dash-section--enter dash-section--delay-2">
       <h2 class="dash-section__title">ملخصات الوحدات</h2>
       <div class="tile-grid">
         <div class="tile">
-          <div class="tile__head">الأداء</div>
+          <div class="tile__head"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>الأداء</span></div>
           @if (performance()) {
             <ul class="tile__list">
               <li>
@@ -96,10 +172,10 @@
           } @else {
             <p class="tile__muted">—</p>
           }
-          <a routerLink="/talent/performance" class="tile__link">انتقال</a>
+          <a routerLink="/talent/performance" class="tile__link">انتقال <i class="fa-solid fa-arrow-left"></i></a>
         </div>
         <div class="tile">
-          <div class="tile__head">التعاقب</div>
+          <div class="tile__head"><i class="fa-solid fa-sitemap" aria-hidden="true"></i><span>التعاقب</span></div>
           @if (succession()) {
             <ul class="tile__list">
               <li><span>خطط نشطة</span><strong>{{ succession()!.activeSuccessionPlans }}</strong></li>
@@ -108,10 +184,10 @@
           } @else {
             <p class="tile__muted">—</p>
           }
-          <a routerLink="/succession" class="tile__link">انتقال</a>
+          <a routerLink="/succession" class="tile__link">انتقال <i class="fa-solid fa-arrow-left"></i></a>
         </div>
         <div class="tile">
-          <div class="tile__head">التطوير</div>
+          <div class="tile__head"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i><span>التطوير</span></div>
           @if (development()) {
             <ul class="tile__list">
               <li><span>خطط نشطة</span><strong>{{ development()!.activeDevelopmentPlans }}</strong></li>
@@ -120,10 +196,10 @@
           } @else {
             <p class="tile__muted">—</p>
           }
-          <a routerLink="/development" class="tile__link">انتقال</a>
+          <a routerLink="/development" class="tile__link">انتقال <i class="fa-solid fa-arrow-left"></i></a>
         </div>
         <div class="tile">
-          <div class="tile__head">السوق</div>
+          <div class="tile__head"><i class="fa-solid fa-store" aria-hidden="true"></i><span>السوق</span></div>
           @if (marketplace()) {
             <ul class="tile__list">
               <li><span>طلبات</span><strong>{{ marketplace()!.totalApplications }}</strong></li>
@@ -132,27 +208,32 @@
           } @else {
             <p class="tile__muted">—</p>
           }
-          <a routerLink="/marketplace" class="tile__link">انتقال</a>
+          <a routerLink="/marketplace" class="tile__link">انتقال <i class="fa-solid fa-arrow-left"></i></a>
         </div>
         @if (auth.hasPermission(PermissionCodes.IntelligenceView)) {
           <div class="tile tile--accent">
-            <div class="tile__head">الذكاء المؤسسي</div>
+            <div class="tile__head"><i class="fa-solid fa-brain" aria-hidden="true"></i><span>الذكاء المؤسسي</span></div>
             <p class="tile__muted">رؤى وتوصيات وتوليد ذكاء من البيانات الفعلية.</p>
-            <a routerLink="/analytics/intelligence" class="tile__link">فتح الذكاء</a>
+            <a routerLink="/analytics/intelligence" class="tile__link">فتح الذكاء <i class="fa-solid fa-arrow-left"></i></a>
           </div>
         }
       </div>
     </section>
 
     <section class="dash-section dash-section--enter dash-section--delay-3">
-      <h2 class="dash-section__title">ملخص تنفيذي إضافي</h2>
-      <div class="mini-kpis">
-        <div class="mini-kpi"><span>تصنيفات</span><b>{{ summary()!.totalTalentClassifications | number }}</b></div>
-        <div class="mini-kpi"><span>درجات مواهب</span><b>{{ summary()!.totalTalentScores | number }}</b></div>
-        <div class="mini-kpi"><span>أداء مرتفع</span><b>{{ summary()!.highPerformerCount | number }}</b></div>
-        <div class="mini-kpi"><span>قادة استراتيجيون</span><b>{{ summary()!.strategicLeaderCount | number }}</b></div>
-        <div class="mini-kpi"><span>خطط تعاقب</span><b>{{ summary()!.activeSuccessionPlanCount | number }}</b></div>
-        <div class="mini-kpi"><span>خطط تطوير</span><b>{{ summary()!.activeDevelopmentPlanCount | number }}</b></div>
+      <h2 class="dash-section__title">تحليل تنفيذي مقارن</h2>
+      <div class="panel panel--chart">
+        <div class="panel__head">
+          <h3>مقارنة أهم المؤشرات</h3>
+          <span class="panel__tag">{{ 'dashboard.chart.columnTag' | t }}</span>
+        </div>
+        <app-chart-widget
+          kind="bar"
+          [labels]="chartExecutiveDetailsLabels()"
+          [values]="chartExecutiveDetailsValues()"
+          [colors]="colorsExecutiveDetails"
+          datasetLabel="القيمة"
+        />
       </div>
     </section>
   } @else {

@@ -1,0 +1,22 @@
+<header class="header">
+  <button class="brand" type="button" (click)="navigateTo.emit('platform')">
+    <img src="/assets/images/talent-os-logo.png" alt="Talent OS Logo" />
+    
+  </button>
+  <nav>
+    <button type="button" (click)="navigateTo.emit('platform')">{{ nav.platform }}</button>
+    <button type="button" (click)="navigateTo.emit('modules')">{{ nav.modules }}</button>
+    <button type="button" (click)="navigateTo.emit('outcomes')">{{ nav.outcomes }}</button>
+    <button type="button" (click)="navigateTo.emit('how-it-works')">{{ nav.how }}</button>
+    <button type="button" (click)="navigateTo.emit('demo')">{{ nav.demo }}</button>
+  </nav>
+  <div class="actions">
+    <div class="lang">
+      <button type="button" [class.active]="lang === 'en'" (click)="langChange.emit('en')">EN</button>
+      <button type="button" [class.active]="lang === 'ar'" (click)="langChange.emit('ar')">AR</button>
+    </div>
+    <a class="cta" [routerLink]="isAuthenticated() ? '/dashboard' : '/login'">
+      {{ isAuthenticated() ? (lang === 'ar' ? 'لوحة التحكم' : 'Dashboard') : nav.signIn }}
+    </a>
+  </div>
+</header>

@@ -5,6 +5,11 @@ import { permissionGuard } from './core/guards/permission.guard';
 import { PermissionCodes } from './shared/models/permission-codes';
 
 export const routes: Routes = [
+  { path: '', pathMatch: 'full', redirectTo: 'landing' },
+  {
+    path: 'landing',
+    loadComponent: () => import('./features/landing/landing-page.component').then((m) => m.LandingPageComponent),
+  },
   {
     path: 'login',
     canActivate: [guestGuard],

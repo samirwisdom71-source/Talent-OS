@@ -1,0 +1,17 @@
+<section class="hero">
+  <div>
+    <p class="eyebrow">{{ lang === 'en' ? 'Enterprise Talent Intelligence' : 'ذكاء المواهب للمؤسسات' }}</p>
+    <h1>{{ hero.title }}</h1>
+    <p class="subtitle">{{ hero.subtitle }}</p>
+    <div class="actions">
+      <button class="primary" type="button" (click)="navigateTo.emit('auth')">{{ hero.primary }}</button>
+      <button class="secondary" type="button" (click)="navigateTo.emit('modules')">{{ hero.secondary }}</button>
+    </div>
+  </div>
+  <article class="mockup" aria-hidden="true">
+    <img
+      src="/assets/images/landing-dashboard.png"
+      [alt]="lang === 'en' ? 'Executive Dashboard' : 'لوحة تنفيذية'"
+    />
+  </article>
+</section>

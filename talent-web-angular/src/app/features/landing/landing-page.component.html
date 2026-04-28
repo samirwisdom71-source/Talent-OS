@@ -1,0 +1,12 @@
+<div class="landing" [attr.dir]="lang() === 'ar' ? 'rtl' : 'ltr'" [attr.lang]="lang()">
+  <app-landing-header [lang]="lang()" [nav]="copy().nav" (langChange)="switchLang($event)" (navigateTo)="scrollTo($event)" />
+  <main>
+    <app-landing-hero id="platform" [lang]="lang()" [hero]="heroData()" (navigateTo)="scrollTo($event)" />
+    <app-landing-value-strip [tags]="copy().tags" />
+    <section id="modules"><app-landing-modules-grid [title]="copy().modulesTitle" [lead]="copy().modulesLead" [cards]="copy().modules" /></section>
+    <section id="how-it-works"><app-landing-how-it-works [title]="copy().howTitle" [steps]="copy().steps" /></section>
+    <section id="outcomes"><app-landing-outcomes [eyebrow]="copy().outcomesEyebrow" [title]="copy().outcomesTitle" [lead]="copy().outcomesLead" [items]="copy().outcomes" /></section>
+    <section id="demo"><app-landing-final-cta [title]="copy().finalTitle" [subtitle]="copy().finalSubtitle" [primaryLabel]="heroData().primary" [secondaryLabel]="copy().hero.secondary" (navigateTo)="scrollTo($event)" /></section>
+  </main>
+  <app-landing-footer [description]="copy().footerDescription" [links]="copy().footerLinks" [copyright]="copy().copyright" (navigateTo)="scrollTo($event)" />
+</div>

@@ -1,0 +1,10 @@
+<article class="flow">
+  <h2>{{ title }}</h2>
+  <div class="steps">
+    <section *ngFor="let step of steps; let i = index">
+      <span class="step-index">{{ i + 1 }}</span>
+      <h3>{{ step.title }}</h3>
+      <p>{{ step.description }}</p>
+    </section>
+  </div>
+</article>

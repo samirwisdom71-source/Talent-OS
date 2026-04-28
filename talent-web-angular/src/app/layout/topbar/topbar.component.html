@@ -25,7 +25,10 @@
       @if (notificationsOpen()) {
         <section class="topbar__panel topbar__panel--notifications card">
           <header class="topbar__panel-head">
-            <strong>{{ 'topbar.notifications' | t }}</strong>
+            <div class="topbar__panel-title">
+              <i class="fa-regular fa-bell"></i>
+              <strong>{{ 'topbar.notifications' | t }}</strong>
+            </div>
             <button type="button" class="topbar__link-btn" (click)="markAllRead()">{{ 'topbar.markAllRead' | t }}</button>
           </header>
           @if (notificationsBusy()) {
@@ -35,25 +38,44 @@
           } @else {
             <div class="topbar__notif-list">
               @for (item of notifications(); track item.id) {
-                <article class="topbar__notif-item">
+                <article
+                  class="topbar__notif-item"
+                  [class.topbar__notif-item--unread]="!item.isRead"
+                  [class.topbar__notif-item--read]="item.isRead"
+                >
+                  <span class="topbar__notif-dot" aria-hidden="true">
+                    <i class="fa-solid fa-bell"></i>
+                  </span>
                   <div class="topbar__notif-main">
-                    <p class="topbar__notif-title">{{ item.title }}</p>
+                    <div class="topbar__notif-title-row">
+                      <p class="topbar__notif-title">{{ item.title }}</p>
+                      <span class="topbar__notif-state" [class.topbar__notif-state--unread]="!item.isRead">
+                        <i class="fa-solid fa-circle"></i>
+                        {{ (item.isRead ? 'topbar.read' : 'topbar.unread') | t }}
+                      </span>
+                    </div>
                     <p class="topbar__notif-msg">{{ item.message }}</p>
-                    <time>{{ item.createdOnUtc | date: 'short' }}</time>
-                  </div>
-                  <div>
-                    @if (canOpen(item)) {
-                      <button type="button" class="topbar__mini-btn" (click)="openNotification(item)">فتح</button>
-                    }
-                    <button type="button" class="topbar__mini-btn" (click)="markRead(item.id)">
-                      {{ 'topbar.markRead' | t }}
-                    </button>
+                    <div class="topbar__notif-meta">
+                      <time>{{ item.createdOnUtc | date: 'short' }}</time>
+                    </div>
+                    <div class="topbar__notif-actions">
+                      @if (canOpen(item)) {
+                        <button type="button" class="topbar__mini-btn topbar__mini-btn--plain" (click)="openNotification(item)">فتح</button>
+                      }
+                      @if (!item.isRead) {
+                        <button type="button" class="topbar__mini-btn topbar__mini-btn--primary" (click)="markRead(item.id)">
+                          {{ 'topbar.markRead' | t }}
+                        </button>
+                      }
+                    </div>
                   </div>
                 </article>
               }
             </div>
           }
-          <a routerLink="/notifications" class="topbar__panel-link">{{ 'topbar.viewAllNotifications' | t }}</a>
+          <footer class="topbar__panel-foot">
+            <a routerLink="/notifications" class="topbar__panel-link">{{ 'topbar.viewAllNotifications' | t }}</a>
+          </footer>
         </section>
       }
     </div>

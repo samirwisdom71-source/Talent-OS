@@ -1,0 +1,18 @@
+<footer>
+  <div class="bg-glow" aria-hidden="true"></div>
+  <div class="identity">
+    <div class="brand">
+      <img class="logo" src="/assets/images/talent-os-logo.png" alt="Talent OS Logo" />
+      
+    </div>
+    <p>{{ description }}</p>
+  </div>
+  <nav>
+    <button type="button" (click)="navigateTo.emit('platform')">{{ links.platform }}</button>
+    <button type="button" (click)="navigateTo.emit('modules')">{{ links.modules }}</button>
+    <button type="button" (click)="navigateTo.emit('outcomes')">{{ links.analytics }}</button>
+    <button type="button">{{ links.security }}</button>
+    <button type="button">{{ links.contact }}</button>
+  </nav>
+  <p class="copy">{{ copyright }}</p>
+</footer>

@@ -1,0 +1,23 @@
+:host { display: block; }
+
+.landing {
+  min-height: 100vh;
+  color: #0f172a;
+  background:
+    radial-gradient(circle at 15% -10%, rgb(99 102 241 / 25%), transparent 35%),
+    radial-gradient(circle at 90% 8%, rgb(6 182 212 / 20%), transparent 35%),
+    radial-gradient(circle at 50% 95%, rgb(45 212 191 / 20%), transparent 42%),
+    #f8fbff;
+}
+
+main {
+  margin: 0 auto;
+  padding: 0 1.2rem 4rem;
+}
+
+section {
+  scroll-margin-top: 96px;
+  margin-bottom: 2rem;
+}
+
+html { scroll-behavior: smooth; }

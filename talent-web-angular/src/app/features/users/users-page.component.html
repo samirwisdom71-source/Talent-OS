@@ -139,7 +139,29 @@
       </label>
       <label>
         <span>{{ 'users.form.password' | t }} <span class="required">*</span></span>
-        <input type="password" [(ngModel)]="createModel.password" />
+        <div class="password-field">
+          <input [type]="showCreatePassword() ? 'text' : 'password'" [(ngModel)]="createModel.password" />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="toggleCreatePasswordVisibility()"
+            [attr.aria-label]="showCreatePassword() ? 'Hide password' : 'Show password'"
+          >
+            @if (showCreatePassword()) {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M2 12s3.5-6 10-6s10 6 10 6s-3.5 6-10 6s-10-6-10-6Zm10 3.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7Z"
+                />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 7a5 5 0 0 1 5 5c0 .65-.13 1.26-.36 1.82l2.92 2.92A11.73 11.73 0 0 0 22 12s-3.5-6-10-6c-1.86 0-3.48.49-4.9 1.26l2.16 2.16A4.96 4.96 0 0 1 12 7Zm-9.8-4.8L1 3.4l2.05 2.05A11.8 11.8 0 0 0 2 12s3.5 6 10 6c2.02 0 3.76-.58 5.27-1.45L20.6 20l1.2-1.2L2.2 2.2ZM7.53 9.73l1.55 1.55A2.99 2.99 0 0 0 9 12a3 3 0 0 0 3 3c.25 0 .49-.03.72-.08l1.55 1.55A4.96 4.96 0 0 1 12 17a5 5 0 0 1-5-5c0-.8.19-1.55.53-2.27Z"
+                />
+              </svg>
+            }
+          </button>
+        </div>
       </label>
       <label>
         <span>{{ 'users.form.employeeOptional' | t }}</span>
@@ -272,7 +294,33 @@
       </label>
       <label>
         <span>{{ 'users.form.newPasswordOptional' | t }}</span>
-        <input type="password" [(ngModel)]="editModel.newPassword" [placeholder]="'users.form.passwordHint' | t" />
+        <div class="password-field">
+          <input
+            [type]="showEditPassword() ? 'text' : 'password'"
+            [(ngModel)]="editModel.newPassword"
+            [placeholder]="'users.form.passwordHint' | t"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="toggleEditPasswordVisibility()"
+            [attr.aria-label]="showEditPassword() ? 'Hide password' : 'Show password'"
+          >
+            @if (showEditPassword()) {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M2 12s3.5-6 10-6s10 6 10 6s-3.5 6-10 6s-10-6-10-6Zm10 3.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7Z"
+                />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 7a5 5 0 0 1 5 5c0 .65-.13 1.26-.36 1.82l2.92 2.92A11.73 11.73 0 0 0 22 12s-3.5-6-10-6c-1.86 0-3.48.49-4.9 1.26l2.16 2.16A4.96 4.96 0 0 1 12 7Zm-9.8-4.8L1 3.4l2.05 2.05A11.8 11.8 0 0 0 2 12s3.5 6 10 6c2.02 0 3.76-.58 5.27-1.45L20.6 20l1.2-1.2L2.2 2.2ZM7.53 9.73l1.55 1.55A2.99 2.99 0 0 0 9 12a3 3 0 0 0 3 3c.25 0 .49-.03.72-.08l1.55 1.55A4.96 4.96 0 0 1 12 17a5 5 0 0 1-5-5c0-.8.19-1.55.53-2.27Z"
+                />
+              </svg>
+            }
+          </button>
+        </div>
       </label>
       <label>
         <span>{{ 'users.form.employeeOptional' | t }}</span>

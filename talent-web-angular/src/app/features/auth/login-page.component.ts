@@ -36,6 +36,7 @@ export class LoginPageComponent {
 
   error: string | null = null;
   busy = false;
+  showPassword = false;
 
   submit(event?: Event): void {
     event?.preventDefault();
@@ -66,5 +67,9 @@ export class LoginPageComponent {
 
   toggleLang(): void {
     this.i18n.toggleLang();
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 }

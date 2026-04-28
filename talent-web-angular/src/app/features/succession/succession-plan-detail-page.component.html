@@ -36,7 +36,7 @@
 
   <div class="card candidates">
     <div class="candidates__head">
-      <h2 class="h2">{{ 'مرشحو الخلافة' | t }}</h2>
+      <h2 class="h2">{{ 'مرشحو التعاقب' | t }}</h2>
       @if (auth.hasPermission(PermissionCodes.SuccessionManage)) {
         <button type="button" class="btn-primary" [disabled]="busy()" (click)="openAdd()">{{ 'إضافة مرشح' | t }}</button>
       }

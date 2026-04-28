@@ -1,21 +1,23 @@
 .login {
   min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.login__container {
+  width: 100%;
+  min-height: 100vh;
   display: grid;
-  place-items: center;
-  padding: 2rem;
-  background:
-    radial-gradient(1200px 600px at 20% 0%, rgba(56, 189, 248, 0.18), transparent),
-    radial-gradient(900px 500px at 100% 20%, rgba(99, 102, 241, 0.16), transparent),
-    var(--color-bg);
+  grid-template-columns: 44% 56%;
 }
 
 .login__panel {
-  width: min(400px, 100%);
-  padding: 2rem 2rem 1.5rem;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: min(460px, 100%);
+  margin-inline: auto;
+  padding: clamp(1.4rem, 2.6vw, 2.2rem);
+  background: transparent;
 }
 
 .login__brand {
@@ -24,16 +26,12 @@
 }
 
 .login__logo {
-  width: 3rem;
-  height: 3rem;
-  margin: 0 auto 0.75rem;
-  border-radius: 14px;
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  font-size: 1.25rem;
-  background: linear-gradient(135deg, #38bdf8, #6366f1);
-  color: #0f172a;
+  width: 3.2rem;
+  height: 3.2rem;
+  margin: 0 auto 0.85rem;
+  border-radius: 0.9rem;
+  object-fit: cover;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);
 }
 
 .login__title {
@@ -79,6 +77,43 @@
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  width: 100%;
+  padding-inline-end: 2.8rem;
+}
+
+.password-toggle {
+  position: absolute;
+  inset-inline-end: 0.55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--color-accent-strong);
+  width: 1.9rem;
+  height: 1.9rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.password-toggle:hover {
+  background: rgba(14, 165, 233, 0.12);
+}
+
+.password-toggle svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: currentColor;
 }
 
 .login__field input:focus {
@@ -153,4 +188,35 @@
   cursor: pointer;
   color: var(--color-muted);
   font-size: 0.85rem;
+}
+
+.login__visual {
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+}
+
+.login__visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@media (max-width: 980px) {
+  .login__container {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .login__visual {
+    min-height: 260px;
+    order: -1;
+    padding: 1rem;
+  }
+
+  .login__panel {
+    padding: 1.2rem;
+  }
 }

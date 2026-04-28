@@ -1,5 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -19,11 +20,19 @@ import { ChartWidgetComponent } from '../../shared/charts/chart-widget.component
 import { EmptyStateComponent } from '../../shared/ui/empty-state.component';
 import { I18nService } from '../../shared/services/i18n.service';
 import { EnumLabels, UiLang } from '../../shared/utils/enum-labels';
+import { AnalyticsDateRangeQuery } from '../../shared/models/domain-analytics.models';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import {
+  performanceBandI18nKey,
+  potentialBandI18nKey,
+  readinessLevelI18nKey,
+} from '../analytics/executive-analytics-labels';
+import { opportunityTypeI18nKey } from '../analytics/performance-kpis-enum-labels';
 
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [DecimalPipe, RouterLink, ChartWidgetComponent, EmptyStateComponent],
+  imports: [DecimalPipe, FormsModule, RouterLink, ChartWidgetComponent, EmptyStateComponent, TranslatePipe],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.scss',
 })
@@ -46,8 +55,33 @@ export class DashboardPageComponent implements OnInit {
 
   readonly chartTalentLabels = signal<string[]>([]);
   readonly chartTalentValues = signal<number[]>([]);
+  readonly chartPerformanceLabels = signal<string[]>([]);
+  readonly chartPerformanceValues = signal<number[]>([]);
+  readonly chartSuccessionLabels = signal<string[]>([]);
+  readonly chartSuccessionValues = signal<number[]>([]);
   readonly chartOpsLabels = signal<string[]>([]);
   readonly chartOpsValues = signal<number[]>([]);
+  readonly chartExecutiveDetailsLabels = signal<string[]>([]);
+  readonly chartExecutiveDetailsValues = signal<number[]>([]);
+  readonly chartPerfBandLabels = signal<string[]>([]);
+  readonly chartPerfBandValues = signal<number[]>([]);
+  readonly chartPotentialBandLabels = signal<string[]>([]);
+  readonly chartPotentialBandValues = signal<number[]>([]);
+  readonly chartReadinessLabels = signal<string[]>([]);
+  readonly chartReadinessValues = signal<number[]>([]);
+  readonly chartMarketTypeLabels = signal<string[]>([]);
+  readonly chartMarketTypeValues = signal<number[]>([]);
+  readonly dateFrom = signal('');
+  readonly dateTo = signal('');
+  readonly colorsNine = ['#6366F1', '#06B6D4', '#14B8A6', '#A855F7', '#F59E0B', '#EC4899', '#22C55E', '#3B82F6', '#F97316'];
+  readonly colorsOps = ['#4F46E5', '#0EA5E9', '#14B8A6', '#F59E0B'];
+  readonly colorsPerformance = ['#A855F7'];
+  readonly colorsSuccession = ['#6366F1', '#22C55E', '#F59E0B'];
+  readonly colorsPerfBand = ['#0EA5E9'];
+  readonly colorsMarketType = ['#8B5CF6', '#06B6D4', '#14B8A6', '#F59E0B', '#EC4899', '#3B82F6', '#22C55E', '#F97316'];
+  readonly colorsPotentialBand = ['#EC4899'];
+  readonly colorsReadiness = ['#10B981'];
+  readonly colorsExecutiveDetails = ['#6366F1', '#8B5CF6', '#06B6D4', '#14B8A6', '#F59E0B', '#EC4899'];
 
   ngOnInit(): void {
     this.reload();
@@ -62,14 +96,21 @@ export class DashboardPageComponent implements OnInit {
   }
 
   reload(): void {
+    const dateRange = this.buildDateRange();
+    if (this.dateFrom() && this.dateTo() && !dateRange) {
+      this.loadError.set(true);
+      return;
+    }
     this.loadError.set(false);
     forkJoin({
-      exec: this.analytics.getSummary().pipe(catchError(() => of(null))),
-      talent: this.domain.getTalentDistribution({}).pipe(catchError(() => of(null))),
-      succ: this.domain.getSuccessionSummary().pipe(catchError(() => of(null))),
-      dev: this.domain.getDevelopmentSummary().pipe(catchError(() => of(null))),
-      mkt: this.domain.getMarketplaceSummary().pipe(catchError(() => of(null))),
-      perf: this.domain.getPerformanceSummary().pipe(catchError(() => of(null))),
+      exec: this.analytics.getSummary(dateRange).pipe(catchError(() => of(null))),
+      talent: this.domain
+        .getTalentDistribution({ fromUtc: dateRange?.fromUtc ?? undefined, toUtc: dateRange?.toUtc ?? undefined })
+        .pipe(catchError(() => of(null))),
+      succ: this.domain.getSuccessionSummary(dateRange).pipe(catchError(() => of(null))),
+      dev: this.domain.getDevelopmentSummary(dateRange).pipe(catchError(() => of(null))),
+      mkt: this.domain.getMarketplaceSummary(dateRange).pipe(catchError(() => of(null))),
+      perf: this.domain.getPerformanceSummary(dateRange).pipe(catchError(() => of(null))),
     }).subscribe({
       next: ({ exec, talent, succ, dev, mkt, perf }) => {
         this.summary.set(exec);
@@ -98,12 +139,88 @@ export class DashboardPageComponent implements OnInit {
           exec.openMarketplaceOpportunityCount,
           exec.activeDevelopmentPlanCount,
         ]);
+        this.chartPerformanceLabels.set(['الأهداف', 'التقييمات']);
+        this.chartPerformanceValues.set([
+          perf?.totalGoals ?? exec.totalPerformanceGoals ?? 0,
+          perf?.totalEvaluations ?? exec.finalizedEvaluationCount ?? 0,
+        ]);
+        this.chartSuccessionLabels.set(['خطط نشطة', 'بمرشح أساسي', 'جاهز الآن']);
+        this.chartSuccessionValues.set([
+          succ?.activeSuccessionPlans ?? exec.activeSuccessionPlanCount,
+          succ?.plansWithPrimarySuccessor ?? 0,
+          succ?.plansWithReadyNowSuccessor ?? 0,
+        ]);
+        this.chartExecutiveDetailsLabels.set([
+          'تصنيفات',
+          'درجات مواهب',
+          'أداء مرتفع',
+          'قادة استراتيجيون',
+          'خطط تعاقب',
+          'خطط تطوير',
+        ]);
+        this.chartExecutiveDetailsValues.set([
+          exec.totalTalentClassifications,
+          exec.totalTalentScores,
+          exec.highPerformerCount,
+          exec.strategicLeaderCount,
+          exec.activeSuccessionPlanCount,
+          exec.activeDevelopmentPlanCount,
+        ]);
+        const perfBand = [...(exec.byPerformanceBand ?? [])].sort((a, b) => a.value - b.value);
+        this.chartPerfBandLabels.set(perfBand.map((x) => this.i18n.t(performanceBandI18nKey(x.value))));
+        this.chartPerfBandValues.set(perfBand.map((x) => x.count));
+
+        const potentialBand = [...(exec.byPotentialBand ?? [])].sort((a, b) => a.value - b.value);
+        this.chartPotentialBandLabels.set(potentialBand.map((x) => this.i18n.t(potentialBandI18nKey(x.value))));
+        this.chartPotentialBandValues.set(potentialBand.map((x) => x.count));
+
+        const readiness = [...(exec.successorReadiness ?? [])].sort((a, b) => a.value - b.value);
+        this.chartReadinessLabels.set(readiness.map((x) => this.i18n.t(readinessLevelI18nKey(x.value))));
+        this.chartReadinessValues.set(readiness.map((x) => x.count));
+
+        const marketType = [...(exec.marketplaceOpportunitiesByType ?? [])].sort((a, b) => a.code - b.code);
+        this.chartMarketTypeLabels.set(marketType.map((x) => this.i18n.t(opportunityTypeI18nKey(x.code))));
+        this.chartMarketTypeValues.set(marketType.map((x) => x.count));
       },
       error: () => {
         this.loadError.set(true);
         this.summary.set(null);
       },
     });
+  }
+
+  applyQuickRange(days: number): void {
+    const today = new Date();
+    const from = new Date(today);
+    from.setDate(today.getDate() - days + 1);
+    this.dateFrom.set(this.toDateInput(from));
+    this.dateTo.set(this.toDateInput(today));
+    this.reload();
+  }
+
+  clearDateFilter(): void {
+    this.dateFrom.set('');
+    this.dateTo.set('');
+    this.reload();
+  }
+
+  private toDateInput(date: Date): string {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private buildDateRange(): AnalyticsDateRangeQuery | null {
+    const from = this.dateFrom();
+    const to = this.dateTo();
+    if (!from || !to) return null;
+    const fromUtc = new Date(`${from}T00:00:00.000Z`);
+    const toUtc = new Date(`${to}T23:59:59.999Z`);
+    if (Number.isNaN(fromUtc.getTime()) || Number.isNaN(toUtc.getTime()) || fromUtc > toUtc) {
+      return null;
+    }
+    return { fromUtc: fromUtc.toISOString(), toUtc: toUtc.toISOString() };
   }
 
   private animateExec(exec: ExecutiveDashboardSummaryDto): void {

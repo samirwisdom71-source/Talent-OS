@@ -1,0 +1,11 @@
+<article>
+  <h2>{{ title }}</h2>
+  <p class="lead">{{ lead }}</p>
+  <div class="grid">
+    <section *ngFor="let card of cards">
+      <span class="icon">{{ card.icon }}</span>
+      <h3>{{ card.title }}</h3>
+      <p>{{ card.description }}</p>
+    </section>
+  </div>
+</article>

@@ -1,0 +1,11 @@
+<article class="outcomes">
+  <div class="copy">
+    <p class="eyebrow">{{ eyebrow }}</p>
+    <h2>{{ title }}</h2>
+    <p class="lead">{{ lead }}</p>
+    <div class="copy-glow" aria-hidden="true"></div>
+  </div>
+  <ul>
+    <li *ngFor="let item of items">{{ item }}</li>
+  </ul>
+</article>
