@@ -2,7 +2,8 @@ import { DecimalPipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { DomainAnalyticsApiService } from '../../services/domain-analytics-api.service';
 import { MarketplaceOpportunitiesApiService } from '../../services/marketplace-opportunities-api.service';
 import { PagedResult } from '../../shared/models/api.types';
@@ -33,21 +34,18 @@ export class MarketplaceListPageComponent implements OnInit {
   readonly summaryFailed = signal(false);
 
   ngOnInit(): void {
+    const canViewSummary =
+      this.auth.hasPermission(PermissionCodes.MarketplaceManage) || this.auth.hasPermission(PermissionCodes.AnalyticsView);
+
     forkJoin({
-      opps: this.api.getPaged({ page: 1, pageSize: 50 }),
-      m: this.analytics.getMarketplaceSummary(),
+      opps: this.api.getPaged({ page: 1, pageSize: 50 }).pipe(catchError(() => of(null))),
+      m: canViewSummary ? this.analytics.getMarketplaceSummary().pipe(catchError(() => of(null))) : of(null),
     }).subscribe({
       next: ({ opps, m }) => {
         this.data.set(opps);
         this.summary.set(m);
-        this.failed.set(false);
-        this.summaryFailed.set(false);
-      },
-      error: () => {
-        this.data.set(null);
-        this.summary.set(null);
-        this.failed.set(true);
-        this.summaryFailed.set(true);
+        this.failed.set(opps === null);
+        this.summaryFailed.set(canViewSummary && m === null);
       },
     });
   }

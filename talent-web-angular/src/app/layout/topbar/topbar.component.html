@@ -9,21 +9,22 @@
   </button>
   <div class="topbar__spacer"></div>
   <div class="topbar__actions">
-    <div class="topbar__menu-wrap">
-      <button
-        type="button"
-        class="topbar__icon-btn"
-        (click)="toggleNotifications()"
-        [attr.aria-expanded]="notificationsOpen()"
-        [attr.aria-label]="'topbar.notifications' | t"
-      >
-        <i class="fa-regular fa-bell" aria-hidden="true"></i>
-      </button>
-      @if (unread() !== null && (unread() ?? 0) > 0) {
-        <span class="topbar__badge">{{ unread() }}</span>
-      }
-      @if (notificationsOpen()) {
-        <section class="topbar__panel topbar__panel--notifications card">
+    @if (auth.hasPermission(PermissionCodes.NotificationView)) {
+      <div class="topbar__menu-wrap">
+        <button
+          type="button"
+          class="topbar__icon-btn"
+          (click)="toggleNotifications()"
+          [attr.aria-expanded]="notificationsOpen()"
+          [attr.aria-label]="'topbar.notifications' | t"
+        >
+          <i class="fa-regular fa-bell" aria-hidden="true"></i>
+        </button>
+        @if (unread() !== null && (unread() ?? 0) > 0) {
+          <span class="topbar__badge">{{ unread() }}</span>
+        }
+        @if (notificationsOpen()) {
+          <section class="topbar__panel topbar__panel--notifications card">
           <header class="topbar__panel-head">
             <div class="topbar__panel-title">
               <i class="fa-regular fa-bell"></i>
@@ -76,9 +77,10 @@
           <footer class="topbar__panel-foot">
             <a routerLink="/notifications" class="topbar__panel-link">{{ 'topbar.viewAllNotifications' | t }}</a>
           </footer>
-        </section>
-      }
-    </div>
+          </section>
+        }
+      </div>
+    }
 
     <button type="button" class="topbar__ghost" (click)="toggleLang()">{{ 'login.lang' | t }}</button>
     <div class="topbar__menu-wrap">

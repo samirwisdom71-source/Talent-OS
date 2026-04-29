@@ -8,6 +8,7 @@ import { resolveNotificationNavigation } from '../../shared/utils/notification-n
 import { I18nService } from '../../shared/services/i18n.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { LayoutStateService } from '../layout-state.service';
+import { PermissionCodes } from '../../shared/models/permission-codes';
 
 @Component({
   selector: 'app-topbar',
@@ -23,6 +24,7 @@ export class TopbarComponent implements OnInit {
   private readonly host = inject(ElementRef<HTMLElement>);
   readonly layout = inject(LayoutStateService);
   readonly i18n = inject(I18nService);
+  readonly PermissionCodes = PermissionCodes;
 
   readonly unread = signal<number | null>(null);
   readonly notificationsOpen = signal(false);
@@ -31,6 +33,9 @@ export class TopbarComponent implements OnInit {
   readonly notificationsBusy = signal(false);
 
   ngOnInit(): void {
+    if (!this.auth.hasPermission(PermissionCodes.NotificationView)) {
+      return;
+    }
     this.loadUnread();
   }
 
@@ -42,6 +47,9 @@ export class TopbarComponent implements OnInit {
   }
 
   toggleNotifications(): void {
+    if (!this.auth.hasPermission(PermissionCodes.NotificationView)) {
+      return;
+    }
     const next = !this.notificationsOpen();
     this.notificationsOpen.set(next);
     this.profileOpen.set(false);

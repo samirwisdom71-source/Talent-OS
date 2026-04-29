@@ -1,0 +1,33 @@
+.forbidden {
+  margin: 3rem auto;
+  width: min(560px, calc(100vw - 2rem));
+  text-align: center;
+  padding: 2rem 1.2rem;
+}
+
+.forbidden__icon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 0.8rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(99, 102, 241, 0.12);
+  color: #4338ca;
+  font-size: 1.6rem;
+}
+
+.forbidden h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 2rem;
+}
+
+.forbidden p {
+  margin: 0.45rem 0 0;
+  color: #64748b;
+}
+
+.forbidden__actions {
+  margin-top: 1rem;
+}

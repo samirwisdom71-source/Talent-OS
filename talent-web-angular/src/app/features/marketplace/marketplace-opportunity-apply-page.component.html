@@ -10,7 +10,7 @@
   <form class="apply-form" (submit)="$event.preventDefault(); submit()">
     <label class="field">
       <span>{{ 'marketplace.app.colEmployee' | t }} *</span>
-      <app-lookup-search-combo kind="employee" [placeholder]="'اختر الموظف' | t" [(value)]="employeeId" />
+      <app-lookup-search-combo kind="employee" [placeholder]="'ابحث عن الموظف'" [(value)]="employeeId" />
     </label>
 
     <label class="field">

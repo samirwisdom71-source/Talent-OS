@@ -19,6 +19,6 @@ export const permissionGuard: CanActivateFn = (route) => {
   const required = collectPermissions(route);
   if (!required.length) return true;
   if (auth.hasAnyPermission(required)) return true;
-  void router.navigate(['/dashboard']);
+  void router.navigate(['/403']);
   return false;
 };

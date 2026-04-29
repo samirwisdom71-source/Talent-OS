@@ -8,7 +8,9 @@
       @if (auth.hasPermission(PermissionCodes.IntelligenceView)) {
         <a class="btn-dash btn-dash--ghost" routerLink="/analytics/intelligence">الذكاء المؤسسي</a>
       }
-      <a class="btn-dash" routerLink="/analytics/executive">تحليلات أعمق</a>
+      @if (auth.hasPermission(PermissionCodes.AnalyticsView)) {
+        <a class="btn-dash" routerLink="/analytics/executive">تحليلات أعمق</a>
+      }
     </div>
   </header>
 
@@ -156,60 +158,68 @@
     <section class="dash-section dash-section--enter dash-section--delay-2">
       <h2 class="dash-section__title">ملخصات الوحدات</h2>
       <div class="tile-grid">
-        <div class="tile">
-          <div class="tile__head"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>الأداء</span></div>
-          @if (performance()) {
-            <ul class="tile__list">
-              <li>
-                <span>أهداف مكتملة</span>
-                <strong>{{ performance()!.completedGoals }}/{{ performance()!.totalGoals }}</strong>
-              </li>
-              <li>
-                <span>تقييمات مُعتمدة</span>
-                <strong>{{ performance()!.finalizedEvaluations }}/{{ performance()!.totalEvaluations }}</strong>
-              </li>
-            </ul>
-          } @else {
-            <p class="tile__muted">—</p>
-          }
-          <a routerLink="/talent/performance" class="tile__link">انتقال <i class="fa-solid fa-arrow-left"></i></a>
-        </div>
-        <div class="tile">
-          <div class="tile__head"><i class="fa-solid fa-sitemap" aria-hidden="true"></i><span>التعاقب</span></div>
-          @if (succession()) {
-            <ul class="tile__list">
-              <li><span>خطط نشطة</span><strong>{{ succession()!.activeSuccessionPlans }}</strong></li>
-              <li><span>بخليفة أساسي</span><strong>{{ succession()!.plansWithPrimarySuccessor }}</strong></li>
-            </ul>
-          } @else {
-            <p class="tile__muted">—</p>
-          }
-          <a routerLink="/succession" class="tile__link">انتقال <i class="fa-solid fa-arrow-left"></i></a>
-        </div>
-        <div class="tile">
-          <div class="tile__head"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i><span>التطوير</span></div>
-          @if (development()) {
-            <ul class="tile__list">
-              <li><span>خطط نشطة</span><strong>{{ development()!.activeDevelopmentPlans }}</strong></li>
-              <li><span>بنود مكتملة</span><strong>{{ development()!.completedDevelopmentPlanItems }}</strong></li>
-            </ul>
-          } @else {
-            <p class="tile__muted">—</p>
-          }
-          <a routerLink="/development" class="tile__link">انتقال <i class="fa-solid fa-arrow-left"></i></a>
-        </div>
-        <div class="tile">
-          <div class="tile__head"><i class="fa-solid fa-store" aria-hidden="true"></i><span>السوق</span></div>
-          @if (marketplace()) {
-            <ul class="tile__list">
-              <li><span>طلبات</span><strong>{{ marketplace()!.totalApplications }}</strong></li>
-              <li><span>فرص مفتوحة</span><strong>{{ marketplace()!.openOpportunities }}</strong></li>
-            </ul>
-          } @else {
-            <p class="tile__muted">—</p>
-          }
-          <a routerLink="/marketplace" class="tile__link">انتقال <i class="fa-solid fa-arrow-left"></i></a>
-        </div>
+        @if (auth.hasAnyPermission([PermissionCodes.PerformanceView, PermissionCodes.PerformanceManage])) {
+          <div class="tile">
+            <div class="tile__head"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>الأداء</span></div>
+            @if (performance()) {
+              <ul class="tile__list">
+                <li>
+                  <span>أهداف مكتملة</span>
+                  <strong>{{ performance()!.completedGoals }}/{{ performance()!.totalGoals }}</strong>
+                </li>
+                <li>
+                  <span>تقييمات مُعتمدة</span>
+                  <strong>{{ performance()!.finalizedEvaluations }}/{{ performance()!.totalEvaluations }}</strong>
+                </li>
+              </ul>
+            } @else {
+              <p class="tile__muted">—</p>
+            }
+            <a routerLink="/talent/performance" class="tile__link">انتقال <i class="fa-solid fa-arrow-left"></i></a>
+          </div>
+        }
+        @if (auth.hasAnyPermission([PermissionCodes.SuccessionView, PermissionCodes.SuccessionManage])) {
+          <div class="tile">
+            <div class="tile__head"><i class="fa-solid fa-sitemap" aria-hidden="true"></i><span>التعاقب</span></div>
+            @if (succession()) {
+              <ul class="tile__list">
+                <li><span>خطط نشطة</span><strong>{{ succession()!.activeSuccessionPlans }}</strong></li>
+                <li><span>بخليفة أساسي</span><strong>{{ succession()!.plansWithPrimarySuccessor }}</strong></li>
+              </ul>
+            } @else {
+              <p class="tile__muted">—</p>
+            }
+            <a routerLink="/succession" class="tile__link">انتقال <i class="fa-solid fa-arrow-left"></i></a>
+          </div>
+        }
+        @if (auth.hasAnyPermission([PermissionCodes.DevelopmentView, PermissionCodes.DevelopmentManage])) {
+          <div class="tile">
+            <div class="tile__head"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i><span>التطوير</span></div>
+            @if (development()) {
+              <ul class="tile__list">
+                <li><span>خطط نشطة</span><strong>{{ development()!.activeDevelopmentPlans }}</strong></li>
+                <li><span>بنود مكتملة</span><strong>{{ development()!.completedDevelopmentPlanItems }}</strong></li>
+              </ul>
+            } @else {
+              <p class="tile__muted">—</p>
+            }
+            <a routerLink="/development" class="tile__link">انتقال <i class="fa-solid fa-arrow-left"></i></a>
+          </div>
+        }
+        @if (auth.hasAnyPermission([PermissionCodes.MarketplaceView, PermissionCodes.MarketplaceManage, PermissionCodes.MarketplaceApply])) {
+          <div class="tile">
+            <div class="tile__head"><i class="fa-solid fa-store" aria-hidden="true"></i><span>السوق</span></div>
+            @if (marketplace()) {
+              <ul class="tile__list">
+                <li><span>طلبات</span><strong>{{ marketplace()!.totalApplications }}</strong></li>
+                <li><span>فرص مفتوحة</span><strong>{{ marketplace()!.openOpportunities }}</strong></li>
+              </ul>
+            } @else {
+              <p class="tile__muted">—</p>
+            }
+            <a routerLink="/marketplace" class="tile__link">انتقال <i class="fa-solid fa-arrow-left"></i></a>
+          </div>
+        }
         @if (auth.hasPermission(PermissionCodes.IntelligenceView)) {
           <div class="tile tile--accent">
             <div class="tile__head"><i class="fa-solid fa-brain" aria-hidden="true"></i><span>الذكاء المؤسسي</span></div>

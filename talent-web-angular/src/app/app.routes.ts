@@ -16,6 +16,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login-page.component').then((m) => m.LoginPageComponent),
   },
   {
+    path: '403',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/errors/forbidden-page.component').then((m) => m.ForbiddenPageComponent),
+  },
+  {
     path: '',
     loadComponent: () => import('./layout/shell/app-shell.component').then((m) => m.AppShellComponent),
     canActivate: [authGuard],

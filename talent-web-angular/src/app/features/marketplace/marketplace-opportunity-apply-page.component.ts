@@ -3,8 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { ToastService } from '../../core/services/toast.service';
+import { IdentityLookupsApiService } from '../../services/identity-lookups-api.service';
 import { OpportunityApplicationsApiService } from '../../services/opportunity-applications-api.service';
-import { UsersApiService } from '../../services/users-api.service';
 import { PermissionCodes } from '../../shared/models/permission-codes';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { I18nService } from '../../shared/services/i18n.service';
@@ -21,7 +21,7 @@ export class MarketplaceOpportunityApplyPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly api = inject(OpportunityApplicationsApiService);
-  private readonly usersApi = inject(UsersApiService);
+  private readonly lookupsApi = inject(IdentityLookupsApiService);
   private readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
   private readonly i18n = inject(I18nService);
@@ -38,10 +38,18 @@ export class MarketplaceOpportunityApplyPageComponent implements OnInit {
     if (!id) return;
     this.oppId.set(id);
 
-    const uid = this.auth.sessionSnapshot()?.userId;
-    if (uid) {
-      this.usersApi.getById(uid).subscribe({
-        next: (u) => (this.employeeId = u.employeeId ?? ''),
+    const email = this.auth.sessionSnapshot()?.email?.trim().toLowerCase() ?? '';
+    const userName = this.auth.sessionSnapshot()?.userName?.trim().toLowerCase() ?? '';
+    const searchTerm = email || userName;
+    if (searchTerm) {
+      this.lookupsApi.getEmployees(searchTerm, 50).subscribe({
+        next: (rows) => {
+          const byEmail = email
+            ? rows.find((x) => (x.email ?? '').trim().toLowerCase() === email)
+            : undefined;
+          const byName = userName ? rows.find((x) => x.name.trim().toLowerCase() === userName) : undefined;
+          this.employeeId = byEmail?.id ?? byName?.id ?? rows[0]?.id ?? '';
+        },
         error: () => (this.employeeId = ''),
       });
     }
