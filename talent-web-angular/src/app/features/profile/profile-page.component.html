@@ -7,27 +7,64 @@
 
 <section class="profile-grid">
   <article class="card profile-card profile-card--hero">
-    <div class="profile-avatar" aria-hidden="true">
-      <i class="fa-regular fa-circle-user"></i>
+    <div class="profile-hero-main">
+      <div class="profile-avatar-wrap">
+        <div
+          class="profile-avatar-frame"
+          [class.profile-avatar-frame--open]="avatarActionsOpen()"
+          (mouseleave)="closeAvatarActions()"
+          (click)="toggleAvatarActions()"
+        >
+          @if (avatarUrl()) {
+            <img class="profile-avatar profile-avatar--image" [src]="avatarUrl()!" [alt]="'profile.avatarAlt' | t" />
+          } @else {
+            <img
+              class="profile-avatar profile-avatar--placeholder"
+              [src]="'https://api.dicebear.com/9.x/initials/svg?seed=' + avatarSeed()"
+              [alt]="'profile.avatarAlt' | t"
+            />
+          }
+          <div class="profile-avatar-actions" (click)="$event.stopPropagation()">
+            <label class="avatar-action avatar-action--primary" [title]="avatarUrl() ? ('profile.avatar.change' | t) : ('profile.avatar.upload' | t)">
+              <i class="fa-solid fa-camera" aria-hidden="true"></i>
+              <input type="file" accept="image/*" (change)="onAvatarSelected($event)" />
+            </label>
+            @if (avatarUrl()) {
+              <button type="button" class="avatar-action avatar-action--danger" (click)="removeAvatar()" [title]="'profile.avatar.remove' | t">
+                <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="profile-identity">
+        <h2>{{ auth.sessionSnapshot()?.userName || '-' }}</h2>
+        <p>{{ auth.sessionSnapshot()?.email || '-' }}</p>
+      </div>
     </div>
-    <div class="profile-identity">
-      <h2>{{ auth.sessionSnapshot()?.userName || '-' }}</h2>
-      <p>{{ auth.sessionSnapshot()?.email || '-' }}</p>
+    <div class="profile-hero-actions">
+      <button type="button" class="btn-primary btn-primary--icon profile-edit-btn" (click)="openEdit()">
+        <i class="fa-solid fa-user-pen" aria-hidden="true"></i>
+        {{ 'profile.actions.edit' | t }}
+      </button>
     </div>
   </article>
 
-  <article class="card profile-card">
-    <h3>{{ 'profile.accountInfo' | t }}</h3>
+  <article class="card profile-card profile-card--account">
+    <h3 class="profile-card__title">
+      <i class="fa-regular fa-id-card" aria-hidden="true"></i>
+      {{ 'profile.accountInfo' | t }}
+    </h3>
     <dl class="profile-list">
-      <div>
+      <div class="profile-list__item">
         <dt>{{ 'profile.userName' | t }}</dt>
         <dd>{{ auth.sessionSnapshot()?.userName || '-' }}</dd>
       </div>
-      <div>
+      <div class="profile-list__item">
         <dt>{{ 'profile.email' | t }}</dt>
         <dd>{{ auth.sessionSnapshot()?.email || '-' }}</dd>
       </div>
-      <div>
+      <div class="profile-list__item">
         <dt>{{ 'profile.sessionExpiry' | t }}</dt>
         <dd>{{ auth.sessionSnapshot()?.expiresAtUtc ? (auth.sessionSnapshot()!.expiresAtUtc | date: 'medium') : '-' }}</dd>
       </div>
@@ -37,9 +74,12 @@
   <article class="card profile-card">
     <h3>{{ 'profile.permissions' | t }}</h3>
     @if (permissionPages().length > 0) {
-      <div class="permission-tags">
+      <div class="permission-grid">
         @for (page of permissionPages(); track page) {
-          <span class="permission-tag">{{ page }}</span>
+          <span class="permission-tag">
+            <i [class]="permissionIcon(page)" aria-hidden="true"></i>
+            {{ page }}
+          </span>
         }
       </div>
     } @else {
@@ -47,3 +87,36 @@
     }
   </article>
 </section>
+
+@if (editOpen()) {
+  <div class="modal-backdrop" (click)="closeEdit()"></div>
+  <section class="modal card" role="dialog" aria-modal="true">
+    <h2>{{ 'profile.edit.title' | t }}</h2>
+    <div class="form-grid">
+      <label>
+        <span>{{ 'profile.userName' | t }} <span class="required">*</span></span>
+        <input type="text" [(ngModel)]="editModel.userName" />
+      </label>
+      <label>
+        <span>{{ 'users.form.nameAr' | t }}</span>
+        <input type="text" [(ngModel)]="editModel.nameAr" [placeholder]="'users.form.nameArPlaceholder' | t" />
+      </label>
+      <label>
+        <span>{{ 'users.form.nameEn' | t }}</span>
+        <input type="text" [(ngModel)]="editModel.nameEn" [placeholder]="'users.form.nameEnPlaceholder' | t" />
+      </label>
+      <label>
+        <span>{{ 'profile.email' | t }} <span class="required">*</span></span>
+        <input type="email" [(ngModel)]="editModel.email" />
+      </label>
+      <label class="full">
+        <span>{{ 'users.form.newPasswordOptional' | t }}</span>
+        <input type="password" [(ngModel)]="editModel.newPassword" [placeholder]="'users.form.passwordHint' | t" />
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button type="button" (click)="closeEdit()" [disabled]="editBusy()">{{ 'users.actions.cancel' | t }}</button>
+      <button type="button" class="btn-primary" (click)="saveEdit()" [disabled]="editBusy()">{{ 'users.actions.saveEdit' | t }}</button>
+    </div>
+  </section>
+}

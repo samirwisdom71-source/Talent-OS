@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TalentSystem.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+499468ab3f33f3fcab1a1d19cd83c3079b89af22")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+79e9f7d96f557fd1cb3f2339fefbe9bda861fa8d")]
 [assembly: System.Reflection.AssemblyProductAttribute("TalentSystem.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TalentSystem.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
